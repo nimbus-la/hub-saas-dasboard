@@ -1,77 +1,43 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "ES2022"
-    ],
-    
-    // ── MÓDULOS ─────────────────────────────────────────────────────
+    "lib": ["dom", "dom.iterable", "ES2022"],
     "module": "esnext",
     "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    // Fuerza que cada archivo sea un módulo independiente (requerido por Next.js)
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    // ── JSX ─────────────────────────────────────────────────────────
-    "jsx": "react-jsx",
-    // ── STRICTNESS BASE ─────────────────────────────────────────────
-    // Activa: strictNullChecks, strictFunctionTypes, strictBindCallApply,
-    //         strictPropertyInitialization, noImplicitAny, noImplicitThis,
-    //         alwaysStrict, useUnknownInCatchVariables
-    "strict": true,
-    // ── STRICTNESS EXTRA (no incluidas en "strict") ──────────────────
-    // Error si hay variables declaradas pero nunca usadas
-    "noUnusedLocals": true,
-    // Error si hay parámetros de función declarados pero nunca usados
-    "noUnusedParameters": true,
-    // Error si un switch-case no tiene break/return (evita fall-through accidental)
-    "noFallthroughCasesInSwitch": true,
-    // Fuerza acceder a índices de arrays/objetos como T | undefined (no solo T)
-    "noUncheckedIndexedAccess": true,
-    // Error si una propiedad de clase es accedida antes de ser asignada
-    "noImplicitOverride": true,
-    // Fuerza usar 'override' al sobrescribir métodos de una clase padre
-    "noPropertyAccessFromIndexSignature": true,
-    // Error si usas propiedades que no existen en el tipo (más estricto que strict)
-    "exactOptionalPropertyTypes": true,
-    // Error si una función no tiene return explícito en todos los caminos
-    "noImplicitReturns": true,
-    // ── CALIDAD DE CÓDIGO ────────────────────────────────────────────
-    // No permite JS en el proyecto (todo debe ser TS)
     "allowJs": false,
-    // Omite la verificación de tipos en .d.ts de node_modules (performance)
     "skipLibCheck": true,
-    // Fuerza consistencia en nombres de archivos (case-sensitive)
-    "forceConsistentCasingInFileNames": true,
-    // ── EMIT ─────────────────────────────────────────────────────────
-    // Next.js maneja el output, TS solo verifica tipos
+    "strict": true,
     "noEmit": true,
-    // Compilación incremental para mayor velocidad
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "forceConsistentCasingInFileNames": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitReturns": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
     "incremental": true,
-    // ── PLUGINS ──────────────────────────────────────────────────────
     "plugins": [
       {
         "name": "next"
       }
     ],
-    // ── PATHS ────────────────────────────────────────────────────────
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     }
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "**/*.mts",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    "**/*.mts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }
