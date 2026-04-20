@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+:root {
+    --background: #ffffff;
+    --foreground: #171717;
+}
+
+@theme {
+    --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    
+    /* ─── Primary ─────────────────────────────────────── */
+    --color-primary-lighter: #EBD6FD;
+    --color-primary-light: #B985F4;
+    --color-primary-main: #7635DC;
+    --color-primary-dark: #431A9E;
+    --color-primary-darker: #200A69;
+
+    /* ─── Secondary ───────────────────────────────────── */
+    --color-secondary-lighter: #EFD6FF;
+    --color-secondary-light: #C684FF;
+    --color-secondary-main: #8E33FF;
+    --color-secondary-dark: #5119B7;
+    --color-secondary-darker: #27097A;
+
+    /* ─── Neutral ─────────────────────────────────────── */
+    --color-neutral-50: #FCFDFD;
+    --color-neutral-100: #F9FAFB;
+    --color-neutral-200: #F4F6F8;
+    --color-neutral-300: #DFE3E8;
+    --color-neutral-400: #C4CDD5;
+    --color-neutral-500: #919EAB;
+    --color-neutral-600: #637381;
+    --color-neutral-700: #454F5B;
+    --color-neutral-800: #1C252E;
+    --color-neutral-900: #141A21;
+
+    /* ─── Success ─────────────────────────────────────── */
+    --color-success-lighter: #D3FCD2;
+    --color-success-light: #77ED8B;
+    --color-success-main: #22C55E;
+    --color-success-dark: #118D57;
+    --color-success-darker: #065E49;
+
+    /* ─── Info ────────────────────────────────────────── */
+    --color-info-lighter: #CAFDEE;
+    --color-info-light: #61F3F3;
+    --color-info-main: #00B8D9;
+    --color-info-dark: #006C9C;
+    --color-info-darker: #003768;
+
+    /* ─── Warning ─────────────────────────────────────── */
+    --color-warning-lighter: #FFF5CC;
+    --color-warning-light: #FFD666;
+    --color-warning-main: #FFAB00;
+    --color-warning-dark: #B76E00;
+    --color-warning-darker: #7A4100;
+
+    /* ─── Error ───────────────────────────────────────── */
+    --color-error-lighter: #FFE9D5;
+    --color-error-light: #FFAC82;
+    --color-error-main: #FF5630;
+    --color-error-dark: #B71D18;
+    --color-error-darker: #7A0916;
+}
+
+@theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --font-sans: var(--font-geist-sans);
+    --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: #0a0a0a;
+        --foreground: #ededed;
+    }
+}
+
+body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: Arial, Helvetica, sans-serif;
+}
