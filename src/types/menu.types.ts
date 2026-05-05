@@ -1,3 +1,5 @@
+import { IconToken } from "@/tokens";
+
 export interface MenuStructureDefault {
     title: string;
     type: string;
@@ -8,7 +10,7 @@ export interface MenuStructureDefault {
 
 export interface MenuStructureItems extends MenuStructureDefault {
     url: string;
-    icon: string;
+    icon: IconToken;
 };
 
 

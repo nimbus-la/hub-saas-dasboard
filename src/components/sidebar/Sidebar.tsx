@@ -5,8 +5,7 @@ import { usePathname } from "next/navigation";
 
 import { MenuStructureItems, MenuStructurePrimary } from "@/types";
 import SidebarGroup from "./SidebarGroup";
-import { DATA_MENU } from "@/utils";
-import { Home } from "lucide-react";
+import { DATA_MENU, getMenuIcon } from "@/utils";
 import GenericButton from "../buttons/GenericButton";
 
 
@@ -39,6 +38,7 @@ export default function Sidebar() {
                                         section.items.map(
                                             (item: MenuStructureItems, index: number) => {
                                                 const isActive = pathname === item.url;
+                                                const StartIcon = getMenuIcon(item.icon);
 
                                                 return (
                                                     <li key={index}>
@@ -46,7 +46,7 @@ export default function Sidebar() {
                                                             <GenericButton
                                                                 label={item.title}
                                                                 selected={isActive}
-                                                                startIcon={Home}
+                                                                startIcon={StartIcon}
                                                                 variant="ghost"
                                                                 size="medium"
                                                                 align="start"
