@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { MenuStructureItems, MenuStructurePrimary } from "@/types";
 import SidebarGroup from "./SidebarGroup";
 import { DATA_MENU } from "@/utils";
+import { Home } from "lucide-react";
+import GenericButton from "../buttons/GenericButton";
 
 
 export default function Sidebar() {
@@ -40,21 +42,16 @@ export default function Sidebar() {
 
                                                 return (
                                                     <li key={index}>
-                                                        <Link
-                                                            href={item.url}
-                                                            className={`relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${isActive
-                                                                ? "bg-primary-main/10 text-primary-light"
-                                                                : "text-slate-400 hover:bg-slate-800 hover:text-slate-100"
-                                                                }`}
-                                                        >
-                                                            <span className={isActive ? "text-primary-light" : "text-slate-500"}>
-                                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                                    <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
-                                                                    <rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
-                                                                </svg>
-                                                            </span>
-
-                                                            {item.title}
+                                                        <Link href={item.url}>
+                                                            <GenericButton
+                                                                label={item.title}
+                                                                selected={isActive}
+                                                                startIcon={Home}
+                                                                variant="ghost"
+                                                                size="medium"
+                                                                align="start"
+                                                                fullWidth
+                                                            />
                                                         </Link>
                                                     </li>
                                                 );

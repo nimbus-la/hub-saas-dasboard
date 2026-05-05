@@ -31,7 +31,7 @@ export default function RootLayout({
         <div className="flex min-h-screen">
           <Sidebar />
 
-          <div className="pl-64 w-full bg-neutral-200 dark:bg-[#020d1a]">
+          <div className="pl-64 w-full bg-neutral-200">
             <Navbar />
 
             <main className="isolate mx-auto w-full max-w-screen-2xl overflow-hidden p-4 md:p-6 2xl:p-10">

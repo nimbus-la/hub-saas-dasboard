@@ -6,10 +6,10 @@ interface NavbarProps {
 
 export default function Navbar({ title = "Dashboard" }: NavbarProps) {
     return (
-        <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-neutral-300 bg-white px-6 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-950/80">
+        <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-neutral-300 bg-white px-6 backdrop-blur-sm">
             {/* Left: Page title */}
             <div>
-                <h1 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                <h1 className="text-base font-semibold text-slate-900">
                     {title}
                 </h1>
             </div>
@@ -33,12 +33,12 @@ export default function Navbar({ title = "Dashboard" }: NavbarProps) {
                     <input
                         type="text"
                         placeholder="Buscar..."
-                        className="h-9 w-52 rounded-lg border border-slate-200 bg-slate-50 pl-9 pr-3 text-sm text-slate-700 outline-none transition-all placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:placeholder:text-slate-500"
+                        className="h-9 w-52 rounded-lg border border-slate-200 bg-slate-50 pl-9 pr-3 text-sm text-slate-700 outline-none transition-all placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20"
                     />
                 </div>
 
                 {/* Notifications */}
-                <button className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-700 dark:border-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-300">
+                <button className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-700">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
                         <path d="M13.73 21a2 2 0 0 1-3.46 0" />
