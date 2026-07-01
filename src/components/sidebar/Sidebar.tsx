@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { MenuStructureItems, MenuStructurePrimary } from "@/types";
 import SidebarGroup from "./SidebarGroup";
 import { DATA_MENU, getMenuIcon } from "@/utils";
-import GenericButton from "../buttons/GenericButton";
+import SidebarButton from "./SidebarButton";
 
 
 export default function Sidebar() {
@@ -26,7 +26,7 @@ export default function Sidebar() {
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 overflow-y-auto px-3 py-4">
+            <nav className="flex-1 overflow-y-auto py-4">
                 <ul className="space-y-4">
                     {DATA_MENU.map((section: MenuStructurePrimary, index: number) => {
 
@@ -43,14 +43,11 @@ export default function Sidebar() {
                                                 return (
                                                     <li key={index}>
                                                         <Link href={item.url}>
-                                                            <GenericButton
+                                                            <SidebarButton
+                                                                icon={StartIcon}
                                                                 label={item.title}
                                                                 selected={isActive}
-                                                                startIcon={StartIcon}
-                                                                variant="ghost"
                                                                 size="medium"
-                                                                align="start"
-                                                                fullWidth
                                                             />
                                                         </Link>
                                                     </li>
