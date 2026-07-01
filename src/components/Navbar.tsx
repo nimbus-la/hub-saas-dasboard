@@ -1,17 +1,28 @@
 "use client";
 
+import { useSidebarLayout } from "@/context";
+import { Menu } from "lucide-react";
+
 interface NavbarProps {
     title?: string;
 }
 
 export default function Navbar({ title = "Dashboard" }: NavbarProps) {
+    const { toggleMobileOpen } = useSidebarLayout();
+
     return (
         <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-neutral-300 bg-white px-6 backdrop-blur-sm">
             {/* Left: Page title */}
-            <div>
-                <h1 className="text-base font-semibold text-slate-900">
-                    {title}
-                </h1>
+            <div className="flex items-center gap-3">
+                <button
+                    onClick={toggleMobileOpen}
+                    aria-label="Abrir menú"
+                    className="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-600 transition-colors hover:bg-neutral-100 md:hidden"
+                >
+                    <Menu size={18} />
+                </button>
+
+                <h1 className="text-base font-semibold text-slate-900">{title}</h1>
             </div>
 
             {/* Right: Search + actions */}

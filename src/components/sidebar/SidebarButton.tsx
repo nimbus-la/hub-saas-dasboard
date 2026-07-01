@@ -2,6 +2,7 @@
 // Soporta icono (lucide-react) + label y los estados: default, hover,
 // selected y disabled. El estado "selected" añade un indicador vertical a
 
+import { useSidebarLayout } from "@/context";
 import { cva, VariantProps } from "class-variance-authority";
 import { LucideIcon } from "lucide-react";
 
@@ -38,17 +39,19 @@ const sidebarButtonVariants = cva(
                 medium: "h-[40px] text-[14px] leading-5",
                 small: "h-[32px] text-[12px] leading-5",
             },
+            collapsed: {
+                true: "justify-center px-0",
+                false: "px-6",
+            },
         },
 
-        defaultVariants: {
-            size: "medium",
-        },
+        defaultVariants: { size: "medium", collapsed: false },
     }
 );
 
 interface SidebarButtonProps
     extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onClick">,
-    VariantProps<typeof sidebarButtonVariants> {
+    Omit<VariantProps<typeof sidebarButtonVariants>, "collapsed"> {
     icon?: LucideIcon;
     label: string;
     selected?: boolean;
@@ -78,6 +81,7 @@ export default function SidebarButton({
     className,
     ...props
 }: SidebarButtonProps) {
+    const { isCollapsed } = useSidebarLayout();
     const iconSize = ICON_SIZE[size ?? "medium"];
 
     return (
@@ -86,7 +90,7 @@ export default function SidebarButton({
             disabled={disabled}
             data-selected={selected}
             onClick={onClick}
-            className={sidebarButtonVariants({ size, className })}
+            className={sidebarButtonVariants({ size, collapsed: isCollapsed, className })}
             {...props}
         >
             {/* ── Indicador de selección (barra izquierda) ─────────────────── */}
@@ -97,9 +101,9 @@ export default function SidebarButton({
 
             {Icon && <Icon size={iconSize} strokeWidth={2} className="shrink-0" />}
 
-            <span className="truncate">{label}</span>
+            {!isCollapsed && <span className="truncate">{label}</span>}
 
-            {isNew && (
+            {!isCollapsed && isNew && (
                 <span className="ml-auto inline-flex shrink-0 items-center rounded-full bg-primary-main px-2 py-1 text-[10px] font-semibold leading-none text-white">
                     Nuevo
                 </span>

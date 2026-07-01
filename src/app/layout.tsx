@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "@/style/style.css";
-import Sidebar from "@/components/sidebar/Sidebar";
-import Navbar from "@/components/Navbar";
+import { SidebarLayoutProvider } from "@/context";
+import AppShell from "@/components/layout/AppShell";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -28,17 +28,11 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body>
-        <div className="flex min-h-screen">
-          <Sidebar />
-
-          <div className="pl-64 w-full bg-neutral-200">
-            <Navbar />
-
-            <main className="isolate mx-auto w-full max-w-screen-2xl overflow-hidden p-4 md:p-6 2xl:p-10">
-              {children}
-            </main>
-          </div>
-        </div>
+        <SidebarLayoutProvider>
+          <AppShell>
+            {children}
+          </AppShell>
+        </SidebarLayoutProvider>
       </body>
     </html>
   );

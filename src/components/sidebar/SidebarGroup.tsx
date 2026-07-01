@@ -2,6 +2,7 @@ import React from "react";
 
 import { motion } from "framer-motion";
 import { ChevronRight } from 'lucide-react';
+import { useSidebarLayout } from "@/context";
 
 
 interface SidebarGroupProps {
@@ -10,7 +11,12 @@ interface SidebarGroupProps {
 };
 
 export default function SidebarGroup({ label, children }: SidebarGroupProps) {
+    const { isCollapsed } = useSidebarLayout();
     const [isOpen, setIsOpen] = React.useState(true);
+
+    if (isCollapsed) {
+        return <ul className="space-y-0.5">{children}</ul>;
+    };
 
     return (
         <div>
