@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans, Geist } from "next/font/google";
 import "@/style/style.css";
 import { SidebarLayoutProvider } from "@/context";
 import AppShell from "@/components/layout/AppShell";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -24,7 +27,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${jakarta.variable} h-full`}
+      className={cn("h-full", jakarta.variable, "font-sans", geist.variable)}
       suppressHydrationWarning
     >
       <body>

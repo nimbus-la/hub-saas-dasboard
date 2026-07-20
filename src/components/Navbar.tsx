@@ -1,11 +1,20 @@
 "use client";
 
 import { useSidebarLayout } from "@/context";
-import { Menu } from "lucide-react";
+import { MapPin, Menu } from "lucide-react";
+import { InputSelector } from "./inputs/InputSelector";
 
 interface NavbarProps {
     title?: string;
 }
+
+const sucursales = [
+    { label: "Cocina Central", value: "cc" },
+    { label: "Comedor Norte", value: "cn" },
+    { label: "Sucursal Poblado", value: "sp" },
+    { label: "Barra Sur", value: "bs" },
+    { label: "Terraza Centro", value: "tc" },
+];
 
 export default function Navbar({ title = "Dashboard" }: NavbarProps) {
     const { toggleMobileOpen } = useSidebarLayout();
@@ -28,25 +37,11 @@ export default function Navbar({ title = "Dashboard" }: NavbarProps) {
             {/* Right: Search + actions */}
             <div className="flex items-center gap-3">
                 {/* Search */}
-                <div className="relative hidden sm:block">
-                    <svg
-                        className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                    >
-                        <circle cx="11" cy="11" r="8" />
-                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                    </svg>
-                    <input
-                        type="text"
-                        placeholder="Buscar..."
-                        className="h-9 w-52 rounded-lg border border-slate-200 bg-slate-50 pl-9 pr-3 text-sm text-slate-700 outline-none transition-all placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20"
-                    />
-                </div>
+                <InputSelector
+                    leadingIcon={<MapPin />}
+                    placeholder="Buscar sucursal..."
+                    options={sucursales}
+                />
 
                 {/* Notifications */}
                 <button className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-700">
