@@ -1,5 +1,7 @@
 import MetricCard from "@/components/cards/MetricCard";
 import SalesChartSection from "@/components/charts/SalesChartSection";
+import TopProductsTable from "@/components/tables/TopProductsTable";
+import { getTopProducts } from "@/lib/top-products";
 import { ChartNoAxesCombined, DollarSign, ShoppingBag, Users } from "lucide-react";
 
 export default function Dashboard() {
@@ -37,8 +39,9 @@ export default function Dashboard() {
                     />
                 </section>
 
-                <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                     <SalesChartSection className="lg:col-span-2" />
+                    <TopProductsTable className="lg:col-span-1" products={getTopProducts()} />
                 </section>
             </div>
         </>
