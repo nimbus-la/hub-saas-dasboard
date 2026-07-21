@@ -6,10 +6,10 @@
 // así que es seguro para SSR/hydration.
 //
 // Requiere: pnpm add chart.js
-// Ubicación sugerida: src/components/charts/BranchSalesChart.tsx
 
 import { useEffect, useRef } from "react";
 import Chart from "chart.js/auto";
+import type { ScriptableContext } from "chart.js";
 import { cn } from "@/lib/utils";
 import {
     BRANCHES,
@@ -40,6 +40,17 @@ function cssVar(name: string, fallback: string): string {
     return v || fallback;
 }
 
+// Convierte un hex (#RRGGBB o #RGB) a rgba() con alfa, para el degradado del área.
+function hexToRgba(hex: string, alpha: number): string {
+    const h = hex.replace("#", "");
+    const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+    const n = parseInt(full, 16);
+    const r = (n >> 16) & 255;
+    const g = (n >> 8) & 255;
+    const b = n & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 
 export default function SalesChart({
     labels,
@@ -58,32 +69,28 @@ export default function SalesChart({
     useEffect(() => {
         if (!canvasRef.current) return;
 
-        const datasets = series.map((s, i, arr) => {
-            const r = 6;
-            const isBottom = i === 0;
-            const isTop = i === arr.length - 1;
-            const borderRadius =
-                arr.length === 1
-                    ? r
-                    : {
-                        topLeft: isTop ? r : 0,
-                        topRight: isTop ? r : 0,
-                        bottomLeft: isBottom ? r : 0,
-                        bottomRight: isBottom ? r : 0,
-                    };
-
-            return {
-                label: s.name,
-                data: s.data,
-                backgroundColor: s.color,
-                stack: "ventas",
-                borderRadius,
-                borderSkipped: false,
-                categoryPercentage: 0.65,
-                barPercentage: 0.85,
-                maxBarThickness: 30,
-            };
-        });
+        const datasets = series.map((s) => ({
+            label: s.name,
+            data: s.data,
+            borderColor: s.color,
+            // Relleno con degradado que se desvanece hacia abajo (el "shadow")
+            backgroundColor: (context: ScriptableContext<"line">) => {
+                const { ctx, chartArea } = context.chart;
+                if (!chartArea) return "transparent"; // aún no hay área en el 1er frame
+                const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                gradient.addColorStop(0, hexToRgba(s.color, 0.2));
+                gradient.addColorStop(1, hexToRgba(s.color, 0));
+                return gradient;
+            },
+            fill: true,
+            tension: 0.4,          // curva suave
+            borderWidth: 2,
+            pointRadius: 0,        // sin puntos visibles...
+            pointHoverRadius: 4,   // ...salvo al hacer hover
+            pointHoverBackgroundColor: s.color,
+            pointHoverBorderColor: "#fff",
+            pointHoverBorderWidth: 2,
+        }));
 
         const neutral500 = cssVar("--color-neutral-500", "#919EAB");
         const neutral300 = cssVar("--color-neutral-300", "#DFE3E8");
@@ -114,7 +121,7 @@ export default function SalesChart({
         };
 
         const chart = new Chart(canvasRef.current, {
-            type: "bar",
+            type: "line",
             data: { labels, datasets },
             plugins: [dashedGrid],
             options: {
@@ -136,13 +143,11 @@ export default function SalesChart({
                 },
                 scales: {
                     x: {
-                        stacked: true,
                         border: { display: false },
                         grid: { display: false },
                         ticks: { color: neutral500, font: { size: 12 } },
                     },
                     y: {
-                        stacked: true,
                         beginAtZero: true,
                         suggestedMax: minYMax, // piso de 800k; crece si los datos lo superan
                         border: { display: false },

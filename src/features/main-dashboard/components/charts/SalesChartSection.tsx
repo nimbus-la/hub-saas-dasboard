@@ -14,7 +14,7 @@
 
 import { useMemo, useState } from "react";
 import { getBranchSales, type PeriodKey } from "@/lib/branch-sales";
-import SalesChart from "@/components/charts/SalesChart";
+import SalesChart from "./SalesChart";
 
 export default function SalesChartSection({ className }: { className?: string }) {
     const [period, setPeriod] = useState<PeriodKey>("meses");
