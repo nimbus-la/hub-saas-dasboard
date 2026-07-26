@@ -16,7 +16,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
             <div
                 className={cx(
-                    "w-full bg-neutral-200 transition-[padding] duration-200",
+                    "w-full bg-neutral-100 transition-[padding] duration-200",
                     isCollapsed ? "md:pl-20" : "md:pl-64"
                 )}
             >

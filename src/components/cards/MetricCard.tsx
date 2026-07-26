@@ -61,7 +61,6 @@ export default function MetricCard({
         <div
             className={cn(
                 "flex w-full min-w-0 flex-col gap-4 rounded-lg border border-neutral-200 bg-white p-6",
-                "shadow-[0_1px_2px_rgba(145,158,171,0.16)]",
                 className
             )}
         >
