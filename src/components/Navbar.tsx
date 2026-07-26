@@ -1,13 +1,19 @@
 "use client";
 
+import { useState } from "react";
+
 import { useSidebarLayout } from "@/context";
-import { Bell, MapPin, Menu } from "lucide-react";
+import { Bell, MapPin, Menu, X } from "lucide-react";
 import { InputSelector } from "./inputs/InputSelector";
 import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 interface NavbarProps {
     title?: string;
     subtitle?: string;
+    /** Datos del bloque de perfil (opcionales, con valores por defecto). */
+    userName?: string;
+    userRole?: string;
+    userAvatarUrl?: string;
 }
 
 const sucursales = [
@@ -18,56 +24,149 @@ const sucursales = [
     { label: "Terraza Centro", value: "tc" },
 ];
 
-export default function Navbar({ title = "Dashboard", subtitle }: NavbarProps) {
+/** Botón de icono: 36x36, un solo radio, foco visible, sin sombra. */
+const iconButton =
+    "flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted-foreground " +
+    "transition-colors duration-150 ease-out hover:bg-muted hover:text-foreground " +
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-main/30 " +
+    "active:scale-95 motion-reduce:transition-none motion-reduce:active:scale-100";
+
+/** Campo (combobox de sucursal) alineado a la spec: h-9, rounded-lg, relleno sutil. */
+const selectorField =
+    "h-9 rounded-lg bg-muted border-transparent hover:border-border " +
+    "transition-colors duration-150 ease-out motion-reduce:transition-none " +
+    "[&_svg]:text-muted-foreground [&_svg]:size-4 " +
+    "[&_[data-slot=input-group-control]]:text-sm " +
+    "[&_[data-slot=input-group-control]]:text-foreground " +
+    "[&_[data-slot=input-group-control]]:placeholder:text-muted-foreground";
+
+function initialsFrom(name: string) {
+    return name
+        .trim()
+        .split(/\s+/)
+        .slice(0, 2)
+        .map((word) => word[0]?.toUpperCase() ?? "")
+        .join("");
+}
+
+export default function Navbar({
+    title = "Dashboard",
+    subtitle,
+    userName = "Juan Manuel",
+    userRole = "Administrador",
+    userAvatarUrl = "",
+}: NavbarProps) {
     const { toggleMobileOpen } = useSidebarLayout();
+    const [isSelectorOpen, setIsSelectorOpen] = useState(false);
 
     return (
-        <header className="sticky top-0 z-40 flex h-18 items-center justify-between px-8 border-b border-neutral-300 backdrop-blur-sm">
-            {/* Left: Page title */}
-            <div className="flex items-center gap-3">
-                <button
-                    onClick={toggleMobileOpen}
-                    aria-label="Abrir menú"
-                    className="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-600 transition-colors hover:bg-neutral-100 md:hidden"
-                >
-                    <Menu size={18} />
-                </button>
+        <header className="sticky top-0 z-40 h-16 border-b border-border bg-background">
+            <nav
+                aria-label="Barra superior"
+                className="relative flex h-full items-center justify-between gap-4 px-4 md:px-6"
+            >
+                {/* ─── Izquierda: menú móvil + selector ─────────────────────── */}
+                <div className="flex min-w-0 items-center gap-2">
+                    <button
+                        type="button"
+                        onClick={toggleMobileOpen}
+                        aria-label="Abrir menú"
+                        className={`${iconButton} md:hidden`}
+                    >
+                        <Menu size={20} strokeWidth={1.5} aria-hidden="true" />
+                    </button>
 
-                <div className="flex flex-col items-start gap-0.5">
-                    <h1 className="text-lg font-semibold text-slate-900">
-                        {title}
-                    </h1>
-
-                    {subtitle && (
-                        <p className="text-sm leading-5 text-slate-500">
-                            {subtitle}
-                        </p>
-                    )}
+                    {/* Selector de sucursal (≥640px) */}
+                    <div className="hidden w-full max-w-[200px] sm:block lg:max-w-xs">
+                        <InputSelector
+                            leadingIcon={<MapPin strokeWidth={1.5} />}
+                            placeholder="Selecionar sucursal"
+                            options={sucursales}
+                            size="sm"
+                            inputClassName={selectorField}
+                        />
+                    </div>
                 </div>
-            </div>
 
-            {/* Right: Search + actions */}
-            <div className="flex items-center gap-3">
-                {/* Search */}
-                <InputSelector
-                    leadingIcon={<MapPin />}
-                    placeholder="Selecionar sucursal"
-                    options={sucursales}
-                />
+                {/* ─── Derecha: acciones + perfil ──────────────── */}
+                <div className="flex shrink-0 items-center gap-2">
 
-                {/* Notifications */}
-                <Bell
-                    className="cursor-pointer text-slate-500 transition-colors hover:text-slate-900"
-                    onClick={() => console.log('Hola!')}
-                />
+                    {/* Selector colapsado en icono (<640px) */}
+                    <button
+                        type="button"
+                        onClick={() => setIsSelectorOpen(true)}
+                        aria-label="Seleccionar sucursal"
+                        aria-expanded={isSelectorOpen}
+                        className={`${iconButton} sm:hidden`}
+                    >
+                        <MapPin size={20} strokeWidth={1.5} aria-hidden="true" />
+                    </button>
 
-                {/* Avatar */}
-                <Avatar>
-                    <AvatarImage src="" alt="@shadcn" />
-                    <AvatarFallback>JM</AvatarFallback>
-                    <AvatarBadge className="bg-success-main dark:bg-success-dark" />
-                </Avatar>
-            </div>
+                    {/* Notificaciones */}
+                    <button
+                        type="button"
+                        onClick={() => console.log('Hola!')}
+                        aria-label="Ver notificaciones"
+                        className={`relative ${iconButton}`}
+                    >
+                        <Bell size={20} strokeWidth={1.5} aria-hidden="true" />
+                        <span
+                            aria-hidden="true"
+                            className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-error-main ring-2 ring-background"
+                        />
+                    </button>
+
+                    {/* Perfil */}
+                    <div className="ml-2 flex items-center gap-3 border-l border-border pl-3">
+                        <Avatar className="size-9">
+                            <AvatarImage src={userAvatarUrl} alt="" />
+                            <AvatarFallback className="text-xs font-medium">
+                                {initialsFrom(userName)}
+                            </AvatarFallback>
+                            <AvatarBadge className="bg-success-main dark:bg-success-dark" />
+                        </Avatar>
+
+                        <div className="hidden flex-col leading-tight sm:flex">
+                            <span className="text-sm font-medium text-foreground">
+                                {userName}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                                {userRole}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ─── Overlay del selector en móvil ──────────────────────── */}
+                {isSelectorOpen && (
+                    <div
+                        onKeyDown={(event) => {
+                            if (event.key === "Escape") setIsSelectorOpen(false);
+                        }}
+                        className="absolute inset-x-0 top-0 flex h-full items-center gap-2 bg-background px-4 sm:hidden"
+                    >
+                        <div className="min-w-0 flex-1">
+                            <InputSelector
+                                leadingIcon={<MapPin strokeWidth={1.5} />}
+                                placeholder="Selecionar sucursal"
+                                options={sucursales}
+                                size="sm"
+                                inputClassName={selectorField}
+                            />
+                        </div>
+
+                        <button
+                            type="button"
+                            autoFocus
+                            onClick={() => setIsSelectorOpen(false)}
+                            aria-label="Cerrar selector de sucursal"
+                            className={iconButton}
+                        >
+                            <X size={20} strokeWidth={1.5} aria-hidden="true" />
+                        </button>
+                    </div>
+                )}
+            </nav>
         </header>
     );
 }
