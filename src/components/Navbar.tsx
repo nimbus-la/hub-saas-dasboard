@@ -31,15 +31,6 @@ const iconButton =
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-main/30 " +
     "active:scale-95 motion-reduce:transition-none motion-reduce:active:scale-100";
 
-/** Campo (combobox de sucursal) alineado a la spec: h-9, rounded-lg, relleno sutil. */
-const selectorField =
-    "h-9 rounded-lg bg-muted border-transparent hover:border-border " +
-    "transition-colors duration-150 ease-out motion-reduce:transition-none " +
-    "[&_svg]:text-muted-foreground [&_svg]:size-4 " +
-    "[&_[data-slot=input-group-control]]:text-sm " +
-    "[&_[data-slot=input-group-control]]:text-foreground " +
-    "[&_[data-slot=input-group-control]]:placeholder:text-muted-foreground";
-
 function initialsFrom(name: string) {
     return name
         .trim()
@@ -79,11 +70,11 @@ export default function Navbar({
                     {/* Selector de sucursal (≥640px) */}
                     <div className="hidden w-full max-w-50 sm:block lg:max-w-xs">
                         <InputSelector
-                            leadingIcon={<MapPin strokeWidth={1.5} />}
+                            leftIcon={<MapPin strokeWidth={1.5} />}
                             placeholder="Selecionar sucursal"
                             options={sucursales}
                             size="sm"
-                            inputClassName={selectorField}
+                            className="w-xs"
                         />
                     </div>
                 </div>
@@ -150,11 +141,10 @@ export default function Navbar({
                     >
                         <div className="min-w-0 flex-1">
                             <InputSelector
-                                leadingIcon={<MapPin strokeWidth={1.5} />}
+                                leftIcon={<MapPin strokeWidth={1.5} />}
                                 placeholder="Selecionar sucursal"
                                 options={sucursales}
                                 size="sm"
-                                inputClassName={selectorField}
                             />
                         </div>
 

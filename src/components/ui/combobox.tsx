@@ -11,27 +11,13 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group"
-import { ChevronDownIcon, XIcon, CheckIcon } from "lucide-react"
-import { cva } from "class-variance-authority"
+import { ChevronDownIcon, XIcon } from "lucide-react"
 
 const Combobox = ComboboxPrimitive.Root
 
 function ComboboxValue({ ...props }: ComboboxPrimitive.Value.Props) {
   return <ComboboxPrimitive.Value data-slot="combobox-value" {...props} />
 }
-
-const chevronVariants = cva("", {
-  variants: {
-      size: {
-          sm: "size-4",
-          md: "size-[18px]",
-          lg: "size-5",
-      },
-  },
-  defaultVariants: {
-      size: "md",
-  },
-})
 
 function ComboboxTrigger({
   className,
@@ -88,17 +74,17 @@ function ComboboxInput({
         {...props}
       />
       <InputGroupAddon align="inline-end">
+        {showClear && <ComboboxClear disabled={disabled} />}
         {showTrigger && (
           <InputGroupButton
             size="icon-xs"
             variant="ghost"
             render={<ComboboxTrigger />}
             data-slot="input-group-button"
-            className="group-has-data-[slot=combobox-clear]/input-group:hidden data-pressed:bg-transparent"
+            className="data-pressed:bg-transparent"
             disabled={disabled}
           />
         )}
-        {showClear && <ComboboxClear disabled={disabled} />}
       </InputGroupAddon>
       {children}
     </InputGroup>
@@ -167,13 +153,6 @@ function ComboboxItem({
       {...props}
     >
       {children}
-      <ComboboxPrimitive.ItemIndicator
-        render={
-          <span className="pointer-events-none absolute right-2 flex size-4 items-center justify-center" />
-        }
-      >
-        <CheckIcon className="pointer-events-none" />
-      </ComboboxPrimitive.ItemIndicator>
     </ComboboxPrimitive.Item>
   )
 }
