@@ -32,7 +32,7 @@ export default function Sidebar() {
                 />
             )}
 
-            <aside className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-neutral-300 bg-white transition-all duration-200 ${isCollapsed ? "md:w-20" : "md:w-64"} ${isMobileOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}>
+            <aside className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-neutral-200 bg-white transition-all duration-200 ${isCollapsed ? "md:w-20" : "md:w-64"} ${isMobileOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}>
                 {/* Logo */}
                 <div className="flex h-16 items-center gap-3 px-6">
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500">

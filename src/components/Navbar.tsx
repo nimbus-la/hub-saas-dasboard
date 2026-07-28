@@ -8,9 +8,6 @@ import { InputSelector } from "./inputs/InputSelector";
 import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 interface NavbarProps {
-    title?: string;
-    subtitle?: string;
-    /** Datos del bloque de perfil (opcionales, con valores por defecto). */
     userName?: string;
     userRole?: string;
     userAvatarUrl?: string;
@@ -41,8 +38,6 @@ function initialsFrom(name: string) {
 }
 
 export default function Navbar({
-    title = "Dashboard",
-    subtitle,
     userName = "Juan Manuel",
     userRole = "Administrador",
     userAvatarUrl = "",
