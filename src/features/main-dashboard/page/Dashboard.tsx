@@ -9,7 +9,7 @@ export default function Dashboard() {
     return (
         <>
             <div className="flex flex-col gap-6">
-                <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <section className="grid grid-cols-[repeat(auto-fit,minmax(min(15rem,100%),1fr))] gap-6">
                     <MetricCard
                         icon={DollarSign}
                         color="secondary"
