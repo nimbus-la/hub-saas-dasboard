@@ -1,8 +1,8 @@
 "use client";
 
 // ── Contenedor de datos del gráfico de ventas ───────────────────────────────
-// Mantiene el estado de los filtros y obtiene los datos, dejando a
-// BranchSalesChart como componente puramente presentacional.
+// Mantiene el estado de los filtros y obtiene los datos, dejando a SalesChart
+// como componente puramente presentacional.
 //
 // Cuando existan servicios: cambia `getBranchSales(...)` por tu fetch/hook.
 // Ejemplo async:
@@ -10,17 +10,26 @@
 //   useEffect(() => { fetchBranchSales(period, branch).then(setData); }, [period, branch]);
 //
 // Y cuando el selector se mueva al navbar, sube `branch`/`setBranch` a un
-// context o store y elimina el estado local + las props onBranchChange.
+// context o store y elimina el estado local.
 
 import { useMemo, useState } from "react";
-import { getBranchSales, type PeriodKey } from "@/lib/branch-sales";
+import {
+    ALL_BRANCHES,
+    getBranchSales,
+    type PeriodKey,
+} from "@/lib/branch-sales";
 import SalesChart from "./SalesChart";
 
-export default function SalesChartSection({ className }: { className?: string }) {
-    const [period, setPeriod] = useState<PeriodKey>("meses");
-    const [branch, setBranch] = useState<string>("todas");
+const INITIAL_PERIOD: PeriodKey = "meses";
 
-    const { labels, series } = useMemo(() => getBranchSales(period, branch), [period, branch]);
+export default function SalesChartSection({ className }: { className?: string }) {
+    const [period, setPeriod] = useState<PeriodKey>(INITIAL_PERIOD);
+    const [branch, setBranch] = useState<string>(ALL_BRANCHES);
+
+    const { labels, series } = useMemo(
+        () => getBranchSales(period, branch),
+        [period, branch]
+    );
 
     return (
         <SalesChart

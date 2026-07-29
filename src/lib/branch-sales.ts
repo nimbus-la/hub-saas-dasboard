@@ -5,6 +5,9 @@
 
 export type PeriodKey = "dias" | "semanas" | "meses";
 
+/** Id que representa "todas las sucursales" en los filtros. */
+export const ALL_BRANCHES = "todas";
+
 export interface Branch {
     id: string;
     name: string;
@@ -30,41 +33,93 @@ export const BRANCHES: Branch[] = [
 ];
 
 // ── Periodos y etiquetas de eje ─────────────────────────────────────────────
-export const PERIODS: { key: PeriodKey; label: string; labels: string[] }[] = [
+export interface Period {
+    key: PeriodKey;
+    label: string;
+    labels: string[];
+}
+
+export const PERIODS: Period[] = [
     { key: "dias", label: "Días", labels: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"] },
     { key: "semanas", label: "Semanas", labels: ["Sem 1", "Sem 2", "Sem 3", "Sem 4", "Sem 5", "Sem 6", "Sem 7", "Sem 8"] },
     { key: "meses", label: "Meses", labels: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"] },
 ];
 
-// ── Mock determinista (mismo resultado en cada render → sin hydration issues) ─
-const AMP: Record<PeriodKey, number> = { dias: 16000, semanas: 95000, meses: 380000 };
-const BRANCH_FACTOR = [1.0, 1.28, 0.72, 0.9];
+const DEFAULT_PERIOD_KEY: PeriodKey = "meses";
 
-function salesValue(branchIndex: number, period: PeriodKey, i: number): number {
-    const amp = AMP[period];
-    const wave = (Math.sin(i * 0.8 + branchIndex * 1.7) + 1) / 2;
-    const jitter = ((Math.sin(i * 3.1 + branchIndex) + 1) / 2) * 0.25;
-    const factor = BRANCH_FACTOR[branchIndex] ?? 1;
-    return Math.round(amp * factor * (0.6 + 0.6 * wave + jitter));
+// ── Mock determinista (mismo resultado en cada render → sin hydration issues) ─
+// Importe base por punto según el periodo: un día vende mucho menos que un mes.
+const PERIOD_AMPLITUDE: Record<PeriodKey, number> = {
+    dias: 16_000,
+    semanas: 95_000,
+    meses: 380_000,
+};
+
+// Peso relativo de cada sucursal, en el mismo orden que `BRANCHES`.
+const BRANCH_WEIGHTS = [1.0, 1.28, 0.72, 0.9];
+
+/**
+ * Genera un importe reproducible combinando una onda suave (la tendencia) con
+ * una segunda onda de frecuencia alta (el ruido), desfasadas por sucursal para
+ * que las líneas no queden paralelas.
+ */
+function calculateSalesValue(
+    branchIndex: number,
+    period: PeriodKey,
+    pointIndex: number
+): number {
+    const amplitude = PERIOD_AMPLITUDE[period];
+    const trend = (Math.sin(pointIndex * 0.8 + branchIndex * 1.7) + 1) / 2;
+    const noise = ((Math.sin(pointIndex * 3.1 + branchIndex) + 1) / 2) * 0.25;
+    const branchWeight = BRANCH_WEIGHTS[branchIndex] ?? 1;
+
+    return Math.round(amplitude * branchWeight * (0.6 + 0.6 * trend + noise));
 }
 
-// Con `branch === "todas"` apila todas las sucursales; si no, solo la elegida.
-export function getBranchSales(period: PeriodKey, branch: string): BranchSalesData {
-    const DEFAULT_PERIOD = PERIODS.find((p) => p.key === "meses")!;
-    const cfg = PERIODS.find((p) => p.key === period) ?? DEFAULT_PERIOD;
-    const active = branch === "todas" ? BRANCHES : BRANCHES.filter((b) => b.id === branch);
+function findPeriod(periodKey: PeriodKey): Period {
+    const defaultPeriod = PERIODS.find(({ key }) => key === DEFAULT_PERIOD_KEY)!;
+    return PERIODS.find(({ key }) => key === periodKey) ?? defaultPeriod;
+}
 
-    const series: SalesSeries[] = active.map((b) => {
-        const gi = BRANCHES.findIndex((x) => x.id === b.id);
-        const data = cfg.labels.map((_, i) => salesValue(gi, period, i));
-        const total = data.reduce((acc, cur) => acc + cur, 0);
-        return { ...b, data, total };
+/** Con `branch === ALL_BRANCHES` devuelve todas las sucursales; si no, solo la elegida. */
+export function getBranchSales(
+    period: PeriodKey,
+    branch: string
+): BranchSalesData {
+    const selectedPeriod = findPeriod(period);
+    const selectedBranches =
+        branch === ALL_BRANCHES
+            ? BRANCHES
+            : BRANCHES.filter((candidate) => candidate.id === branch);
+
+    const series: SalesSeries[] = selectedBranches.map((selectedBranch) => {
+        // El índice dentro de BRANCHES define la forma de la onda y el peso, así
+        // que una sucursal dibuja la misma línea se filtre o no.
+        const branchIndex = BRANCHES.findIndex(
+            (candidate) => candidate.id === selectedBranch.id
+        );
+
+        const data = selectedPeriod.labels.map((_label, pointIndex) =>
+            calculateSalesValue(branchIndex, period, pointIndex)
+        );
+        const total = data.reduce((runningTotal, value) => runningTotal + value, 0);
+
+        return { ...selectedBranch, data, total };
     });
 
-    return { labels: [...cfg.labels], series };
+    return { labels: [...selectedPeriod.labels], series };
 }
 
 // ── Formateadores compartidos ───────────────────────────────────────────────
-const compact = new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 });
-export const fmtMoney = (n: number) => "$" + compact.format(n);              // ejes y leyenda
-export const fmtMoneyFull = (n: number) => "$" + n.toLocaleString("es-MX");  // tooltip
+const compactNumberFormatter = new Intl.NumberFormat("en-US", {
+    notation: "compact",
+    maximumFractionDigits: 1,
+});
+
+/** Ejes y leyenda: `$380K`. */
+export const formatMoneyCompact = (amount: number): string =>
+    "$" + compactNumberFormatter.format(amount);
+
+/** Tooltip y métrica principal: `$380,412`. */
+export const formatMoneyFull = (amount: number): string =>
+    "$" + amount.toLocaleString("es-MX");
