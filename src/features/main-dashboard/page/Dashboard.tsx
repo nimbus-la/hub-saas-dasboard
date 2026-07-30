@@ -3,11 +3,11 @@ import { ChartNoAxesCombined, DollarSign, ShoppingBag, Users } from "lucide-reac
 import MetricCard from "@/components/cards/MetricCard";
 import { getRecentOrders } from "@/lib/recent-orders";
 import { getTopProducts } from "@/lib/top-products";
-import SalesChartSection from "../components/charts/SalesChartSection";
-import RecentOrdersTable from "../components/tables/RecentOrdersTable";
-import TopProductsTable from "../components/tables/TopProductsTable";
+import { RecentOrdersTable, SalesChartSection, TopProductsCard } from "../components";
 
 export default function Dashboard() {
+    const { products: topProducts, totalUnits: topProductsUnits } = getTopProducts();
+
     return (
         <>
             <div className="flex flex-col gap-6">
@@ -44,7 +44,12 @@ export default function Dashboard() {
 
                 <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                     <SalesChartSection className="lg:col-span-2" />
-                    <TopProductsTable className="lg:col-span-1" products={getTopProducts()} />
+                    
+                    <TopProductsCard
+                        className="lg:col-span-1"
+                        products={topProducts}
+                        totalUnits={topProductsUnits}
+                    />
                 </section>
 
                 <section>

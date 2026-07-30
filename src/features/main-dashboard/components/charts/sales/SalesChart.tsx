@@ -26,13 +26,13 @@ import {
 import SalesChartDataTable from "./SalesChartDataTable";
 import SalesChartLegend from "./SalesChartLegend";
 import SalesChartPeriodFilter from "./SalesChartPeriodFilter";
-import { createCrosshairPlugin } from "../../utils/charts/crosshair-plugin";
+import { createCrosshairPlugin } from "../../../utils/charts/crosshair-plugin";
 import {
     buildSalesChartOptions,
     buildSalesDatasets,
     readSalesChartTheme,
-} from "../../utils/charts/sales-chart-config";
-import { useHiddenSeries } from "../../hooks/use-hidden-series";
+} from "../../../utils/charts/sales-chart-config";
+import { useHiddenSeries } from "../../../hooks/use-hidden-series";
 
 const DEFAULT_DELTA_PERCENTAGE = 18;
 

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <!-- Pan superior -->
+  <path d="M6 28C6 15.85 17.64 6 32 6s26 9.85 26 22a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z" fill="#E9A45C"/>
+  <ellipse cx="21" cy="18" rx="3.4" ry="2.1" fill="#FFF1DC" transform="rotate(-18 21 18)"/>
+  <ellipse cx="33" cy="14" rx="3.4" ry="2.1" fill="#FFF1DC"/>
+  <ellipse cx="44" cy="19" rx="3.4" ry="2.1" fill="#FFF1DC" transform="rotate(16 44 19)"/>
+  <!-- Lechuga -->
+  <g fill="#79D06B">
+    <rect x="7" y="29" width="50" height="5"/>
+    <circle cx="12" cy="34" r="4"/>
+    <circle cx="22" cy="34" r="4"/>
+    <circle cx="32" cy="34" r="4"/>
+    <circle cx="42" cy="34" r="4"/>
+    <circle cx="52" cy="34" r="4"/>
+  </g>
+  <!-- Carne -->
+  <rect x="7" y="36" width="50" height="10" rx="5" fill="#8B5A38"/>
+  <!-- Pan inferior -->
+  <path d="M8 47h48a2 2 0 0 1 2 2v1c0 4.42-3.58 8-8 8H14c-4.42 0-8-3.58-8-8v-1a2 2 0 0 1 2-2Z" fill="#DE9A52"/>
+</svg>

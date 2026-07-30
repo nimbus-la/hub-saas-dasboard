@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <!-- Relleno -->
+  <ellipse cx="32" cy="22" rx="25" ry="9" fill="#C0553B"/>
+  <ellipse cx="21" cy="19" rx="10" ry="5" fill="#79D06B"/>
+  <ellipse cx="44" cy="20" rx="9" ry="4.5" fill="#79D06B"/>
+  <circle cx="32" cy="17" r="3" fill="#FFD166"/>
+  <circle cx="50" cy="25" r="2.5" fill="#FFD166"/>
+  <!-- Tortilla -->
+  <path d="M7 26h6v4a19 19 0 0 0 38 0v-4h6v4a25 25 0 0 1-50 0v-4Z" fill="#F0C05A"/>
+</svg>
