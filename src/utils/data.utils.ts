@@ -1,4 +1,4 @@
-import { MenuStructurePrimary } from "@/types";
+import { MenuStructurePrimary } from "@/interfaces";
 
 export const DATA_MENU: MenuStructurePrimary[] = [
     {

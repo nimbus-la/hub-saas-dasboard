@@ -1,8 +1,10 @@
 import { ChartNoAxesCombined, DollarSign, ShoppingBag, Users } from "lucide-react";
 
 import MetricCard from "@/components/cards/MetricCard";
+import { getRecentOrders } from "@/lib/recent-orders";
 import { getTopProducts } from "@/lib/top-products";
 import SalesChartSection from "../components/charts/SalesChartSection";
+import RecentOrdersTable from "../components/tables/RecentOrdersTable";
 import TopProductsTable from "../components/tables/TopProductsTable";
 
 export default function Dashboard() {
@@ -43,6 +45,10 @@ export default function Dashboard() {
                 <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                     <SalesChartSection className="lg:col-span-2" />
                     <TopProductsTable className="lg:col-span-1" products={getTopProducts()} />
+                </section>
+
+                <section>
+                    <RecentOrdersTable orders={getRecentOrders()} />
                 </section>
             </div>
         </>

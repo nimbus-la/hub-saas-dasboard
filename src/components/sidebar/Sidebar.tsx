@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { MenuStructureItems, MenuStructurePrimary } from "@/types";
+import { MenuStructureItems, MenuStructurePrimary } from "@/interfaces";
 import SidebarGroup from "./SidebarGroup";
 import { DATA_MENU, getMenuIcon } from "@/utils";
 import SidebarButton from "./SidebarButton";
