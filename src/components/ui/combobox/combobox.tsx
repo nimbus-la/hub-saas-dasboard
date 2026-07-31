@@ -10,8 +10,8 @@ import {
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
-} from "@/components/ui/input-group"
-import { ChevronDownIcon, XIcon } from "lucide-react"
+} from "@/components/ui/input"
+import { CheckIcon, ChevronDownIcon, XIcon } from "lucide-react"
 
 const Combobox = ComboboxPrimitive.Root
 
@@ -157,6 +157,25 @@ function ComboboxItem({
   )
 }
 
+function ComboboxItemIndicator({
+  className,
+  children,
+  ...props
+}: ComboboxPrimitive.ItemIndicator.Props) {
+  return (
+    <ComboboxPrimitive.ItemIndicator
+      data-slot="combobox-item-indicator"
+      className={cn(
+        "absolute right-2 flex items-center justify-center text-accent-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        className
+      )}
+      {...props}
+    >
+      {children ?? <CheckIcon />}
+    </ComboboxPrimitive.ItemIndicator>
+  )
+}
+
 function ComboboxGroup({ className, ...props }: ComboboxPrimitive.Group.Props) {
   return (
     <ComboboxPrimitive.Group
@@ -283,6 +302,7 @@ export {
   ComboboxContent,
   ComboboxList,
   ComboboxItem,
+  ComboboxItemIndicator,
   ComboboxGroup,
   ComboboxLabel,
   ComboboxCollection,
