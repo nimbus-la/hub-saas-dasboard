@@ -13,3 +13,6 @@ export type { ColumnAlign } from '../interfaces/data-table.types';
 
 // ── Insignias ───────────────────────────────────────────────────────────────
 export { default as StatusBadge } from './badges/StatusBadge';
+
+// ── Formularios ─────────────────────────────────────────────────────────────
+export { InputSelector } from './inputs/InputSelector';
