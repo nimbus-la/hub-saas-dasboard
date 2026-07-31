@@ -182,7 +182,17 @@ export default function SalesChart({
             )}
 
             {/* ── Lienzo del gráfico ─────────────────────────────────────── */}
-            <div className="relative mt-4 h-76 w-full sm:h-84">
+            {/* Alto fijo mientras las tarjetas van apiladas (el canvas necesita
+                un contenedor con altura definida). Desde `lg` la tarjeta es una
+                celda de la rejilla que se estira hasta la más alta de la fila,
+                así que ahí el gráfico se queda ese alto sobrante en vez de
+                dejarlo en blanco al pie.
+
+                `-mx-2`: el canvas se mete 8px en el padding de la tarjeta, justo
+                lo que Chart.js reserva como `EDGE_GUTTER` para que el punto en
+                hover de los extremos quepa entero. Así el ÁREA DE TRAZADO (no el
+                canvas) queda alineada con el resto del contenido. */}
+            <div className="relative -mx-2 mt-4 h-76 sm:h-84 lg:h-auto lg:min-h-84 lg:flex-1">
                 {hasData ? (
                     <canvas
                         ref={canvasRef}
@@ -190,7 +200,9 @@ export default function SalesChart({
                         aria-label={`Evolución de ventas por sucursal (${labels.at(0)} a ${labels.at(-1)}). Total del periodo: ${formatMoneyFull(visibleSalesTotal)}. Los valores exactos están en la tabla siguiente.`}
                     />
                 ) : (
-                    <div className="flex h-full flex-col items-center justify-center gap-1 rounded-xl bg-neutral-100/60">
+                    // `mx-2` cancela el sangrado del contenedor: el bloque vacío
+                    // sí se alinea con el borde del contenido de la tarjeta.
+                    <div className="mx-2 flex h-full flex-col items-center justify-center gap-1 rounded-xl bg-neutral-100/60">
                         <p className="text-sm font-semibold text-neutral-800">
                             Sin datos para este periodo
                         </p>

@@ -49,10 +49,13 @@ const DEFAULT_PERIOD_KEY: PeriodKey = "meses";
 
 // ── Mock determinista (mismo resultado en cada render → sin hydration issues) ─
 // Importe base por punto según el periodo: un día vende mucho menos que un mes.
+// Guardan la proporción real entre periodos (una semana ≈ 7 días, un mes ≈ 4,3
+// semanas), así el eje Y baja de ~$5M en "Meses" a ~$1.1M y ~$170K sin tocar la
+// escala a mano: se ajusta sola a los datos de cada filtro.
 const PERIOD_AMPLITUDE: Record<PeriodKey, number> = {
-    dias: 16_000,
-    semanas: 95_000,
-    meses: 380_000,
+    dias: 90_000,
+    semanas: 600_000,
+    meses: 2_500_000,
 };
 
 // Peso relativo de cada sucursal, en el mismo orden que `BRANCHES`.

@@ -19,11 +19,20 @@ const LINE_WIDTH = 2.5;
 const POINT_HOVER_RADIUS = 5;
 const POINT_HOVER_BORDER_WIDTH = 3;
 const POINT_HIT_RADIUS = 24;            // área de toque cómoda en móvil
+// Colchón entre el área de trazado y el borde del canvas. El punto en hover mide
+// POINT_HOVER_RADIUS + borde/2 = 6.5px de radio y el primer/último dato caen justo
+// sobre el borde (`offset: false`), así que sin este margen se dibujarían cortados.
+// Lo compensa el `-mx-2` del contenedor: la línea sigue alineada con la tarjeta.
+const EDGE_GUTTER = 8;
 
 const ANIMATION_DURATION_MS = 700;
 const Y_AXIS_HEADROOM = "6%";           // el pico nunca toca la última línea
-const Y_AXIS_MAX_TICKS = 5;
+// Tope, no objetivo: Chart.js elige el paso "redondo" que quepa por debajo.
+// Con 7 sale $0→$5M de millón en millón en Meses y $0→$1.2M de 200K en 200K
+// en Semanas, sin amontonar las líneas de la rejilla.
+const Y_AXIS_MAX_TICKS = 7;
 const X_AXIS_TICK_PADDING = 14;         // deja aire para el marcador del crosshair
+const Y_AXIS_TICK_PADDING = 14;         // aire entre los importes y la rejilla
 const AXIS_FONT_SIZE = 12;
 
 export interface SalesChartTheme {
@@ -73,6 +82,10 @@ export function buildSalesDatasets(
         backgroundColor: (context: ScriptableContext<"line">) =>
             buildAreaGradient(context, branchSeries.color),
         fill: true,
+        // Chart.js recorta cada dataset contra el área de trazado y calcula el
+        // margen con el radio en reposo (0), no con el de hover: los puntos de
+        // los extremos salían partidos por la mitad. Con este margen caben enteros.
+        clip: EDGE_GUTTER,
         tension: LINE_TENSION,
         borderWidth: LINE_WIDTH,
         borderCapStyle: "round",
@@ -145,7 +158,14 @@ export function buildSalesChartOptions({
             : { duration: ANIMATION_DURATION_MS, easing: "easeOutQuart" },
         // Un único hover por punto del eje X: muestra todas las sucursales a la vez.
         interaction: { mode: "index", intersect: false },
-        layout: { padding: { top: 8, right: 2, left: 2 } },
+        layout: {
+            padding: {
+                top: EDGE_GUTTER,
+                right: EDGE_GUTTER,
+                bottom: 0,
+                left: EDGE_GUTTER,
+            },
+        },
         plugins: {
             legend: { display: false }, // leyenda propia: interactiva y con totales
             tooltip: {
@@ -171,9 +191,27 @@ export function buildSalesChartOptions({
         },
         scales: {
             x: {
+                // Sin `offset`: el primer y el último punto caen sobre los bordes
+                // y la línea ocupa todo el ancho del área de trazado.
+                offset: false,
+                // Chart.js aplica `ticks.padding` también en horizontal (ver
+                // Scale#_calculatePadding), así que el aire pensado para separar
+                // las etiquetas del eje metía además X_AXIS_TICK_PADDING px muertos
+                // a cada lado y el trazado no llegaba al borde de la tarjeta. Lo
+                // anulamos después del ajuste: el aire vertical se conserva.
+                afterFit: (scale) => {
+                    scale.paddingLeft = 0;
+                    scale.paddingRight = 0;
+                },
                 border: { display: false },
                 grid: { display: false },
                 ticks: {
+                    // `inner`: las etiquetas de los extremos se alinean hacia
+                    // adentro (las del medio siguen centradas en su punto). Así
+                    // "Ene" no invade la columna de importes ni "Dic" se sale por
+                    // la derecha, y el gráfico deja de reservar ese hueco a los
+                    // lados: aprovecha todo el ancho de la tarjeta.
+                    align: "inner",
                     color: theme.axisLabelColor,
                     padding: X_AXIS_TICK_PADDING,
                     maxRotation: 0,
@@ -189,7 +227,7 @@ export function buildSalesChartOptions({
                 grid: { color: theme.gridLineColor, drawTicks: false },
                 ticks: {
                     color: theme.axisLabelColor,
-                    padding: 12,
+                    padding: Y_AXIS_TICK_PADDING,
                     maxTicksLimit: Y_AXIS_MAX_TICKS,
                     font: axisFont,
                     callback: (value) => formatMoneyCompact(Number(value)),
