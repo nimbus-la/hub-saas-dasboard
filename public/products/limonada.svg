@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <defs>
+    <clipPath id="vaso">
+      <path d="M17 16h30l-3.2 36.4a6 6 0 0 1-6 5.6H26.2a6 6 0 0 1-6-5.6L17 16Z"/>
+    </clipPath>
+  </defs>
+  <!-- Popote -->
+  <path d="M46 8 36 27" stroke="#FF7A59" stroke-width="4.5" stroke-linecap="round"/>
+  <!-- Vaso -->
+  <path d="M17 16h30l-3.2 36.4a6 6 0 0 1-6 5.6H26.2a6 6 0 0 1-6-5.6L17 16Z" fill="#E8F4FA"/>
+  <!-- Limonada -->
+  <rect x="14" y="27" width="36" height="34" fill="#FFD84D" clip-path="url(#vaso)"/>
+  <!-- Brillo del vidrio -->
+  <path d="M23 24v22" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity=".55"/>
+  <!-- Rodaja de limón -->
+  <circle cx="47" cy="14" r="7" fill="#FFDF5D"/>
+  <circle cx="47" cy="14" r="3.8" fill="#FFF3B0"/>
+</svg>

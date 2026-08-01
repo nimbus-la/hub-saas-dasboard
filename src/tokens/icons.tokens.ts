@@ -4,6 +4,9 @@ import {
     ClipboardList,
     ShoppingBasket,
     Users,
+    PanelRightClose,
+    PanelRightOpen,
+    Flame,
 } from "lucide-react";
 
 
@@ -13,6 +16,9 @@ export const ICON_TOKENS = {
     INVENTORY: ClipboardList,
     ORDERS: ShoppingBasket,
     EMPLEOYES: Users,
+    PANEL_RIGHT_OPEN: PanelRightOpen,
+    PANEL_RIGHT_CLOSE: PanelRightClose,
+    FLAME: Flame,
 } as const;
 
 

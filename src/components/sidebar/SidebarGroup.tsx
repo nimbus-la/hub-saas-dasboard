@@ -2,6 +2,7 @@ import React from "react";
 
 import { motion } from "framer-motion";
 import { ChevronRight } from 'lucide-react';
+import { useSidebarLayout } from "@/context";
 
 
 interface SidebarGroupProps {
@@ -10,7 +11,12 @@ interface SidebarGroupProps {
 };
 
 export default function SidebarGroup({ label, children }: SidebarGroupProps) {
+    const { isCollapsed } = useSidebarLayout();
     const [isOpen, setIsOpen] = React.useState(true);
+
+    if (isCollapsed) {
+        return <ul className="space-y-0.5">{children}</ul>;
+    };
 
     return (
         <div>
@@ -19,7 +25,7 @@ export default function SidebarGroup({ label, children }: SidebarGroupProps) {
                 initial="rest"
                 whileHover="hover"
                 animate="rest"
-                className="group mb-1 flex w-full cursor-pointer items-center rounded-md py-1.5"
+                className="group mb-1 flex w-full cursor-pointer items-center rounded-md px-3 py-1.5"
             >
                 {/* Flecha — aparece suavemente sin moverse */}
                 <motion.div
