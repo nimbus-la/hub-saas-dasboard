@@ -1,6 +1,9 @@
 import type * as React from "react";
 
-export type InputSelectorSize = "sm" | "md" | "lg";
+/** Escala compartida por todos los campos de formulario. */
+export type InputSize = "sm" | "md" | "lg";
+
+export type InputSelectorSize = InputSize;
 
 export interface InputSelectorOption {
     label: string;
@@ -71,4 +74,84 @@ export interface InputSelectorProps {
     inputClassName?: string;
     /** Clases del panel de opciones. */
     contentClassName?: string;
+}
+
+/* -------------------------------------------------------------------------- */
+/*  TextField                                                                  */
+/* -------------------------------------------------------------------------- */
+
+export type TextFieldSize = InputSize;
+
+/** Tipos permitidos: el campo es de una sola línea. */
+export type TextFieldType =
+    | "text"
+    | "email"
+    | "password"
+    | "search"
+    | "tel"
+    | "url"
+    | "number";
+
+export interface TextFieldProps
+    extends Omit<
+        React.ComponentPropsWithoutRef<"input">,
+        "size" | "type" | "value" | "defaultValue" | "onChange" | "className"
+    > {
+    /** Valor del campo (modo controlado). */
+    value?: string;
+    /** Valor inicial (modo no controlado). */
+    defaultValue?: string;
+    /**
+     * Se dispara en cada pulsación y al limpiar el campo.
+     * Recibe el valor ya extraído; el evento nativo llega como segundo
+     * argumento y es `undefined` cuando el cambio viene del botón "x".
+     */
+    onChange?: (
+        value: string,
+        event?: React.ChangeEvent<HTMLInputElement>
+    ) => void;
+
+    /** Texto de la etiqueta superior. */
+    label?: string;
+    /** Muestra el asterisco de campo obligatorio. */
+    required?: boolean;
+    /** Texto guía dentro del campo — nunca sustituye a la etiqueta. */
+    placeholder?: string;
+    /** Texto de ayuda debajo del campo. */
+    helperText?: string;
+    /** Estado de error: `true` o un mensaje (reemplaza al helperText). */
+    error?: boolean | string;
+    /** Deshabilita el campo. */
+    disabled?: boolean;
+    /** Solo lectura: enfocable y copiable, pero no editable. */
+    readOnly?: boolean;
+
+    /**
+     * Tipo del control. Con `password` aparece el botón de mostrar/ocultar.
+     * @default "text"
+     */
+    type?: TextFieldType;
+    /** Muestra el botón "x" para vaciar el campo cuando tiene contenido. */
+    clearable?: boolean;
+    /** Icono a la izquierda del texto. */
+    leftIcon?: React.ReactNode;
+    /** Adorno a la derecha del texto (icono, sufijo o botón). */
+    rightIcon?: React.ReactNode;
+
+    /** Máximo de caracteres admitidos. */
+    maxLength?: number;
+    /** Muestra el contador a la derecha del texto de ayuda. */
+    showCount?: boolean;
+
+    /** Alto, tipografía, padding y tamaño de iconos. */
+    size?: TextFieldSize;
+    /** Ocupa el 100% del contenedor padre. */
+    fullWidth?: boolean;
+
+    /** Clases del contenedor externo. */
+    className?: string;
+    /** Clases del campo (InputGroup). */
+    fieldClassName?: string;
+    /** Clases del `<input>`. */
+    inputClassName?: string;
 }
