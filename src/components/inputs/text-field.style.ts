@@ -1,12 +1,14 @@
 import { cva } from "class-variance-authority";
 
 /* -------------------------------------------------------------------------- */
-/*  Estilos del InputSelector                                                  */
+/*  Estilos del TextField                                                      */
 /*                                                                             */
 /*  Tokens de marca definidos en style.css: primary-*, neutral-*, error-*.     */
 /*                                                                             */
-/*  El control es un combobox editable: el propio campo filtra las opciones,   */
-/*  así que los estados se pintan sobre el InputGroup con variantes `has-*`.   */
+/*  El campo se monta sobre InputGroup, así que los estados se pintan en el    */
+/*  contenedor con variantes `has-*` y bajan al <input> por selectores de      */
+/*  slot. Misma mecánica que InputSelector para que ambos campos compartan     */
+/*  alto, radios y colores.                                                    */
 /*                                                                             */
 /*  Las clases se escriben literales a propósito: Tailwind escanea el código   */
 /*  fuente y no detecta nombres construidos por interpolación.                 */
@@ -14,9 +16,9 @@ import { cva } from "class-variance-authority";
 
 /**
  * Campo (InputGroup): alto, borde, fondo y los cinco estados
- * — normal, hover, seleccionado (foco/abierto), error y deshabilitado.
+ * — normal, hover, foco, error y deshabilitado.
  */
-export const inputSelectorFieldVariants = cva(
+export const textFieldVariants = cva(
     [
         "w-full rounded-lg border bg-white",
         "transition-[color,background-color,border-color,box-shadow]",
@@ -35,23 +37,21 @@ export const inputSelectorFieldVariants = cva(
         // ── Iconos ───────────────────────────────────────────────────────
         "[&_svg]:text-neutral-500",
         "hover:[&_svg]:text-neutral-600",
-        // El chevron se tiñe de marca mientras el panel está abierto.
-        // Base UI marca `data-popup-open` en todos los controles del campo,
-        // así que se acota al botón del chevron para no teñir también la "x".
-        "[&_[data-slot=input-group-button][data-popup-open]_svg]:text-primary-main",
 
-        // El chevron y la "x" viven en botones fantasma: sin fondo propio.
+        // Los botones "x" y del ojo viven en botones fantasma: sin fondo
+        // propio, solo el icono se oscurece al pasar por encima.
         "[&_[data-slot=input-group-addon][data-align=inline-end]]:mr-0",
         "[&_[data-slot=input-group-button]]:hover:bg-transparent",
-        "[&_[data-slot=combobox-clear]]:hover:bg-transparent",
-        "[&_[data-slot=combobox-clear]:hover_svg]:text-neutral-800",
+        "[&_[data-slot=input-group-button]:hover_svg]:text-neutral-800",
 
         // ── Deshabilitado ────────────────────────────────────────────────
+        // InputGroup baja la opacidad del grupo entero; aquí se sustituye por
+        // colores planos para que el texto no quede translúcido sobre el gris.
         "has-disabled:cursor-not-allowed has-disabled:border-neutral-300",
-        "has-disabled:bg-neutral-200 has-disabled:opacity-100",
+        "has-disabled:bg-neutral-100",
         "has-disabled:hover:border-neutral-300",
-        "has-disabled:[&_[data-slot=input-group-control]]:text-neutral-400",
-        "has-disabled:[&_[data-slot=input-group-control]]:placeholder:text-neutral-400",
+        "has-disabled:[&_[data-slot=input-group-control]]:text-neutral-600",
+        "has-disabled:[&_[data-slot=input-group-control]]:placeholder:text-neutral-600",
         "has-disabled:[&_svg]:text-neutral-400",
         "has-disabled:hover:[&_svg]:text-neutral-400",
     ],
@@ -61,35 +61,46 @@ export const inputSelectorFieldVariants = cva(
                 sm: [
                     "h-9",
                     "[&_[data-slot=input-group-control]]:pl-3",
-                    "[&_[data-slot=input-group-control]]:text-sm",
+                    "[&_[data-slot=input-group-control]]:pr-3",
+                    // 16px en móvil evita el zoom automático de iOS al enfocar;
+                    // a partir de `md` baja a la escala densa del panel.
+                    "[&_[data-slot=input-group-control]]:text-base",
+                    "md:[&_[data-slot=input-group-control]]:text-sm",
                     "[&_svg]:size-4",
+                    "[&_[data-slot=input-group-addon][data-align=inline-start]]:pl-3",
                     "[&_[data-slot=input-group-addon][data-align=inline-end]]:pr-2",
                 ],
                 md: [
                     "h-10",
                     "[&_[data-slot=input-group-control]]:pl-3.5",
-                    "[&_[data-slot=input-group-control]]:text-sm",
+                    "[&_[data-slot=input-group-control]]:pr-3.5",
+                    "[&_[data-slot=input-group-control]]:text-base",
+                    "md:[&_[data-slot=input-group-control]]:text-sm",
                     "[&_svg]:size-4.5",
+                    "[&_[data-slot=input-group-addon][data-align=inline-start]]:pl-3.5",
                     "[&_[data-slot=input-group-addon][data-align=inline-end]]:pr-2.5",
                 ],
                 lg: [
                     "h-12",
                     "[&_[data-slot=input-group-control]]:pl-4",
+                    "[&_[data-slot=input-group-control]]:pr-4",
                     "[&_[data-slot=input-group-control]]:text-base",
                     "[&_svg]:size-5",
+                    "[&_[data-slot=input-group-addon][data-align=inline-start]]:pl-4",
                     "[&_[data-slot=input-group-addon][data-align=inline-end]]:pr-3.5",
                 ],
             },
-            invalid: {
-                /*
-                 * Normal → hover → seleccionado.
-                 * El anillo es el único adorno del campo y aparece solo con el
-                 * foco: 2px al 15% de opacidad, un contorno pegado al borde de
-                 * marca en vez de un halo difuso. Al abrir el panel el input
-                 * conserva el foco, así que el estado se mantiene mientras se
-                 * elige una opción.
-                 */
-                false: [
+
+            /**
+             * Color del borde y del anillo de foco.
+             *
+             * El anillo es el único adorno del campo y aparece solo con el
+             * foco: 2px al 15% de opacidad, un contorno pegado al borde en vez
+             * de un halo difuso.
+             */
+            tone: {
+                /* Normal → hover → foco. */
+                default: [
                     "border-neutral-300 hover:border-neutral-400",
                     "has-[[data-slot=input-group-control]:focus-visible]:border-primary-main",
                     "has-[[data-slot=input-group-control]:focus-visible]:ring-2",
@@ -97,38 +108,36 @@ export const inputSelectorFieldVariants = cva(
                 ],
                 /*
                  * Error: borde rojo permanente, sin anillo hasta que hay foco.
-                 * El InputGroup pinta un anillo fijo con `aria-invalid`, así que
-                 * se anula y se vuelve a encender con el foco. La regla de foco
+                 * InputGroup pinta un anillo fijo con `aria-invalid`, así que se
+                 * anula y se vuelve a encender con el foco. La regla de foco
                  * apila los dos `has-*` para ganar en especificidad sin depender
                  * del orden del stylesheet.
                  */
-                true: [
+                invalid: [
                     "border-error-main hover:border-error-main",
-                    // El chevron acompaña al color del error, no al de marca.
-                    "[&_[data-slot=input-group-button][data-popup-open]_svg]:text-error-main",
                     "has-[[data-slot][aria-invalid=true]]:border-error-main",
                     "has-[[data-slot][aria-invalid=true]]:ring-0",
                     "has-[[data-slot=input-group-control]:focus-visible]:border-error-main",
                     "has-[[data-slot=input-group-control]:focus-visible]:has-[[data-slot][aria-invalid=true]]:ring-2",
                     "has-[[data-slot=input-group-control]:focus-visible]:has-[[data-slot][aria-invalid=true]]:ring-error-main/15",
                 ],
+                /*
+                 * Solo lectura: fondo gris claro y borde inerte al hover, pero
+                 * sigue siendo enfocable — de ahí el anillo neutro, que lo
+                 * distingue del deshabilitado sin insinuar que se puede editar.
+                 */
+                readOnly: [
+                    "bg-neutral-100 border-neutral-300 hover:border-neutral-300",
+                    "[&_[data-slot=input-group-control]]:cursor-default",
+                    "has-[[data-slot=input-group-control]:focus-visible]:border-neutral-400",
+                    "has-[[data-slot=input-group-control]:focus-visible]:ring-2",
+                    "has-[[data-slot=input-group-control]:focus-visible]:ring-neutral-400/20",
+                ],
             },
         },
-        defaultVariants: { size: "md", invalid: false },
+        defaultVariants: { size: "md", tone: "default" },
     }
 );
-
-/** Addon del icono izquierdo: sólo aporta el padding inicial del campo. */
-export const inputSelectorLeftIconVariants = cva("", {
-    variants: {
-        size: {
-            sm: "pl-3",
-            md: "pl-3.5",
-            lg: "pl-4",
-        },
-    },
-    defaultVariants: { size: "md" },
-});
 
 /**
  * Etiqueta superior.
@@ -136,11 +145,8 @@ export const inputSelectorLeftIconVariants = cva("", {
  * Va un escalón por debajo del texto del campo y pegada a él: la etiqueta
  * pertenece al control, no al bloque anterior. Comparte tamaño y separación
  * con el texto de ayuda, de modo que ambos enmarcan el campo por igual.
- *
- * Los valores están sincronizados con `text-field.style.ts`: los dos campos
- * deben alinearse al ponerlos en la misma fila de un formulario.
  */
-export const inputSelectorLabelVariants = cva(
+export const textFieldLabelVariants = cva(
     "block font-medium select-none",
     {
         variants: {
@@ -158,85 +164,67 @@ export const inputSelectorLabelVariants = cva(
     }
 );
 
-/** Texto de ayuda / mensaje de error. Espeja a la etiqueta. */
-export const inputSelectorHelperVariants = cva("", {
-    variants: {
-        size: {
-            sm: "mt-1 text-xs",
-            md: "mt-1 text-xs",
-            lg: "mt-1.5 text-sm",
-        },
-        invalid: {
-            true: "text-error-dark",
-            false: "text-neutral-600",
-        },
-    },
-    defaultVariants: { size: "md", invalid: false },
-});
-
-/** Panel flotante de opciones. */
-export const inputSelectorContentVariants = cva([
-    "min-w-(--anchor-width) rounded-lg border border-neutral-200 bg-white p-0",
-    "shadow-lg shadow-neutral-900/8 ring-0",
-    "motion-reduce:animate-none motion-reduce:transition-none",
-]);
-
 /**
- * Lista scrolleable. `ComboboxList` llega con `no-scrollbar`, que oculta la
- * barra; aquí se reactiva en versión fina. Los selectores se duplican (`&&`)
- * para superar en especificidad a esa utilidad sin depender del orden.
+ * Fila inferior: texto de ayuda a la izquierda y contador a la derecha.
+ * Se reserva el alto aunque solo haya contador, para que el campo no salte
+ * al aparecer un mensaje de error.
  */
-export const inputSelectorListVariants = cva([
-    "max-h-60 overflow-y-auto p-1 overscroll-contain",
-    "[&&]:[scrollbar-width:thin]",
-    "[&&]:[scrollbar-color:var(--color-neutral-300)_transparent]",
-    "[&&::-webkit-scrollbar]:block [&&::-webkit-scrollbar]:w-1.5",
-    "[&&::-webkit-scrollbar-track]:bg-transparent",
-    "[&&::-webkit-scrollbar-thumb]:rounded-full",
-    "[&&::-webkit-scrollbar-thumb]:bg-neutral-300",
-]);
-
-/** Opción del panel. */
-export const inputSelectorItemVariants = cva(
-    [
-        "cursor-pointer rounded-md text-neutral-800",
-        "transition-colors duration-100 motion-reduce:transition-none",
-
-        /*
-         * `selected` y `highlighted` empatan en especificidad, así que se
-         * separan con variantes explícitas en vez de confiar en el orden.
-         */
-        "[&[data-highlighted]:not([data-selected])]:bg-neutral-100",
-        "[&[data-highlighted]:not([data-selected])]:text-neutral-800",
-        "[&[data-selected]]:bg-primary-lighter/60",
-        "[&[data-selected]]:font-medium",
-        "[&[data-selected]]:text-primary-dark",
-        "[&[data-selected][data-highlighted]]:bg-primary-lighter",
-        "data-disabled:cursor-not-allowed data-disabled:text-neutral-400 data-disabled:opacity-100",
-    ],
+export const textFieldFooterVariants = cva(
+    "flex items-start justify-between gap-4",
     {
         variants: {
             size: {
-                sm: "gap-2 py-1.5 pr-2.5 pl-2.5 text-sm",
-                md: "gap-2 py-2 pr-3 pl-3 text-sm",
-                lg: "gap-2.5 py-2.5 pr-3.5 pl-3.5 text-base",
+                sm: "mt-1",
+                md: "mt-1",
+                lg: "mt-1.5",
             },
         },
         defaultVariants: { size: "md" },
     }
 );
 
-/** Mensaje de "sin resultados". */
-export const inputSelectorEmptyVariants = cva(
-    "text-center text-neutral-600",
+/** Texto de ayuda / mensaje de error. */
+export const textFieldHelperVariants = cva("", {
+    variants: {
+        size: {
+            sm: "text-xs",
+            md: "text-xs",
+            lg: "text-sm",
+        },
+        invalid: {
+            true: "text-error-dark",
+            false: "text-neutral-600",
+        },
+        disabled: {
+            true: "text-neutral-400",
+            false: "",
+        },
+    },
+    defaultVariants: { size: "md", invalid: false, disabled: false },
+});
+
+/**
+ * Contador de caracteres. Cifras tabulares para que el ancho no baile
+ * mientras se escribe.
+ */
+export const textFieldCountVariants = cva(
+    "shrink-0 tabular-nums select-none",
     {
         variants: {
             size: {
-                sm: "px-3 py-5 text-xs",
-                md: "px-3 py-6 text-sm",
-                lg: "px-4 py-7 text-sm",
+                sm: "text-xs",
+                md: "text-xs",
+                lg: "text-sm",
+            },
+            invalid: {
+                true: "text-error-dark",
+                false: "text-neutral-600",
+            },
+            disabled: {
+                true: "text-neutral-400",
+                false: "",
             },
         },
-        defaultVariants: { size: "md" },
+        defaultVariants: { size: "md", invalid: false, disabled: false },
     }
 );
