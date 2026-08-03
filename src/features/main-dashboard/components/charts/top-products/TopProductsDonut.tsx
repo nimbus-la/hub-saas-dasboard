@@ -11,8 +11,9 @@
 import { useEffect, useRef } from "react";
 import Chart from "chart.js/auto";
 
+import { formatNumber, formatPercent } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { formatShare, formatUnits, type RankedProduct } from "@/lib/top-products";
+import { type RankedProduct } from "@/lib/top-products";
 import {
     buildTopProductsChartOptions,
     buildTopProductsDataset,
@@ -102,7 +103,7 @@ export default function TopProductsDonut({
                 ref={canvasRef}
                 role="img"
                 aria-label={`Dona de participación en unidades vendidas. ${products
-                    .map((product) => `${product.name}, ${formatShare(product.share)}`)
+                    .map((product) => `${product.name}, ${formatPercent(product.share)}`)
                     .join("; ")}. El detalle está en la lista siguiente.`}
             />
 
@@ -113,12 +114,12 @@ export default function TopProductsDonut({
                 </span>
 
                 <span className="text-[26px] leading-none font-bold tracking-tight tabular-nums text-neutral-800">
-                    {formatUnits(activeProduct ? activeProduct.units : totalUnits)}
+                    {formatNumber(activeProduct ? activeProduct.units : totalUnits)}
                 </span>
 
                 <span className="w-full truncate text-xs text-neutral-500 tabular-nums">
                     {activeProduct
-                        ? `${formatShare(activeProduct.share)} del total`
+                        ? `${formatPercent(activeProduct.share)} del total`
                         : `Top ${products.length} · Este mes`}
                 </span>
             </div>

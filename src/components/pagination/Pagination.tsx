@@ -16,6 +16,7 @@
 import { useId } from "react";
 import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 
+import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { PaginationProps } from "@/interfaces";
 
@@ -77,7 +78,7 @@ export default function Pagination({
                 </span>{" "}
                 de{" "}
                 <span className="font-semibold tabular-nums text-neutral-800">
-                    {totalItems.toLocaleString("es-CO")}
+                    {formatNumber(totalItems)}
                 </span>{" "}
                 {noun}
             </p>

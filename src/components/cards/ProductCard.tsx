@@ -3,10 +3,10 @@ import { ListChecks, Pencil, Trash2, TriangleAlert } from "lucide-react";
 
 import StatusBadge from "@/components/badges/StatusBadge";
 import GenericButton from "@/components/buttons/GenericButton";
+import { formatCurrency } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import {
     formatIngredients,
-    formatPrice,
     isProductUnavailable,
     PRODUCT_STATUS_LABELS,
     PRODUCT_STATUS_TONES,
@@ -119,7 +119,7 @@ export default function ProductCard({
                         alinean sus dígitos y la columna se ve temblorosa. */}
                     <span className="shrink-0 text-base font-bold tabular-nums text-neutral-800">
                         <span className="sr-only">Precio: </span>
-                        {formatPrice(product.price)}
+                        {formatCurrency(product.price)}
                     </span>
                 </div>
             </div>

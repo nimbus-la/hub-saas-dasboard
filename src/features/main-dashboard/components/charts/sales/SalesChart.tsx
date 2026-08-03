@@ -16,12 +16,9 @@ import { useEffect, useRef } from "react";
 import Chart from "chart.js/auto";
 import { TrendingDown, TrendingUp } from "lucide-react";
 
+import { formatCurrency } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import {
-    formatMoneyFull,
-    type PeriodKey,
-    type SalesSeries,
-} from "@/lib/branch-sales";
+import { type PeriodKey, type SalesSeries } from "@/lib/branch-sales";
 
 import SalesChartDataTable from "./SalesChartDataTable";
 import SalesChartLegend from "./SalesChartLegend";
@@ -150,7 +147,7 @@ export default function SalesChart({
 
                     <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
                         <p className="text-[28px] leading-none font-bold tracking-tight tabular-nums text-neutral-800">
-                            {formatMoneyFull(visibleSalesTotal)}
+                            {formatCurrency(visibleSalesTotal)}
                         </p>
 
                         <span
@@ -197,7 +194,7 @@ export default function SalesChart({
                     <canvas
                         ref={canvasRef}
                         role="img"
-                        aria-label={`Evolución de ventas por sucursal (${labels.at(0)} a ${labels.at(-1)}). Total del periodo: ${formatMoneyFull(visibleSalesTotal)}. Los valores exactos están en la tabla siguiente.`}
+                        aria-label={`Evolución de ventas por sucursal (${labels.at(0)} a ${labels.at(-1)}). Total del periodo: ${formatCurrency(visibleSalesTotal)}. Los valores exactos están en la tabla siguiente.`}
                     />
                 ) : (
                     // `mx-2` cancela el sangrado del contenedor: el bloque vacío

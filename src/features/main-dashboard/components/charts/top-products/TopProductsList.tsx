@@ -8,14 +8,9 @@
 
 import Image from "next/image";
 
+import { formatCurrency, formatNumber, formatPercent } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import {
-    formatShare,
-    formatUnitPrice,
-    formatUnits,
-    type ProductAccent,
-    type RankedProduct,
-} from "@/lib/top-products";
+import { type ProductAccent, type RankedProduct } from "@/lib/top-products";
 
 interface TopProductsListProps {
     products: RankedProduct[];
@@ -98,7 +93,7 @@ export default function TopProductsList({
                                 </span>
 
                                 <span className="truncate text-xs text-neutral-500 tabular-nums">
-                                    {formatUnits(product.units)} unidades vendidas
+                                    {formatNumber(product.units)} unidades vendidas
                                 </span>
                             </div>
 
@@ -106,7 +101,7 @@ export default function TopProductsList({
                             <div className="ml-auto flex shrink-0 flex-col items-end">
                                 <span className="text-sm font-bold text-neutral-800 tabular-nums">
                                     <span className="sr-only">Precio unitario: </span>
-                                    {formatUnitPrice(product.price)}
+                                    {formatCurrency(product.price)}
                                 </span>
 
                                 <span className="flex items-center gap-1.5 text-xs text-neutral-500 tabular-nums">
@@ -114,7 +109,7 @@ export default function TopProductsList({
                                         aria-hidden="true"
                                         className={cn("size-2 shrink-0 rounded-full", accent.dot)}
                                     />
-                                    {formatShare(product.share)}
+                                    {formatPercent(product.share)}
                                     <span className="sr-only"> de las unidades del top</span>
                                 </span>
                             </div>

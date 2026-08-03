@@ -6,6 +6,7 @@
 // fotos reales basta con cambiar la ruta; si el origen es remoto, recuerda
 // declarar el dominio en `images.remotePatterns` de next.config.ts.
 
+import { formatNumber } from "@/lib/format";
 import type { BadgeTone } from "@/interfaces";
 
 /**
@@ -128,34 +129,19 @@ export function getProducts(): Product[] {
     return PRODUCTS;
 }
 
-// ── Formatos (es-CO) ────────────────────────────────────────────────────────
+// ── Etiquetas del dominio ───────────────────────────────────────────────────
+// Solo el texto que acompaña a la cifra: el formato del número lo pone
+// `@/lib/format`, y los precios se pintan con `formatCurrency` directamente.
 
 /** `1 producto` · `22 productos` */
 export const formatProductCount = (count: number): string =>
-    `${count.toLocaleString("es-CO")} ${count === 1 ? "producto" : "productos"}`;
-
-/**
- * `$ 28.000` · `$ 1.250.000`
- *
- * Sin decimales: el peso colombiano no se cotiza en centavos y en una rejilla
- * de veinte tarjetas dos decimales por precio son ruido. El formateador se crea
- * una sola vez porque `Intl.NumberFormat` es caro y aquí se llama por cada
- * producto en pantalla.
- */
-const priceFormatter = new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-});
-
-export const formatPrice = (price: number): string => priceFormatter.format(price);
+    `${formatNumber(count)} ${count === 1 ? "producto" : "productos"}`;
 
 /** `Sin ingredientes` · `1 ingrediente` · `9 ingredientes` */
 export const formatIngredients = (count: number): string => {
     if (count === 0) return "Sin ingredientes";
 
-    return `${count} ${count === 1 ? "ingrediente" : "ingredientes"}`;
+    return `${formatNumber(count)} ${count === 1 ? "ingrediente" : "ingredientes"}`;
 };
 
 /**

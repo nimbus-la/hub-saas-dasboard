@@ -6,26 +6,10 @@ import StatusBadge from "@/components/badges/StatusBadge";
 import LinkButton from "@/components/buttons/LinkButton";
 import DataTable from "@/components/tables/DataTable";
 import TitleSubtitleCell from "@/components/tables/TitleSubtitleCell";
+import { formatCurrency, formatDate } from "@/lib/format";
 import { ORDER_STATUS_LABELS, type Order, type OrderStatus } from "@/lib/recent-orders";
 import { cn } from "@/lib/utils";
 import { BadgeTone } from "@/interfaces";
-
-
-// ── Formateadores ───────────────────────────────────────────────────────────
-// Se crean una sola vez a nivel de módulo (instanciar Intl en cada celda es caro).
-// La fecha se formatea en UTC para que servidor y cliente coincidan y no haya
-// desajustes de hidratación por la zona horaria del navegador.
-const currencyFormatter = new Intl.NumberFormat("es-MX", {
-    style: "currency",
-    currency: "MXN",
-});
-
-const dateFormatter = new Intl.DateTimeFormat("es-MX", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    timeZone: "UTC",
-});
 
 
 // Color de la insignia según el estado de la orden (tokens del design system).
@@ -65,7 +49,7 @@ const orderColumns: ColumnDef<Order>[] = [
         meta: { align: "right" },
         cell: ({ row }) => (
             <span className="font-semibold tabular-nums text-neutral-800">
-                {currencyFormatter.format(row.original.amount)}
+                {formatCurrency(row.original.amount)}
             </span>
         ),
     },
@@ -84,7 +68,7 @@ const orderColumns: ColumnDef<Order>[] = [
         header: "Fecha de la orden",
         cell: ({ row }) => (
             <time dateTime={row.original.placedAt} className="tabular-nums">
-                {dateFormatter.format(new Date(row.original.placedAt))}
+                {formatDate(row.original.placedAt)}
             </time>
         ),
     },

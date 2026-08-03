@@ -5,7 +5,8 @@
 // gráfico. El estado oculto se distingue por forma (punto hueco) además de por
 // color, para no depender solo del color.
 
-import { formatMoneyCompact, type SalesSeries } from "@/lib/branch-sales";
+import { formatCurrencyCompact } from "@/lib/format";
+import { type SalesSeries } from "@/lib/branch-sales";
 import { cn } from "@/lib/utils";
 
 interface SalesChartLegendProps {
@@ -64,7 +65,7 @@ export default function SalesChartLegend({
                                 isHidden ? "text-neutral-400" : "text-neutral-800"
                             )}
                         >
-                            {formatMoneyCompact(branchSeries.total)}
+                            {formatCurrencyCompact(branchSeries.total)}
                         </span>
                     </button>
                 );
