@@ -45,6 +45,15 @@ const buttonVariants = cva(
                     "data-[selected=true]:hover:bg-primary-main/20",
                     "disabled:bg-white disabled:text-neutral-300",
                 ],
+
+                // Destructivo discreto: el color hace el aviso sin competir con
+                // el primario. Para eliminar, archivar o cancelar de verdad.
+                danger: [
+                    "bg-transparent text-error-main",
+                    "hover:bg-error-lighter hover:text-error-dark",
+                    "focus-visible:ring-3 focus-visible:ring-error-light",
+                    "disabled:bg-white disabled:text-neutral-300",
+                ],
             },
 
             // ── Tamaño — icon and text ──────────────────────────────────────

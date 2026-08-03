@@ -168,12 +168,13 @@ export function TextField({
                     aria-invalid={invalid || undefined}
                     aria-describedby={describedBy}
                     className={cn(
-                        // El spinner nativo de `type=number` aparece al pasar el
-                        // ratón justo donde viven la "x", el ojo y el sufijo. Se
-                        // retira sólo cuando hay algo con lo que chocar: un campo
-                        // numérico sin adornos conserva su control nativo.
+                        // El spinner nativo de `type=number` y la "x" nativa de
+                        // `type=search` aparecen justo donde viven la "x", el ojo
+                        // y el sufijo. Se retiran sólo cuando hay algo con lo que
+                        // chocar: un campo sin adornos conserva su control nativo
+                        // (si no, `clearable` en una búsqueda muestra dos aspas).
                         hasEndAddon &&
-                        "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+                        "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-search-cancel-button]:appearance-none",
                         inputClassName
                     )}
                     value={currentValue}
