@@ -7,6 +7,7 @@
 
 import { LucideIcon, TrendingDown, TrendingUp } from "lucide-react";
 import { cva, VariantProps } from "class-variance-authority";
+import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 
@@ -54,8 +55,8 @@ export default function MetricCard({
     const trendColor = isPositive ? "text-success-main" : "text-error-main";
 
     // Formatea números con separador de miles; los strings se dejan tal cual
-    const displayValue =
-        typeof value === "number" ? value.toLocaleString("en-US") : value;
+    // (así una métrica puede llegar ya formateada como importe o porcentaje).
+    const displayValue = typeof value === "number" ? formatNumber(value) : value;
 
     return (
         <div

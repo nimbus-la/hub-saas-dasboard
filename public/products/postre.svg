@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" fill="none">
+  <!-- Barquillo -->
+  <path d="M22 31h20l-7.6 25.4a2.5 2.5 0 0 1-4.8 0L22 31Z" fill="#E9A45C"/>
+  <path d="M26.5 39h11" stroke="#C97F3E" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M28.5 47h7" stroke="#C97F3E" stroke-width="1.6" stroke-linecap="round"/>
+  <!-- Bolas de helado -->
+  <circle cx="24.5" cy="27" r="8.5" fill="#F58BA8"/>
+  <circle cx="39.5" cy="27" r="8.5" fill="#FFD9A0"/>
+  <circle cx="32" cy="19" r="9" fill="#FCEBD3"/>
+  <!-- Cereza -->
+  <circle cx="32" cy="8.5" r="3.6" fill="#FF5630"/>
+  <path d="M32.5 5.4c.2-2 1.6-3.2 3.2-3.6" stroke="#79D06B" stroke-width="1.8" stroke-linecap="round"/>
+</svg>

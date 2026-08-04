@@ -7,7 +7,8 @@
 // `width: 1px` es solo un mínimo (crece con su contenido) y el ancho real
 // acabaría estirando el scroll horizontal de la página.
 
-import { formatMoneyFull, type SalesSeries } from "@/lib/branch-sales";
+import { formatCurrency } from "@/lib/format";
+import { type SalesSeries } from "@/lib/branch-sales";
 
 interface SalesChartDataTableProps {
     labels: string[];
@@ -40,7 +41,7 @@ export default function SalesChartDataTable({
                             <th scope="row">{label}</th>
                             {series.map((branchSeries) => (
                                 <td key={branchSeries.id}>
-                                    {formatMoneyFull(branchSeries.data[pointIndex] ?? 0)}
+                                    {formatCurrency(branchSeries.data[pointIndex] ?? 0)}
                                 </td>
                             ))}
                         </tr>

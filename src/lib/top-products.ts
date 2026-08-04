@@ -15,8 +15,8 @@ export interface TopProduct {
     image: string;          // miniatura (ruta pública o URL)
     accent: ProductAccent;  // color de la porción y del marco (token del design system)
     units: number;          // unidades vendidas
-    price: number;          // precio unitario (MXN)
-    revenue: number;        // ventas totales (MXN)
+    price: number;          // precio unitario (COP)
+    revenue: number;        // ventas totales (COP) — units × price
 }
 
 /** Producto ya posicionado dentro del top, con su peso sobre el total. */
@@ -45,11 +45,11 @@ export const ACCENT_COLORS: Record<ProductAccent, string> = {
 };
 
 const PRODUCTS: TopProduct[] = [
-    { id: "p1", name: "Hamburguesa Clásica", category: "Platos fuertes", image: "/products/hamburguesa.svg", accent: "warning", units: 3184, price: 130.30, revenue: 414_920 },
-    { id: "p2", name: "Tacos al Pastor", category: "Antojitos", image: "/products/tacos.svg", accent: "error", units: 2971, price: 120.00, revenue: 356_520 },
-    { id: "p3", name: "Pizza Margherita", category: "Platos fuertes", image: "/products/pizza.svg", accent: "success", units: 2043, price: 189.50, revenue: 387_170 },
-    { id: "p4", name: "Limonada Natural", category: "Bebidas", image: "/products/limonada.svg", accent: "info", units: 1888, price: 50.00, revenue: 94_400 },
-    { id: "p5", name: "Alitas BBQ", category: "Entradas", image: "/products/alitas.svg", accent: "secondary", units: 1562, price: 140.00, revenue: 218_680 },
+    { id: "p1", name: "Hamburguesa Clásica", category: "Platos fuertes", image: "/products/hamburguesa.svg", accent: "warning", units: 3184, price: 28_000, revenue: 89_152_000 },
+    { id: "p2", name: "Tacos al Pastor", category: "Antojitos", image: "/products/tacos.svg", accent: "error", units: 2971, price: 22_000, revenue: 65_362_000 },
+    { id: "p3", name: "Pizza Margherita", category: "Platos fuertes", image: "/products/pizza.svg", accent: "success", units: 2043, price: 42_000, revenue: 85_806_000 },
+    { id: "p4", name: "Limonada Natural", category: "Bebidas", image: "/products/limonada.svg", accent: "info", units: 1888, price: 9_000, revenue: 16_992_000 },
+    { id: "p5", name: "Alitas BBQ", category: "Entradas", image: "/products/alitas.svg", accent: "secondary", units: 1562, price: 30_000, revenue: 46_860_000 },
 ];
 
 /**
@@ -72,23 +72,3 @@ export function getTopProducts(limit: number = TOP_PRODUCTS_LIMIT): TopProductsD
         })),
     };
 }
-
-// ── Formatos (es-MX) ────────────────────────────────────────────────────────
-const shareFormatter = new Intl.NumberFormat("es-MX", {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
-});
-
-const priceFormatter = new Intl.NumberFormat("es-MX", {
-    style: "currency",
-    currency: "MXN",
-});
-
-/** `3.184` */
-export const formatUnits = (units: number): string => units.toLocaleString("es-MX");
-
-/** `$130.30` */
-export const formatUnitPrice = (price: number): string => priceFormatter.format(price);
-
-/** `27,3%` */
-export const formatShare = (share: number): string => `${shareFormatter.format(share)}%`;

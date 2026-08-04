@@ -5,11 +5,8 @@
 
 import type { ChartDataset, ChartOptions, ScriptableContext } from "chart.js";
 import { hexToRgba, readCssVariable } from "@/lib/theme";
-import {
-    formatMoneyCompact,
-    formatMoneyFull,
-    type SalesSeries,
-} from "@/lib/branch-sales";
+import { formatCurrency, formatCurrencyCompact } from "@/lib/format";
+import { type SalesSeries } from "@/lib/branch-sales";
 
 // ── Ajustes visuales ────────────────────────────────────────────────────────
 const GRID_LINE_OPACITY = 0.7;          // rejilla apenas perceptible
@@ -184,7 +181,7 @@ export function buildSalesChartOptions({
                 boxPadding: 6,
                 callbacks: {
                     label: (tooltipItem) =>
-                        ` ${tooltipItem.dataset.label}: ${formatMoneyFull(Number(tooltipItem.parsed.y))}`,
+                        ` ${tooltipItem.dataset.label}: ${formatCurrency(Number(tooltipItem.parsed.y))}`,
                     labelPointStyle: () => ({ pointStyle: "circle", rotation: 0 }),
                 },
             },
@@ -230,7 +227,7 @@ export function buildSalesChartOptions({
                     padding: Y_AXIS_TICK_PADDING,
                     maxTicksLimit: Y_AXIS_MAX_TICKS,
                     font: axisFont,
-                    callback: (value) => formatMoneyCompact(Number(value)),
+                    callback: (value) => formatCurrencyCompact(Number(value)),
                 },
             },
         },

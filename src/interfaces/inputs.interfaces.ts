@@ -155,3 +155,85 @@ export interface TextFieldProps
     /** Clases del `<input>`. */
     inputClassName?: string;
 }
+
+
+
+/* -------------------------------------------------------------------------- */
+/*  TextAreaField                                                              */
+/* -------------------------------------------------------------------------- */
+
+export interface TextAreaFieldProps
+    extends Omit<
+        React.ComponentPropsWithoutRef<"textarea">,
+        "value" | "defaultValue" | "onChange" | "className"
+    > {
+    /** Valor del campo (modo controlado). */
+    value?: string;
+    /** Valor inicial (modo no controlado). */
+    defaultValue?: string;
+    /** Se dispara en cada pulsación; recibe el valor ya extraído. */
+    onChange?: (
+        value: string,
+        event?: React.ChangeEvent<HTMLTextAreaElement>
+    ) => void;
+
+    /** Texto de la etiqueta superior. */
+    label?: string;
+    /** Muestra el asterisco de campo obligatorio. */
+    required?: boolean;
+    /** Texto guía dentro del campo — nunca sustituye a la etiqueta. */
+    placeholder?: string;
+    /** Texto de ayuda debajo del campo. */
+    helperText?: string;
+    /** Estado de error: `true` o un mensaje (reemplaza al helperText). */
+    error?: boolean | string;
+    disabled?: boolean;
+
+    /** Máximo de caracteres admitidos. */
+    maxLength?: number;
+    /** Muestra el contador a la derecha del texto de ayuda. */
+    showCount?: boolean;
+    /** Líneas visibles antes de que el campo empiece a desplazarse. */
+    rows?: number;
+
+    /** Clases del contenedor externo. */
+    className?: string;
+    /** Clases del `<textarea>`. */
+    fieldClassName?: string;
+}
+
+
+
+/* -------------------------------------------------------------------------- */
+/*  Switch                                                                     */
+/* -------------------------------------------------------------------------- */
+
+export type SwitchSize = "sm" | "md";
+
+export interface SwitchProps {
+    /** Estado del interruptor (modo controlado). */
+    checked?: boolean;
+    /** Estado inicial (modo no controlado). */
+    defaultChecked?: boolean;
+    onCheckedChange?: (checked: boolean) => void;
+
+    /**
+     * Etiqueta visible a la izquierda del control.
+     * Sin ella hay que pasar `aria-label`: el interruptor no tiene texto propio.
+     */
+    label?: string;
+    /** Aclaración breve bajo la etiqueta. */
+    description?: string;
+    disabled?: boolean;
+    size?: SwitchSize;
+
+    name?: string;
+    id?: string;
+    /** Clases del contenedor externo. */
+    className?: string;
+    /** Clases del carril. */
+    trackClassName?: string;
+
+    "aria-label"?: string;
+    "aria-describedby"?: string;
+}

@@ -8,13 +8,8 @@
 // `width: 1px` es solo un mínimo (crece con su contenido) y el ancho real
 // acabaría estirando el scroll horizontal de la página.
 
-import { formatMoneyFull } from "@/lib/branch-sales";
-import {
-    formatShare,
-    formatUnitPrice,
-    formatUnits,
-    type RankedProduct,
-} from "@/lib/top-products";
+import { formatCurrency, formatNumber, formatPercent } from "@/lib/format";
+import { type RankedProduct } from "@/lib/top-products";
 
 interface TopProductsDataTableProps {
     products: RankedProduct[];
@@ -30,7 +25,7 @@ export default function TopProductsDataTable({
             <table>
                 <caption>
                     Top {products.length} de productos más vendidos este mes.{" "}
-                    {formatUnits(totalUnits)} unidades en total.
+                    {formatNumber(totalUnits)} unidades en total.
                 </caption>
 
                 <thead>
@@ -51,10 +46,10 @@ export default function TopProductsDataTable({
                             <th scope="row">{product.rank}</th>
                             <td>{product.name}</td>
                             <td>{product.category}</td>
-                            <td>{formatUnits(product.units)}</td>
-                            <td>{formatShare(product.share)}</td>
-                            <td>{formatUnitPrice(product.price)}</td>
-                            <td>{formatMoneyFull(product.revenue)}</td>
+                            <td>{formatNumber(product.units)}</td>
+                            <td>{formatPercent(product.share)}</td>
+                            <td>{formatCurrency(product.price)}</td>
+                            <td>{formatCurrency(product.revenue)}</td>
                         </tr>
                     ))}
                 </tbody>

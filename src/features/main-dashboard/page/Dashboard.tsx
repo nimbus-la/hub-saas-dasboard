@@ -1,6 +1,7 @@
 import { ChartNoAxesCombined, DollarSign, ShoppingBag, Users } from "lucide-react";
 
 import MetricCard from "@/components/cards/MetricCard";
+import { formatCurrencyCompact } from "@/lib/format";
 import { getRecentOrders } from "@/lib/recent-orders";
 import { getTopProducts } from "@/lib/top-products";
 import { RecentOrdersTable, SalesChartSection, TopProductsCard } from "../components";
@@ -16,7 +17,9 @@ export default function Dashboard() {
                         icon={DollarSign}
                         color="secondary"
                         label="Ventas totales"
-                        value="182.940"
+                        // Abreviado: el importe completo en COP no cabe en la
+                        // tarjeta sin partirse en dos líneas.
+                        value={formatCurrencyCompact(682_940_000)}
                         delta={12.5}
                     />
                     <MetricCard
