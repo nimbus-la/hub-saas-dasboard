@@ -1,7 +1,7 @@
-import Image from "next/image";
 import { ListChecks, Pencil, Trash2, TriangleAlert } from "lucide-react";
 
 import StatusBadge from "@/components/badges/StatusBadge";
+import ProductThumbnail from "@/components/cards/ProductThumbnail";
 import GenericButton from "@/components/buttons/GenericButton";
 import { formatCurrency } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -12,14 +12,6 @@ import {
     PRODUCT_STATUS_TONES,
 } from "@/lib/products";
 import type { ProductCardProps } from "@/interfaces";
-
-/**
- * Lado de la miniatura en píxeles.
- *
- * Los SVG escalan sin perder nitidez, así que el valor solo reserva el hueco
- * y evita que la tarjeta salte cuando la imagen entra en el viewport.
- */
-const THUMBNAIL_SIZE = 96;
 
 export default function ProductCard({
     product,
@@ -55,23 +47,18 @@ export default function ProductCard({
             )}
         >
             {/* ── Imagen + estado ────────────────────────────────────────── */}
+            {/* El 4:3 reserva el hueco antes de que la foto llegue: sin él la
+                rejilla entera saltaría al cargar cada miniatura. */}
             <div
                 className={cn(
-                    "relative flex aspect-4/3 items-center justify-center",
+                    "relative aspect-4/3 overflow-hidden",
                     isDimmed ? "bg-neutral-200" : "bg-neutral-100"
                 )}
             >
-                <Image
+                <ProductThumbnail
+                    name={product.name}
                     src={product.image}
-                    // Decorativa: el nombre del producto va justo debajo y
-                    // repetirlo aquí obliga al lector de pantalla a oírlo dos veces.
-                    alt=""
-                    width={THUMBNAIL_SIZE}
-                    height={THUMBNAIL_SIZE}
-                    className={cn(
-                        "size-20 object-contain",
-                        isDimmed && "opacity-60 grayscale"
-                    )}
+                    dimmed={isDimmed}
                 />
 
                 {/* La insignia se queda a plena opacidad: es justo el dato que
