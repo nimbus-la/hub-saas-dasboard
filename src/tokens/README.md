@@ -105,20 +105,26 @@ espaciado —son alturas, no ritmo de layout— así que van con utilidad numér
 
 ## Trampas conocidas
 
-Dos cosas que costaron un rato y conviene no volver a descubrir:
+Tres cosas que costaron un rato y conviene no volver a descubrir:
 
 1. **No declarar `--spacing-*` con la escala de camiseta.** Rompe `w-*` y
    `max-w-*` en todo el proyecto (ver arriba).
 2. **`cn()` lleva la rampa tipográfica registrada en tailwind-merge**
    (`lib/utils.ts`). Sin eso, `cn("text-sm", "text-body-md")` deja las dos
    clases —tailwind-merge no sabe que `text-body-md` es un tamaño— y gana la
-   del componente de shadcn, que es justo la que se quería sustituir. Si se
-   añade un estilo a la rampa, el registro se actualiza solo: se deriva de
+   del componente ajeno, que es justo la que se quería sustituir. Si se añade
+   un estilo a la rampa, el registro se actualiza solo: se deriva de
    `TYPOGRAPHY`.
-3. **Los componentes de `components/ui` (shadcn) traen tamaños propios con más
-   especificidad.** El addon del `InputGroup` fija sus iconos a 16px con
-   `[&>svg:not([class*='size-'])]:size-4`; para que mande la receta hay que
-   alcanzarlo por su slot, como hacen los `*.style.ts` de `inputs/`.
+3. **Lo que llegue de shadcn hay que traducirlo antes de usarlo.** Sus clases
+   apuntan a otras variables (`border-input`, `bg-popover`, `ring-ring`) y sus
+   tamaños vienen con más especificidad que la receta: el addon del
+   `InputGroup` fijaba los iconos a 16px con
+   `[&>svg:not([class*='size-'])]:size-4` y ganaba siempre.
+
+   El alias `ui` de `components.json` sigue apuntando a `components/ui`, así
+   que ahí es donde aterriza lo que se añada con el CLI. Es una sala de
+   espera, no un destino: se traduce y se mueve a su familia, como se hizo con
+   los campos (`inputs/primitives`) y el avatar (`avatars`).
 
 ## Rampa tipográfica
 
