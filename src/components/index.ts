@@ -7,6 +7,9 @@ export { default as ProductCard } from './cards/ProductCard';
 
 // ── Botones ─────────────────────────────────────────────────────────────────
 export { default as LinkButton } from './buttons/LinkButton';
+export { default as GenericButton } from './buttons/GenericButton';
+export { linkButtonVariants } from './buttons/link-button.style';
+export { genericButtonVariants } from './buttons/generic-button.style';
 
 // ── Tablas ──────────────────────────────────────────────────────────────────
 export { default as DataTable } from './tables/DataTable';
