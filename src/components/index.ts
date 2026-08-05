@@ -7,6 +7,9 @@ export { default as ProductCard } from './cards/ProductCard';
 
 // ── Botones ─────────────────────────────────────────────────────────────────
 export { default as LinkButton } from './buttons/LinkButton';
+export { default as GenericButton } from './buttons/GenericButton';
+export { linkButtonVariants } from './buttons/link-button.style';
+export { genericButtonVariants } from './buttons/generic-button.style';
 
 // ── Tablas ──────────────────────────────────────────────────────────────────
 export { default as DataTable } from './tables/DataTable';
@@ -16,6 +19,16 @@ export type { ColumnAlign } from '../interfaces/data-table.types';
 
 // ── Insignias ───────────────────────────────────────────────────────────────
 export { default as StatusBadge } from './badges/StatusBadge';
+
+// ── Avatares ────────────────────────────────────────────────────────────────
+export {
+    Avatar,
+    AvatarBadge,
+    AvatarFallback,
+    AvatarGroup,
+    AvatarGroupCount,
+    AvatarImage,
+} from './avatars/Avatar';
 
 // ── Navegación y listados ───────────────────────────────────────────────────
 export { FilterTabs } from './tabs/FilterTabs';

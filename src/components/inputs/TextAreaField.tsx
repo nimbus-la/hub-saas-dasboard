@@ -99,7 +99,7 @@ export function TextAreaField({
                             // Cifras tabulares: sin ellas el contador baila de
                             // ancho con cada tecla.
                             className={cn(
-                                "shrink-0 text-xs tabular-nums select-none",
+                                "shrink-0 text-caption tabular-nums select-none",
                                 invalid ? "text-error-dark" : "text-neutral-600"
                             )}
                         >

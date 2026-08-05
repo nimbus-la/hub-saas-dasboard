@@ -55,7 +55,7 @@ export default function ProductsEmptyState({
                 al contraste mínimo sobre blanco. */}
             <GenericButton
                 variant="primary"
-                size="medium"
+                size="md"
                 label="Limpiar filtros"
                 onClick={onClearFilters}
             />
