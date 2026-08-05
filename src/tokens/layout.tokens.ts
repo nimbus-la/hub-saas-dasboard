@@ -94,32 +94,42 @@ export const DESKTOP_BREAKPOINT = BREAKPOINT.md;
  */
 export const Z_INDEX = {
     base: 0,
-    /** Cabeceras pegajosas de tabla y barras sticky. */
+    /** Cabeceras pegajosas de tabla y controles anclados dentro del contenido. */
     sticky: 10,
-    /** Menús desplegables y autocompletados. */
-    dropdown: 20,
+    /** Barra superior. */
+    navbar: 40,
     /** Velo oscuro que cubre la página. */
     overlay: 40,
     /** Sidebar en modo drawer, por encima del velo. */
     drawer: 50,
     /** Modales y hojas de diálogo. */
     modal: 60,
+    /**
+     * Capas flotantes ancladas a un control: menús, selectores, popovers.
+     *
+     * Van por encima de la barra superior y de los modales a propósito. Se
+     * montan en un portal, así que salen del contenedor y compiten en la raíz
+     * con el chrome: un desplegable abierto desde la barra —o desde dentro de
+     * un modal— tiene que taparlo, no esconderse debajo.
+     */
+    dropdown: 70,
     /** Notificaciones. */
-    toast: 70,
+    toast: 80,
     /** Tooltips: siempre lo último. */
-    tooltip: 80,
+    tooltip: 90,
 } as const;
 
 
 export const Z_INDEX_CLASS = {
     base: "z-0",
     sticky: "z-10",
-    dropdown: "z-20",
+    navbar: "z-40",
     overlay: "z-40",
     drawer: "z-50",
     modal: "z-[60]",
-    toast: "z-[70]",
-    tooltip: "z-[80]",
+    dropdown: "z-[70]",
+    toast: "z-[80]",
+    tooltip: "z-[90]",
 } as const;
 
 

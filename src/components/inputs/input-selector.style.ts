@@ -75,9 +75,6 @@ export const inputSelectorFieldVariants = cva(
                     "[&_[data-slot=input-group-control]]:text-label-lg",
                     "md:[&_[data-slot=input-group-control]]:text-label-sm",
                     "[&_svg]:size-3.5",
-                    // El addon de shadcn fija sus iconos a 16px con más especificidad
-                    // que la regla de arriba; hay que alcanzarlo por su slot.
-                    "[&_[data-slot=input-group-addon]>svg:not([class*='size-'])]:size-3.5",
                     "[&_[data-slot=input-group-addon][data-align=inline-end]]:pr-2",
                 ],
                 md: [
@@ -87,9 +84,6 @@ export const inputSelectorFieldVariants = cva(
                     "[&_[data-slot=input-group-control]]:text-label-lg",
                     "md:[&_[data-slot=input-group-control]]:text-label-md",
                     "[&_svg]:size-4",
-                    // El addon de shadcn fija sus iconos a 16px con más especificidad
-                    // que la regla de arriba; hay que alcanzarlo por su slot.
-                    "[&_[data-slot=input-group-addon]>svg:not([class*='size-'])]:size-4",
                     "[&_[data-slot=input-group-addon][data-align=inline-end]]:pr-2",
                 ],
                 lg: [
@@ -98,9 +92,6 @@ export const inputSelectorFieldVariants = cva(
                     "[&_[data-slot=input-group-control]]:pl-4",
                     "[&_[data-slot=input-group-control]]:text-label-lg",
                     "[&_svg]:size-4.5",
-                    // El addon de shadcn fija sus iconos a 16px con más especificidad
-                    // que la regla de arriba; hay que alcanzarlo por su slot.
-                    "[&_[data-slot=input-group-addon]>svg:not([class*='size-'])]:size-4.5",
                     "[&_[data-slot=input-group-addon][data-align=inline-end]]:pr-3",
                 ],
                 xl: [
@@ -109,9 +100,6 @@ export const inputSelectorFieldVariants = cva(
                     "[&_[data-slot=input-group-control]]:pl-6",
                     "[&_[data-slot=input-group-control]]:text-label-lg",
                     "[&_svg]:size-5",
-                    // El addon de shadcn fija sus iconos a 16px con más especificidad
-                    // que la regla de arriba; hay que alcanzarlo por su slot.
-                    "[&_[data-slot=input-group-addon]>svg:not([class*='size-'])]:size-5",
                     "[&_[data-slot=input-group-addon][data-align=inline-end]]:pr-3",
                 ],
             },
@@ -130,22 +118,14 @@ export const inputSelectorFieldVariants = cva(
                     "has-[[data-slot=input-group-control]:focus-visible]:ring-2",
                     "has-[[data-slot=input-group-control]:focus-visible]:ring-primary-main/15",
                 ],
-                /*
-                 * Error: borde rojo permanente, sin anillo hasta que hay foco.
-                 * El InputGroup pinta un anillo fijo con `aria-invalid`, así que
-                 * se anula y se vuelve a encender con el foco. La regla de foco
-                 * apila los dos `has-*` para ganar en especificidad sin depender
-                 * del orden del stylesheet.
-                 */
+                /* Error: borde rojo permanente, anillo solo con el foco. */
                 true: [
                     "border-error-main hover:border-error-main",
                     // El chevron acompaña al color del error, no al de marca.
                     "[&_[data-slot=input-group-button][data-popup-open]_svg]:text-error-main",
-                    "has-[[data-slot][aria-invalid=true]]:border-error-main",
-                    "has-[[data-slot][aria-invalid=true]]:ring-0",
                     "has-[[data-slot=input-group-control]:focus-visible]:border-error-main",
-                    "has-[[data-slot=input-group-control]:focus-visible]:has-[[data-slot][aria-invalid=true]]:ring-2",
-                    "has-[[data-slot=input-group-control]:focus-visible]:has-[[data-slot][aria-invalid=true]]:ring-error-main/15",
+                    "has-[[data-slot=input-group-control]:focus-visible]:ring-2",
+                    "has-[[data-slot=input-group-control]:focus-visible]:ring-error-main/15",
                 ],
             },
         },

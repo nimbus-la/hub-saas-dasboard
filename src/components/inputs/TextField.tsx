@@ -10,7 +10,7 @@ import {
     InputGroupAddon,
     InputGroupButton,
     InputGroupInput,
-} from "@/components/ui/input"
+} from "./primitives"
 import type { TextFieldProps, TextFieldSize } from "@/interfaces"
 
 import {

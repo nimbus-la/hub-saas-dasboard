@@ -10,9 +10,9 @@ import {
     ComboboxInput,
     ComboboxItem,
     ComboboxList,
+    InputGroupAddon,
     useComboboxAnchor,
-} from "@/components/ui/combobox"
-import { InputGroupAddon } from "@/components/ui/input"
+} from "./primitives"
 import type {
     InputSelectorOption,
     InputSelectorProps,
