@@ -28,8 +28,31 @@ export const DATA_MENU: MenuStructurePrimary[] = [
                 title: 'Productos',
                 type: 'secondary',
                 icon: 'PRODUCTS',
-                url: '/products',
+                // Sin `url`: actúa como acordeón, sus hijos son las páginas reales.
                 active: true,
+                items: [
+                    {
+                        orden: 1,
+                        title: 'Categorías',
+                        type: 'tertiary',
+                        url: '/products/categories',
+                        active: true,
+                    },
+                    {
+                        orden: 2,
+                        title: 'Lista de productos',
+                        type: 'tertiary',
+                        url: '/products',
+                        active: true,
+                    },
+                    {
+                        orden: 3,
+                        title: 'Crear producto',
+                        type: 'tertiary',
+                        url: '/products/create',
+                        active: true,
+                    },
+                ],
             },
             {
                 orden: 2,
