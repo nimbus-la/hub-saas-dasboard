@@ -4,7 +4,9 @@
 /*  Todo se importa desde `@/tokens`. Aquí viven las recetas, el espaciado y    */
 /*  los números que JavaScript necesita; los valores de radio, tipografía,      */
 /*  sombra y color están en `src/style/style.css` y se consumen como            */
-/*  utilidades de Tailwind (`rounded-lg`, `text-body-md`). Ver README.md.       */
+/*  utilidades de Tailwind (`rounded-lg`, `text-body-md`).                      */
+/*                                                                             */
+/*  Documentación completa: `docs/design-tokens.md`.                           */
 /* -------------------------------------------------------------------------- */
 
 export * from './scale.tokens';

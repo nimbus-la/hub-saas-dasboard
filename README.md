@@ -1,5 +1,14 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Documentación
+
+La documentación del proyecto vive en [`docs/`](./docs):
+
+- [**Guía rápida**](./docs/README.md) — el sistema en una página. Empieza aquí.
+- [**Design tokens**](./docs/design-tokens.md) — qué valores existen y cómo se llaman.
+- [**Tailwind**](./docs/tailwind.md) — cómo está montado y las trampas conocidas.
+- [**Componentes**](./docs/components.md) — cómo construir uno con el sistema.
+
 ## Getting Started
 
 First, run the development server:
