@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useSidebarLayout } from "@/context";
 import { Bell, MapPin, Menu, X } from "lucide-react";
 import { InputSelector } from "./inputs/InputSelector";
-import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarBadge, AvatarFallback, AvatarImage } from "./avatars/Avatar";
 
 interface NavbarProps {
     userName?: string;
@@ -104,10 +104,10 @@ export default function Navbar({
 
                     {/* Perfil */}
                     <div className="ml-2 flex items-center gap-3 border-l border-neutral-300 pl-3">
-                        <Avatar className="size-9">
+                        <Avatar size="sm">
                             <AvatarImage src={userAvatarUrl} alt="" />
 
-                            <AvatarFallback className="text-xs font-medium">
+                            <AvatarFallback>
                                 {initialsFrom(userName)}
                             </AvatarFallback>
 

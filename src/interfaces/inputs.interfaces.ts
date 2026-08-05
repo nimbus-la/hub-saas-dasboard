@@ -1,7 +1,16 @@
 import type * as React from "react";
 
-/** Escala compartida por todos los campos de formulario. */
-export type InputSize = "sm" | "md" | "lg";
+import type { SizeToken } from "@/tokens";
+
+/**
+ * Escala compartida por todos los campos de formulario.
+ *
+ * Es la del sistema recortada por los extremos: `xs` (24px) no admite texto
+ * legible dentro y `2xl` (56px) convierte un campo en un cartel. Los cuatro
+ * escalones que quedan son los mismos de `CONTROL_SIZE`, así que un campo y un
+ * botón del mismo tamaño cuadran al píxel en la misma fila.
+ */
+export type InputSize = Extract<SizeToken, "sm" | "md" | "lg" | "xl">;
 
 export type InputSelectorSize = InputSize;
 
