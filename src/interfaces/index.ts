@@ -11,3 +11,9 @@ export * from "./inputs.interfaces";
 export * from "./pagination.interfaces";
 
 export * from "./tabs.interfaces";
+
+
+
+/** Tokens */
+export * from "./tokens/sizes-token.interface";
+export * from "./tokens/elevation-token.interface";

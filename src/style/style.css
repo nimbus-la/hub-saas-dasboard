@@ -63,6 +63,191 @@
     --color-error-main: #FF5630;
     --color-error-dark: #B71D18;
     --color-error-darker: #7A0916;
+
+    /* ══════════════════════════════════════════════════════════════════
+       DESIGN SYSTEM — escala xs…2xl
+
+       Estas variables son la fuente de verdad de todo lo que solo sirve
+       para pintar: espaciado, tipografía y sombras. Tailwind genera una
+       utilidad por cada una (`gap-md`, `text-body-md`, `shadow-lg`), así
+       que NO se duplican en `src/tokens/`: allí solo viven las recetas
+       (qué token usa cada componente) y los valores que JavaScript
+       necesita como número.
+
+       Para leerlas desde canvas o Chart.js: `readCssVariable()` de
+       `lib/theme.ts`, igual que con los colores.
+       ══════════════════════════════════════════════════════════════════ */
+
+    /* ─── Espaciado ───────────────────────────────────── */
+    /* Retícula de 4px. La escala numérica de Tailwind (`p-4`) sigue
+       disponible; estas claves con nombre son las del sistema.          */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+    --spacing-xl: 24px;
+    --spacing-2xl: 32px;
+
+    /* ─── Tipografía: display ─────────────────────────── */
+    /* Cifras protagonistas y estados vacíos grandes. */
+    --text-display-lg: 48px;
+    --text-display-lg--line-height: 56px;
+    --text-display-lg--font-weight: 700;
+    --text-display-lg--letter-spacing: -0.02em;
+
+    --text-display-md: 40px;
+    --text-display-md--line-height: 48px;
+    --text-display-md--font-weight: 700;
+    --text-display-md--letter-spacing: -0.02em;
+
+    --text-display-sm: 32px;
+    --text-display-sm--line-height: 40px;
+    --text-display-sm--font-weight: 700;
+    --text-display-sm--letter-spacing: -0.02em;
+
+    /* ─── Tipografía: titulares ───────────────────────── */
+    /* Interlineado apretado (≈1.2) y tracking negativo: a 30px o más las
+       letras se ven separadas y hay que cerrarlas.                      */
+    --text-h1: 36px;
+    --text-h1--line-height: 44px;
+    --text-h1--font-weight: 700;
+    --text-h1--letter-spacing: -0.02em;
+
+    --text-h2: 30px;
+    --text-h2--line-height: 38px;
+    --text-h2--font-weight: 700;
+    --text-h2--letter-spacing: -0.02em;
+
+    --text-h3: 24px;
+    --text-h3--line-height: 32px;
+    --text-h3--font-weight: 600;
+    --text-h3--letter-spacing: -0.01em;
+
+    --text-h4: 20px;
+    --text-h4--line-height: 28px;
+    --text-h4--font-weight: 600;
+    --text-h4--letter-spacing: -0.01em;
+
+    --text-h5: 18px;
+    --text-h5--line-height: 26px;
+    --text-h5--font-weight: 600;
+    --text-h5--letter-spacing: 0em;
+
+    --text-h6: 16px;
+    --text-h6--line-height: 24px;
+    --text-h6--font-weight: 600;
+    --text-h6--letter-spacing: 0em;
+
+    /* ─── Tipografía: subtítulos ──────────────────────── */
+    /* Apoyo de un título o cabecera de tarjeta: cuerpo en semibold. */
+    --text-subtitle-lg: 16px;
+    --text-subtitle-lg--line-height: 24px;
+    --text-subtitle-lg--font-weight: 600;
+    --text-subtitle-lg--letter-spacing: 0em;
+
+    --text-subtitle-md: 14px;
+    --text-subtitle-md--line-height: 22px;
+    --text-subtitle-md--font-weight: 600;
+    --text-subtitle-md--letter-spacing: 0em;
+
+    --text-subtitle-sm: 13px;
+    --text-subtitle-sm--line-height: 20px;
+    --text-subtitle-sm--font-weight: 600;
+    --text-subtitle-sm--letter-spacing: 0em;
+
+    /* ─── Tipografía: cuerpo ──────────────────────────── */
+    /* Interlineado holgado (≈1.55): son párrafos, se leen en horizontal. */
+    --text-body-lg: 16px;
+    --text-body-lg--line-height: 26px;
+    --text-body-lg--font-weight: 400;
+    --text-body-lg--letter-spacing: 0em;
+
+    --text-body-md: 14px;
+    --text-body-md--line-height: 22px;
+    --text-body-md--font-weight: 400;
+    --text-body-md--letter-spacing: 0em;
+
+    --text-body-sm: 13px;
+    --text-body-sm--line-height: 20px;
+    --text-body-sm--font-weight: 400;
+    --text-body-sm--letter-spacing: 0em;
+
+    --text-body-xs: 12px;
+    --text-body-xs--line-height: 18px;
+    --text-body-xs--font-weight: 400;
+    --text-body-xs--letter-spacing: 0em;
+
+    /* ─── Tipografía: etiquetas de control ────────────── */
+    /* Interlineado corto a propósito: dentro de un control la altura la
+       fija el propio control y un leading alto descuadra el centrado.   */
+    --text-label-xl: 18px;
+    --text-label-xl--line-height: 24px;
+    --text-label-xl--font-weight: 500;
+    --text-label-xl--letter-spacing: 0em;
+
+    --text-label-lg: 16px;
+    --text-label-lg--line-height: 20px;
+    --text-label-lg--font-weight: 500;
+    --text-label-lg--letter-spacing: 0em;
+
+    --text-label-md: 14px;
+    --text-label-md--line-height: 20px;
+    --text-label-md--font-weight: 500;
+    --text-label-md--letter-spacing: 0em;
+
+    --text-label-sm: 12px;
+    --text-label-sm--line-height: 16px;
+    --text-label-sm--font-weight: 500;
+    --text-label-sm--letter-spacing: 0em;
+
+    --text-label-xs: 11px;
+    --text-label-xs--line-height: 16px;
+    --text-label-xs--font-weight: 500;
+    --text-label-xs--letter-spacing: 0em;
+
+    /* ─── Tipografía: auxiliares ──────────────────────── */
+    /* Ayudas, metadatos y notas al pie. */
+    --text-caption: 12px;
+    --text-caption--line-height: 18px;
+    --text-caption--font-weight: 400;
+    --text-caption--letter-spacing: 0em;
+
+    /* Rótulo de sección. Va siempre con `uppercase`: a 11px en mayúsculas
+       y sin tracking abierto se leería como un bloque macizo.           */
+    --text-overline: 11px;
+    --text-overline--line-height: 16px;
+    --text-overline--font-weight: 700;
+    --text-overline--letter-spacing: 0.08em;
+
+    /* SKU e identificadores. Se acompaña de `font-mono`. */
+    --text-code: 13px;
+    --text-code--line-height: 20px;
+    --text-code--font-weight: 400;
+    --text-code--letter-spacing: 0em;
+
+    /* ─── Sombras ─────────────────────────────────────── */
+    /* Teñidas con el neutro de marca en vez de negro puro: sobre un panel
+       claro el negro ensucia y el gris azulado se integra.
+
+       Regla: las superficies estáticas (tarjetas, tablas) se separan con
+       borde, no con sombra. La sombra es para lo que flota por encima del
+       contenido — menús, popovers, drawers y modales.                   */
+    --shadow-xs: 0 1px 2px 0 rgb(16 24 40 / 0.05);
+    --shadow-sm: 0 1px 3px 0 rgb(16 24 40 / 0.10), 0 1px 2px -1px rgb(16 24 40 / 0.10);
+    --shadow-md: 0 4px 6px -1px rgb(16 24 40 / 0.10), 0 2px 4px -2px rgb(16 24 40 / 0.10);
+    --shadow-lg: 0 10px 15px -3px rgb(16 24 40 / 0.10), 0 4px 6px -4px rgb(16 24 40 / 0.10);
+    --shadow-xl: 0 20px 25px -5px rgb(16 24 40 / 0.10), 0 8px 10px -6px rgb(16 24 40 / 0.10);
+    --shadow-2xl: 0 25px 50px -12px rgb(16 24 40 / 0.25);
+
+    /* ─── Movimiento ──────────────────────────────────── */
+    /* Las duraciones viven en `tokens/motion.tokens.ts`: framer-motion las
+       necesita como número. Aquí solo la curva que Tailwind no trae.    */
+    --ease-emphasized: cubic-bezier(0.2, 0, 0, 1.2);
+
+    /* ─── Puntos de corte ─────────────────────────────── */
+    /* Los demás son los de Tailwind. Este añade la variante `xs:`, y su
+       gemelo en JS está en `tokens/layout.tokens.ts` (BREAKPOINT).      */
+    --breakpoint-xs: 30rem;
 }
 
 @theme inline {
@@ -98,13 +283,21 @@
     --color-card: var(--card);
     --color-foreground: var(--foreground);
     --color-background: var(--background);
-    --radius-sm: calc(var(--radius) * 0.6);
-    --radius-md: calc(var(--radius) * 0.8);
-    --radius-lg: var(--radius);
-    --radius-xl: calc(var(--radius) * 1.4);
-    --radius-2xl: calc(var(--radius) * 1.8);
-    --radius-3xl: calc(var(--radius) * 2.2);
-    --radius-4xl: calc(var(--radius) * 2.6);
+    /* ─── Radios ──────────────────────────────────────── */
+    /* Escala del sistema: el nombre del token ES el nombre de la utilidad
+       (`RADIUS_SEMANTIC.control` → `rounded-lg`). Antes se derivaban de
+       `--radius` con `calc()`; se fijan explícitos porque el design system
+       manda sobre la variable, no al revés. Los valores son los mismos que
+       producía el `calc()`, así que nada cambia de aspecto.
+
+       `--radius` se conserva: los componentes de shadcn (`src/components/
+       ui`) la leen directamente en valores arbitrarios.                 */
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 10px;
+    --radius-xl: 14px;
+    --radius-2xl: 18px;
 }
 
 :root {
