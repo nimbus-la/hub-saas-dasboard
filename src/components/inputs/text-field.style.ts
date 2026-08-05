@@ -1,18 +1,25 @@
 import { cva } from "class-variance-authority";
 
-/* -------------------------------------------------------------------------- */
-/*  Estilos del TextField                                                      */
-/*                                                                             */
-/*  Tokens de marca definidos en style.css: primary-*, neutral-*, error-*.     */
-/*                                                                             */
-/*  El campo se monta sobre InputGroup, así que los estados se pintan en el    */
-/*  contenedor con variantes `has-*` y bajan al <input> por selectores de      */
-/*  slot. Misma mecánica que InputSelector para que ambos campos compartan     */
-/*  alto, radios y colores.                                                    */
-/*                                                                             */
-/*  Las clases se escriben literales a propósito: Tailwind escanea el código   */
-/*  fuente y no detecta nombres construidos por interpolación.                 */
-/* -------------------------------------------------------------------------- */
+import { CONTROL_SIZE, TRANSITION } from "@/tokens";
+
+
+/**
+ * Estilos del TextField
+ * 
+ * El campo se monta sobre InputGroup, así que los estados se pintan en el
+ * contenedor con variantes `has-*` y bajan al <input> por selectores de
+ * slot. Misma mecánica que InputSelector para que ambos campos compartan
+ * alto, radios y colores.
+ * 
+ * Sobre los tokens: alto y radio se leen directos de `CONTROL_SIZE`, pero
+ * el relleno, la tipografía y el tamaño del icono viven dentro de un slot y
+ * hay que escribirlos con su variante delante. Esa clase compuesta no se
+ * puede armar por interpolación —Tailwind escanea el código fuente y no la
+ * vería—, así que va literal, con el mismo escalón que marca la receta:
+ * `px-4` es el `paddingXClass` de `CONTROL_SIZE.md` y `text-label-md` su
+ * `typographyClass`. Si la receta cambia, hay que bajar aquí a la vez.
+ */
+
 
 /**
  * Campo (InputGroup): alto, borde, fondo y los cinco estados
@@ -20,14 +27,14 @@ import { cva } from "class-variance-authority";
  */
 export const textFieldVariants = cva(
     [
-        "w-full rounded-lg border bg-white",
-        "transition-[color,background-color,border-color,box-shadow]",
-        "duration-150 ease-out motion-reduce:transition-none",
+        "w-full border bg-white",
+        TRANSITION.input,
 
         // ── Texto ────────────────────────────────────────────────────────
+        // El grosor lo trae la etiqueta tipográfica (500); aquí solo se
+        // devuelve el placeholder a regular para que no compita con el valor.
         "[&_[data-slot=input-group-control]]:h-full",
         "[&_[data-slot=input-group-control]]:bg-transparent",
-        "[&_[data-slot=input-group-control]]:font-medium",
         "[&_[data-slot=input-group-control]]:text-neutral-800",
         "[&_[data-slot=input-group-control]]:placeholder:font-normal",
         "[&_[data-slot=input-group-control]]:placeholder:text-neutral-600",
@@ -57,37 +64,64 @@ export const textFieldVariants = cva(
     ],
     {
         variants: {
+            /*
+             * Cada escalón es el mismo de `CONTROL_SIZE`, así que un campo y un
+             * botón del mismo tamaño puestos en la misma fila cuadran al píxel.
+             *
+             * El texto sube a 16px por debajo de `md`: es el mínimo con el que
+             * iOS no hace zoom automático al enfocar. A partir de ahí baja a la
+             * escala densa del panel.
+             */
             size: {
                 sm: [
-                    "h-9",
-                    "[&_[data-slot=input-group-control]]:pl-3",
-                    "[&_[data-slot=input-group-control]]:pr-3",
-                    // 16px en móvil evita el zoom automático de iOS al enfocar;
-                    // a partir de `md` baja a la escala densa del panel.
-                    "[&_[data-slot=input-group-control]]:text-base",
-                    "md:[&_[data-slot=input-group-control]]:text-sm",
-                    "[&_svg]:size-4",
+                    CONTROL_SIZE.sm.heightClass,
+                    CONTROL_SIZE.sm.radiusClass,
+                    "[&_[data-slot=input-group-control]]:px-3",
+                    "[&_[data-slot=input-group-control]]:text-label-lg",
+                    "md:[&_[data-slot=input-group-control]]:text-label-sm",
+                    "[&_svg]:size-3.5",
+                    // El addon de shadcn fija sus iconos a 16px con más especificidad
+                    // que la regla de arriba; hay que alcanzarlo por su slot.
+                    "[&_[data-slot=input-group-addon]>svg:not([class*='size-'])]:size-3.5",
                     "[&_[data-slot=input-group-addon][data-align=inline-start]]:pl-3",
                     "[&_[data-slot=input-group-addon][data-align=inline-end]]:pr-2",
                 ],
                 md: [
-                    "h-10",
-                    "[&_[data-slot=input-group-control]]:pl-3.5",
-                    "[&_[data-slot=input-group-control]]:pr-3.5",
-                    "[&_[data-slot=input-group-control]]:text-base",
-                    "md:[&_[data-slot=input-group-control]]:text-sm",
-                    "[&_svg]:size-4.5",
-                    "[&_[data-slot=input-group-addon][data-align=inline-start]]:pl-3.5",
-                    "[&_[data-slot=input-group-addon][data-align=inline-end]]:pr-2.5",
+                    CONTROL_SIZE.md.heightClass,
+                    CONTROL_SIZE.md.radiusClass,
+                    "[&_[data-slot=input-group-control]]:px-4",
+                    "[&_[data-slot=input-group-control]]:text-label-lg",
+                    "md:[&_[data-slot=input-group-control]]:text-label-md",
+                    "[&_svg]:size-4",
+                    // El addon de shadcn fija sus iconos a 16px con más especificidad
+                    // que la regla de arriba; hay que alcanzarlo por su slot.
+                    "[&_[data-slot=input-group-addon]>svg:not([class*='size-'])]:size-4",
+                    "[&_[data-slot=input-group-addon][data-align=inline-start]]:pl-4",
+                    "[&_[data-slot=input-group-addon][data-align=inline-end]]:pr-2",
                 ],
                 lg: [
-                    "h-12",
-                    "[&_[data-slot=input-group-control]]:pl-4",
-                    "[&_[data-slot=input-group-control]]:pr-4",
-                    "[&_[data-slot=input-group-control]]:text-base",
-                    "[&_svg]:size-5",
+                    CONTROL_SIZE.lg.heightClass,
+                    CONTROL_SIZE.lg.radiusClass,
+                    "[&_[data-slot=input-group-control]]:px-4",
+                    "[&_[data-slot=input-group-control]]:text-label-lg",
+                    "[&_svg]:size-4.5",
+                    // El addon de shadcn fija sus iconos a 16px con más especificidad
+                    // que la regla de arriba; hay que alcanzarlo por su slot.
+                    "[&_[data-slot=input-group-addon]>svg:not([class*='size-'])]:size-4.5",
                     "[&_[data-slot=input-group-addon][data-align=inline-start]]:pl-4",
-                    "[&_[data-slot=input-group-addon][data-align=inline-end]]:pr-3.5",
+                    "[&_[data-slot=input-group-addon][data-align=inline-end]]:pr-3",
+                ],
+                xl: [
+                    CONTROL_SIZE.xl.heightClass,
+                    CONTROL_SIZE.xl.radiusClass,
+                    "[&_[data-slot=input-group-control]]:px-6",
+                    "[&_[data-slot=input-group-control]]:text-label-lg",
+                    "[&_svg]:size-5",
+                    // El addon de shadcn fija sus iconos a 16px con más especificidad
+                    // que la regla de arriba; hay que alcanzarlo por su slot.
+                    "[&_[data-slot=input-group-addon]>svg:not([class*='size-'])]:size-5",
+                    "[&_[data-slot=input-group-addon][data-align=inline-start]]:pl-6",
+                    "[&_[data-slot=input-group-addon][data-align=inline-end]]:pr-3",
                 ],
             },
 
@@ -96,7 +130,8 @@ export const textFieldVariants = cva(
              *
              * El anillo es el único adorno del campo y aparece solo con el
              * foco: 2px al 15% de opacidad, un contorno pegado al borde en vez
-             * de un halo difuso.
+             * de un halo difuso. No usa `FOCUS_RING` porque no lo dispara el
+             * propio elemento sino el `has-*` del contenedor.
              */
             tone: {
                 /* Normal → hover → foco. */
@@ -147,13 +182,14 @@ export const textFieldVariants = cva(
  * con el texto de ayuda, de modo que ambos enmarcan el campo por igual.
  */
 export const textFieldLabelVariants = cva(
-    "block font-medium select-none",
+    "block select-none",
     {
         variants: {
             size: {
-                sm: "mb-1 text-xs",
-                md: "mb-1 text-xs",
-                lg: "mb-1.5 text-sm",
+                sm: "mb-1 text-label-sm",
+                md: "mb-1 text-label-sm",
+                lg: "mb-2 text-label-md",
+                xl: "mb-2 text-label-md",
             },
             disabled: {
                 true: "text-neutral-400",
@@ -176,7 +212,8 @@ export const textFieldFooterVariants = cva(
             size: {
                 sm: "mt-1",
                 md: "mt-1",
-                lg: "mt-1.5",
+                lg: "mt-2",
+                xl: "mt-2",
             },
         },
         defaultVariants: { size: "md" },
@@ -184,13 +221,8 @@ export const textFieldFooterVariants = cva(
 );
 
 /** Texto de ayuda / mensaje de error. */
-export const textFieldHelperVariants = cva("", {
+export const textFieldHelperVariants = cva("text-caption", {
     variants: {
-        size: {
-            sm: "text-xs",
-            md: "text-xs",
-            lg: "text-sm",
-        },
         invalid: {
             true: "text-error-dark",
             false: "text-neutral-600",
@@ -200,7 +232,7 @@ export const textFieldHelperVariants = cva("", {
             false: "",
         },
     },
-    defaultVariants: { size: "md", invalid: false, disabled: false },
+    defaultVariants: { invalid: false, disabled: false },
 });
 
 /**
@@ -208,14 +240,9 @@ export const textFieldHelperVariants = cva("", {
  * mientras se escribe.
  */
 export const textFieldCountVariants = cva(
-    "shrink-0 tabular-nums select-none",
+    "shrink-0 text-caption tabular-nums select-none",
     {
         variants: {
-            size: {
-                sm: "text-xs",
-                md: "text-xs",
-                lg: "text-sm",
-            },
             invalid: {
                 true: "text-error-dark",
                 false: "text-neutral-600",
@@ -225,6 +252,6 @@ export const textFieldCountVariants = cva(
                 false: "",
             },
         },
-        defaultVariants: { size: "md", invalid: false, disabled: false },
+        defaultVariants: { invalid: false, disabled: false },
     }
 );

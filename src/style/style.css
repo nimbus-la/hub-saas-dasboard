@@ -68,25 +68,23 @@
        DESIGN SYSTEM — escala xs…2xl
 
        Estas variables son la fuente de verdad de todo lo que solo sirve
-       para pintar: espaciado, tipografía y sombras. Tailwind genera una
-       utilidad por cada una (`gap-md`, `text-body-md`, `shadow-lg`), así
-       que NO se duplican en `src/tokens/`: allí solo viven las recetas
-       (qué token usa cada componente) y los valores que JavaScript
-       necesita como número.
+       para pintar: tipografía, radios y sombras. Tailwind genera una
+       utilidad por cada una (`text-body-md`, `rounded-lg`, `shadow-lg`),
+       así que NO se duplican en `src/tokens/`: allí solo viven las
+       recetas (qué token usa cada componente) y los valores que
+       JavaScript necesita como número.
+
+       El espaciado es la excepción y se queda en `tokens/spacing.tokens.ts`
+       como escala numérica de Tailwind (`p-3`, `gap-2`). Declararlo aquí
+       como `--spacing-xs…2xl` parece lo natural, pero ese namespace lo
+       comparten `w-*` y `max-w-*`, que resuelven contra la escala de
+       contenedores: al nombrarlo con la escala de camiseta, `max-w-sm`
+       pasa de 24rem a 8px y `w-xs` de 20rem a 4px, en silencio y en todo
+       el proyecto. No compensa.
 
        Para leerlas desde canvas o Chart.js: `readCssVariable()` de
        `lib/theme.ts`, igual que con los colores.
        ══════════════════════════════════════════════════════════════════ */
-
-    /* ─── Espaciado ───────────────────────────────────── */
-    /* Retícula de 4px. La escala numérica de Tailwind (`p-4`) sigue
-       disponible; estas claves con nombre son las del sistema.          */
-    --spacing-xs: 4px;
-    --spacing-sm: 8px;
-    --spacing-md: 12px;
-    --spacing-lg: 16px;
-    --spacing-xl: 24px;
-    --spacing-2xl: 32px;
 
     /* ─── Tipografía: display ─────────────────────────── */
     /* Cifras protagonistas y estados vacíos grandes. */

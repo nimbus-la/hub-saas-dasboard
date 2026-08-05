@@ -9,18 +9,16 @@ import type { SizeMap } from "./scale.tokens";
  * Tamaños de componente
  *
  * Aquí está la parte del design system que el CSS no puede expresar: qué token
- * usa cada componente en cada tamaño. Los valores están en `@theme`; esto son
- * RECETAS — combinaciones cerradas de alto, relleno, separación, icono, radio y
- * tipografía. Se eligen juntos porque juntos funcionan: un botón de 40px con
- * texto de 12px y radio de 18px no está "un poco mal", está mal en tres sitios
- * a la vez.
+ * usa cada componente en cada tamaño. Esto son RECETAS — combinaciones cerradas
+ * de alto, relleno, separación, icono, radio y tipografía. Se eligen juntos
+ * porque juntos funcionan: un botón de 40px con texto de 12px y radio de 18px
+ * no está "un poco mal", está mal en tres sitios a la vez.
  *
  * Un componente con prop `size` lee su fila entera de aquí. Así un botón `md` y
  * un input `md` alineados en la misma fila comparten alto al píxel.
  *
  * Alturas: 24 · 32 · 40 · 44 · 48 · 56 — todas múltiplos de 4. No salen de la
- * escala de espaciado (son alturas de control, no ritmo de layout), por eso van
- * con utilidad numérica (`h-10`) y no con nombre.
+ * escala de espaciado: son alturas de control, no ritmo de layout.
  */
 
 
@@ -34,8 +32,8 @@ export const CONTROL_SIZE = {
         height: 24,
         heightClass: "h-6",
         squareClass: "size-6",
-        paddingXClass: "px-sm",
-        gapClass: "gap-xs",
+        paddingXClass: "px-2",
+        gapClass: "gap-1",
         iconSize: ICON_SIZE.xs,
         iconClass: ICON_SIZE_CLASS.xs,
         radiusClass: RADIUS_CLASS.sm,
@@ -47,8 +45,8 @@ export const CONTROL_SIZE = {
         height: 32,
         heightClass: "h-8",
         squareClass: "size-8",
-        paddingXClass: "px-md",
-        gapClass: "gap-sm",
+        paddingXClass: "px-3",
+        gapClass: "gap-2",
         iconSize: ICON_SIZE.sm,
         iconClass: ICON_SIZE_CLASS.sm,
         radiusClass: RADIUS_CLASS.md,
@@ -60,8 +58,8 @@ export const CONTROL_SIZE = {
         height: 40,
         heightClass: "h-10",
         squareClass: "size-10",
-        paddingXClass: "px-lg",
-        gapClass: "gap-sm",
+        paddingXClass: "px-4",
+        gapClass: "gap-2",
         iconSize: ICON_SIZE.md,
         iconClass: ICON_SIZE_CLASS.md,
         radiusClass: RADIUS_CLASS.lg,
@@ -73,8 +71,8 @@ export const CONTROL_SIZE = {
         height: 44,
         heightClass: "h-11",
         squareClass: "size-11",
-        paddingXClass: "px-lg",
-        gapClass: "gap-sm",
+        paddingXClass: "px-4",
+        gapClass: "gap-2",
         iconSize: ICON_SIZE.lg,
         iconClass: ICON_SIZE_CLASS.lg,
         radiusClass: RADIUS_CLASS.lg,
@@ -86,8 +84,8 @@ export const CONTROL_SIZE = {
         height: 48,
         heightClass: "h-12",
         squareClass: "size-12",
-        paddingXClass: "px-xl",
-        gapClass: "gap-md",
+        paddingXClass: "px-6",
+        gapClass: "gap-3",
         iconSize: ICON_SIZE.xl,
         iconClass: ICON_SIZE_CLASS.xl,
         radiusClass: RADIUS_CLASS.xl,
@@ -99,8 +97,8 @@ export const CONTROL_SIZE = {
         height: 56,
         heightClass: "h-14",
         squareClass: "size-14",
-        paddingXClass: "px-xl",
-        gapClass: "gap-md",
+        paddingXClass: "px-6",
+        gapClass: "gap-3",
         iconSize: ICON_SIZE["2xl"],
         iconClass: ICON_SIZE_CLASS["2xl"],
         radiusClass: RADIUS_CLASS.xl,
@@ -121,8 +119,8 @@ export const CONTROL_SIZE = {
 export const BADGE_SIZE = {
     xs: {
         heightClass: "h-5",
-        paddingXClass: "px-xs",
-        gapClass: "gap-xs",
+        paddingXClass: "px-1",
+        gapClass: "gap-1",
         iconSize: ICON_SIZE.xs,
         iconClass: ICON_SIZE_CLASS.xs,
         radiusClass: RADIUS_CLASS.sm,
@@ -131,8 +129,8 @@ export const BADGE_SIZE = {
 
     sm: {
         heightClass: "h-6",
-        paddingXClass: "px-sm",
-        gapClass: "gap-xs",
+        paddingXClass: "px-2",
+        gapClass: "gap-1",
         iconSize: ICON_SIZE.xs,
         iconClass: ICON_SIZE_CLASS.xs,
         radiusClass: RADIUS_CLASS.sm,
@@ -141,8 +139,8 @@ export const BADGE_SIZE = {
 
     md: {
         heightClass: "h-7",
-        paddingXClass: "px-sm",
-        gapClass: "gap-xs",
+        paddingXClass: "px-2",
+        gapClass: "gap-1",
         iconSize: ICON_SIZE.sm,
         iconClass: ICON_SIZE_CLASS.sm,
         radiusClass: RADIUS_CLASS.md,
@@ -151,8 +149,8 @@ export const BADGE_SIZE = {
 
     lg: {
         heightClass: "h-8",
-        paddingXClass: "px-md",
-        gapClass: "gap-sm",
+        paddingXClass: "px-3",
+        gapClass: "gap-2",
         iconSize: ICON_SIZE.md,
         iconClass: ICON_SIZE_CLASS.md,
         radiusClass: RADIUS_CLASS.md,
@@ -161,8 +159,8 @@ export const BADGE_SIZE = {
 
     xl: {
         heightClass: "h-9",
-        paddingXClass: "px-md",
-        gapClass: "gap-sm",
+        paddingXClass: "px-3",
+        gapClass: "gap-2",
         iconSize: ICON_SIZE.md,
         iconClass: ICON_SIZE_CLASS.md,
         radiusClass: RADIUS_CLASS.lg,
@@ -171,8 +169,8 @@ export const BADGE_SIZE = {
 
     "2xl": {
         heightClass: "h-10",
-        paddingXClass: "px-lg",
-        gapClass: "gap-sm",
+        paddingXClass: "px-4",
+        gapClass: "gap-2",
         iconSize: ICON_SIZE.lg,
         iconClass: ICON_SIZE_CLASS.lg,
         radiusClass: RADIUS_CLASS.lg,
@@ -236,14 +234,14 @@ export const AVATAR_SIZE = {
 /*  Superficies: tarjetas, paneles, popovers                                   */
 /* -------------------------------------------------------------------------- */
 
-/** Relleno y separación siguen la escala de espaciado, escalón a escalón. */
+/** Relleno y separación siguen la escala de `SPACING`, escalón a escalón. */
 export const SURFACE_SIZE = {
-    xs: { paddingClass: "p-xs", gapClass: "gap-xs", radiusClass: RADIUS_CLASS.md },
-    sm: { paddingClass: "p-sm", gapClass: "gap-sm", radiusClass: RADIUS_CLASS.md },
-    md: { paddingClass: "p-md", gapClass: "gap-sm", radiusClass: RADIUS_CLASS.lg },
-    lg: { paddingClass: "p-lg", gapClass: "gap-md", radiusClass: RADIUS_CLASS.xl },
-    xl: { paddingClass: "p-xl", gapClass: "gap-lg", radiusClass: RADIUS_CLASS.xl },
-    "2xl": { paddingClass: "p-2xl", gapClass: "gap-xl", radiusClass: RADIUS_CLASS["2xl"] },
+    xs: { paddingClass: "p-1", gapClass: "gap-1", radiusClass: RADIUS_CLASS.md },
+    sm: { paddingClass: "p-2", gapClass: "gap-2", radiusClass: RADIUS_CLASS.md },
+    md: { paddingClass: "p-3", gapClass: "gap-2", radiusClass: RADIUS_CLASS.lg },
+    lg: { paddingClass: "p-4", gapClass: "gap-3", radiusClass: RADIUS_CLASS.xl },
+    xl: { paddingClass: "p-6", gapClass: "gap-4", radiusClass: RADIUS_CLASS.xl },
+    "2xl": { paddingClass: "p-8", gapClass: "gap-6", radiusClass: RADIUS_CLASS["2xl"] },
 } as const satisfies SizeMap<SurfaceSizeToken>;
 
 

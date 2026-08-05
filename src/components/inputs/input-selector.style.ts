@@ -1,16 +1,22 @@
 import { cva } from "class-variance-authority";
 
-/* -------------------------------------------------------------------------- */
-/*  Estilos del InputSelector                                                  */
-/*                                                                             */
-/*  Tokens de marca definidos en style.css: primary-*, neutral-*, error-*.     */
-/*                                                                             */
-/*  El control es un combobox editable: el propio campo filtra las opciones,   */
-/*  así que los estados se pintan sobre el InputGroup con variantes `has-*`.   */
-/*                                                                             */
-/*  Las clases se escriben literales a propósito: Tailwind escanea el código   */
-/*  fuente y no detecta nombres construidos por interpolación.                 */
-/* -------------------------------------------------------------------------- */
+import { CONTROL_SIZE, ELEVATION, RADIUS_CLASS, TRANSITION } from "@/tokens";
+
+
+/**
+ * Estilos del InputSelector
+ * 
+ * El control es un combobox editable: el propio campo filtra las opciones,
+ * así que los estados se pintan sobre el InputGroup con variantes `has-*`.
+ * 
+ * Los escalones son los de `CONTROL_SIZE`, los mismos que usa TextField:
+ * los dos campos tienen que alinearse al ponerlos en la misma fila de un
+ * formulario. Lo que va dentro de un slot (relleno, tipografía, iconos) se
+ * escribe literal con su variante delante, porque una clase compuesta por
+ * interpolación no la vería el escáner de Tailwind; el escalón, eso sí, es
+ * el que marca la receta — ver la nota de `text-field.style.ts`.
+ */
+
 
 /**
  * Campo (InputGroup): alto, borde, fondo y los cinco estados
@@ -18,14 +24,14 @@ import { cva } from "class-variance-authority";
  */
 export const inputSelectorFieldVariants = cva(
     [
-        "w-full rounded-lg border bg-white",
-        "transition-[color,background-color,border-color,box-shadow]",
-        "duration-150 ease-out motion-reduce:transition-none",
+        "w-full border bg-white",
+        TRANSITION.input,
 
         // ── Texto ────────────────────────────────────────────────────────
+        // El grosor lo trae la etiqueta tipográfica (500); el placeholder
+        // vuelve a regular para que no compita con el valor elegido.
         "[&_[data-slot=input-group-control]]:h-full",
         "[&_[data-slot=input-group-control]]:bg-transparent",
-        "[&_[data-slot=input-group-control]]:font-medium",
         "[&_[data-slot=input-group-control]]:text-neutral-800",
         "[&_[data-slot=input-group-control]]:placeholder:font-normal",
         "[&_[data-slot=input-group-control]]:placeholder:text-neutral-600",
@@ -57,27 +63,56 @@ export const inputSelectorFieldVariants = cva(
     ],
     {
         variants: {
+            /*
+             * El texto sube a 16px por debajo de `md`: es el mínimo con el que
+             * iOS no hace zoom automático al enfocar el campo.
+             */
             size: {
                 sm: [
-                    "h-9",
+                    CONTROL_SIZE.sm.heightClass,
+                    CONTROL_SIZE.sm.radiusClass,
                     "[&_[data-slot=input-group-control]]:pl-3",
-                    "[&_[data-slot=input-group-control]]:text-sm",
-                    "[&_svg]:size-4",
+                    "[&_[data-slot=input-group-control]]:text-label-lg",
+                    "md:[&_[data-slot=input-group-control]]:text-label-sm",
+                    "[&_svg]:size-3.5",
+                    // El addon de shadcn fija sus iconos a 16px con más especificidad
+                    // que la regla de arriba; hay que alcanzarlo por su slot.
+                    "[&_[data-slot=input-group-addon]>svg:not([class*='size-'])]:size-3.5",
                     "[&_[data-slot=input-group-addon][data-align=inline-end]]:pr-2",
                 ],
                 md: [
-                    "h-10",
-                    "[&_[data-slot=input-group-control]]:pl-3.5",
-                    "[&_[data-slot=input-group-control]]:text-sm",
-                    "[&_svg]:size-4.5",
-                    "[&_[data-slot=input-group-addon][data-align=inline-end]]:pr-2.5",
+                    CONTROL_SIZE.md.heightClass,
+                    CONTROL_SIZE.md.radiusClass,
+                    "[&_[data-slot=input-group-control]]:pl-4",
+                    "[&_[data-slot=input-group-control]]:text-label-lg",
+                    "md:[&_[data-slot=input-group-control]]:text-label-md",
+                    "[&_svg]:size-4",
+                    // El addon de shadcn fija sus iconos a 16px con más especificidad
+                    // que la regla de arriba; hay que alcanzarlo por su slot.
+                    "[&_[data-slot=input-group-addon]>svg:not([class*='size-'])]:size-4",
+                    "[&_[data-slot=input-group-addon][data-align=inline-end]]:pr-2",
                 ],
                 lg: [
-                    "h-12",
+                    CONTROL_SIZE.lg.heightClass,
+                    CONTROL_SIZE.lg.radiusClass,
                     "[&_[data-slot=input-group-control]]:pl-4",
-                    "[&_[data-slot=input-group-control]]:text-base",
+                    "[&_[data-slot=input-group-control]]:text-label-lg",
+                    "[&_svg]:size-4.5",
+                    // El addon de shadcn fija sus iconos a 16px con más especificidad
+                    // que la regla de arriba; hay que alcanzarlo por su slot.
+                    "[&_[data-slot=input-group-addon]>svg:not([class*='size-'])]:size-4.5",
+                    "[&_[data-slot=input-group-addon][data-align=inline-end]]:pr-3",
+                ],
+                xl: [
+                    CONTROL_SIZE.xl.heightClass,
+                    CONTROL_SIZE.xl.radiusClass,
+                    "[&_[data-slot=input-group-control]]:pl-6",
+                    "[&_[data-slot=input-group-control]]:text-label-lg",
                     "[&_svg]:size-5",
-                    "[&_[data-slot=input-group-addon][data-align=inline-end]]:pr-3.5",
+                    // El addon de shadcn fija sus iconos a 16px con más especificidad
+                    // que la regla de arriba; hay que alcanzarlo por su slot.
+                    "[&_[data-slot=input-group-addon]>svg:not([class*='size-'])]:size-5",
+                    "[&_[data-slot=input-group-addon][data-align=inline-end]]:pr-3",
                 ],
             },
             invalid: {
@@ -123,8 +158,9 @@ export const inputSelectorLeftIconVariants = cva("", {
     variants: {
         size: {
             sm: "pl-3",
-            md: "pl-3.5",
+            md: "pl-4",
             lg: "pl-4",
+            xl: "pl-6",
         },
     },
     defaultVariants: { size: "md" },
@@ -141,13 +177,14 @@ export const inputSelectorLeftIconVariants = cva("", {
  * deben alinearse al ponerlos en la misma fila de un formulario.
  */
 export const inputSelectorLabelVariants = cva(
-    "block font-medium select-none",
+    "block select-none",
     {
         variants: {
             size: {
-                sm: "mb-1 text-xs",
-                md: "mb-1 text-xs",
-                lg: "mb-1.5 text-sm",
+                sm: "mb-1 text-label-sm",
+                md: "mb-1 text-label-sm",
+                lg: "mb-2 text-label-md",
+                xl: "mb-2 text-label-md",
             },
             disabled: {
                 true: "text-neutral-400",
@@ -159,12 +196,13 @@ export const inputSelectorLabelVariants = cva(
 );
 
 /** Texto de ayuda / mensaje de error. Espeja a la etiqueta. */
-export const inputSelectorHelperVariants = cva("", {
+export const inputSelectorHelperVariants = cva("text-caption", {
     variants: {
         size: {
-            sm: "mt-1 text-xs",
-            md: "mt-1 text-xs",
-            lg: "mt-1.5 text-sm",
+            sm: "mt-1",
+            md: "mt-1",
+            lg: "mt-2",
+            xl: "mt-2",
         },
         invalid: {
             true: "text-error-dark",
@@ -174,10 +212,17 @@ export const inputSelectorHelperVariants = cva("", {
     defaultVariants: { size: "md", invalid: false },
 });
 
-/** Panel flotante de opciones. */
+/**
+ * Panel flotante de opciones.
+ *
+ * `ELEVATION.lg` es el escalón que el sistema reserva para desplegables y
+ * popovers; la sombra ya viene teñida con el neutro de marca, así que el panel
+ * no necesita color propio.
+ */
 export const inputSelectorContentVariants = cva([
-    "min-w-(--anchor-width) rounded-lg border border-neutral-200 bg-white p-0",
-    "shadow-lg shadow-neutral-900/8 ring-0",
+    "min-w-(--anchor-width) border border-neutral-200 bg-white p-0 ring-0",
+    RADIUS_CLASS.lg,
+    ELEVATION.lg.class,
     "motion-reduce:animate-none motion-reduce:transition-none",
 ]);
 
@@ -196,11 +241,17 @@ export const inputSelectorListVariants = cva([
     "[&&::-webkit-scrollbar-thumb]:bg-neutral-300",
 ]);
 
-/** Opción del panel. */
+/**
+ * Opción del panel.
+ *
+ * El texto va un punto por encima de la etiqueta del campo: en la lista se lee
+ * en vertical y de corrido, no de un vistazo como el valor ya elegido.
+ */
 export const inputSelectorItemVariants = cva(
     [
-        "cursor-pointer rounded-md text-neutral-800",
-        "transition-colors duration-100 motion-reduce:transition-none",
+        "cursor-pointer text-neutral-800",
+        RADIUS_CLASS.md,
+        TRANSITION.colors,
 
         /*
          * `selected` y `highlighted` empatan en especificidad, así que se
@@ -217,9 +268,10 @@ export const inputSelectorItemVariants = cva(
     {
         variants: {
             size: {
-                sm: "gap-2 py-1.5 pr-2.5 pl-2.5 text-sm",
-                md: "gap-2 py-2 pr-3 pl-3 text-sm",
-                lg: "gap-2.5 py-2.5 pr-3.5 pl-3.5 text-base",
+                sm: "gap-2 px-2 py-1.5 text-body-sm",
+                md: "gap-2 px-3 py-2 text-body-md",
+                lg: "gap-3 px-3 py-2.5 text-body-lg",
+                xl: "gap-3 px-4 py-2.5 text-body-lg",
             },
         },
         defaultVariants: { size: "md" },
@@ -232,9 +284,10 @@ export const inputSelectorEmptyVariants = cva(
     {
         variants: {
             size: {
-                sm: "px-3 py-5 text-xs",
-                md: "px-3 py-6 text-sm",
-                lg: "px-4 py-7 text-sm",
+                sm: "px-3 py-5 text-caption",
+                md: "px-3 py-6 text-body-md",
+                lg: "px-4 py-7 text-body-md",
+                xl: "px-4 py-7 text-body-md",
             },
         },
         defaultVariants: { size: "md" },

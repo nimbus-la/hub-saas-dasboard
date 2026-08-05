@@ -4,6 +4,7 @@ import * as React from "react"
 import { Eye, EyeOff, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { FOCUS_RING } from "@/tokens"
 import {
     InputGroup,
     InputGroupAddon,
@@ -28,8 +29,8 @@ import {
  * Botón fantasma del interior del campo ("x" y ojo).
  *
  * El área táctil se estira más allá del icono para que no haya que apuntar:
- * 24px en `sm` y 32px en `md`/`lg` — el máximo razonable dentro de un campo
- * de 36-48px de alto.
+ * 24px en `sm` y 32px en el resto — el máximo razonable dentro de un campo
+ * de 32-48px de alto.
  */
 function FieldButton({
     size,
@@ -41,7 +42,7 @@ function FieldButton({
         <InputGroupButton
             size={size === "sm" ? "icon-xs" : "icon-sm"}
             variant="ghost"
-            className="cursor-pointer text-neutral-500 focus-visible:border-transparent focus-visible:ring-2 focus-visible:ring-primary-main/25"
+            className={cn("cursor-pointer text-neutral-500 focus-visible:border-transparent", FOCUS_RING.default)}
             {...props}
         />
     )
@@ -235,7 +236,7 @@ export function TextField({
                         // El mensaje de error se anuncia sin robar el foco.
                         aria-live={invalid ? "polite" : undefined}
                         className={cn(
-                            textFieldHelperVariants({ size, invalid, disabled })
+                            textFieldHelperVariants({ invalid, disabled })
                         )}
                     >
                         {message}
@@ -244,7 +245,7 @@ export function TextField({
                     {showCount && (
                         <span
                             className={cn(
-                                textFieldCountVariants({ size, invalid, disabled })
+                                textFieldCountVariants({ invalid, disabled })
                             )}
                         >
                             {currentValue.length}

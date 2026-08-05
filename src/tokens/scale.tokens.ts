@@ -9,14 +9,18 @@
  * Regla de la casa — quién guarda qué:
  *
  *  - `style.css` (`@theme`) guarda los VALORES de todo lo que solo sirve para
- *    pintar: espaciado, radios, tipografía y sombras. Tailwind genera una
- *    utilidad por token (`gap-md`, `rounded-lg`, `text-body-md`).
+ *    pintar: radios, tipografía y sombras. Tailwind genera una utilidad por
+ *    token (`rounded-lg`, `text-body-md`, `shadow-lg`).
  *  - Esta carpeta guarda las RECETAS (qué token usa cada componente) y los
  *    números que JavaScript necesita de verdad: tamaños de icono para lucide,
  *    breakpoints para `matchMedia`, duraciones para framer-motion.
  *
- * Nada vive en los dos sitios. Si te encuentras copiando un número del CSS a un
- * `.ts`, casi seguro que lo que hacía falta era una utilidad con nombre.
+ * El espaciado es la excepción y vive entero aquí, sobre la escala numérica de
+ * Tailwind (`p-3` = 12px). El motivo está explicado en `spacing.tokens.ts`:
+ * declararlo en `@theme` secuestra `w-*` y `max-w-*`.
+ *
+ * Nada más vive en los dos sitios. Si te encuentras copiando un número del CSS
+ * a un `.ts`, casi seguro que lo que hacía falta era una utilidad con nombre.
  *
  * Las clases se escriben LITERALES: Tailwind escanea el código fuente y no
  * detecta nombres construidos por interpolación.

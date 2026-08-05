@@ -26,7 +26,7 @@ export const SIDEBAR = {
     headerHeightClass: "h-16",
     /** Relleno horizontal de la zona de navegación. */
     paddingX: 12,
-    paddingXClass: "px-md",
+    paddingXClass: "px-3",
     /** Alto de un elemento de navegación. */
     itemHeight: 40,
     itemHeightClass: "h-10",
@@ -40,7 +40,7 @@ export const NAVBAR = {
     height: 64,
     heightClass: "h-16",
     paddingX: 16,
-    paddingXClass: "px-lg",
+    paddingXClass: "px-4",
 } as const;
 
 
@@ -56,10 +56,10 @@ export const CONTENT = {
     proseMaxWidthClass: "max-w-[720px]",
     /** Márgenes laterales del contenido. */
     gutter: 24,
-    gutterClass: "px-xl",
+    gutterClass: "px-6",
     /** Separación entre secciones. */
     sectionGap: 32,
-    sectionGapClass: "gap-2xl",
+    sectionGapClass: "gap-8",
 } as const;
 
 
