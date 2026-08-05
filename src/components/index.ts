@@ -20,6 +20,16 @@ export type { ColumnAlign } from '../interfaces/data-table.types';
 // ── Insignias ───────────────────────────────────────────────────────────────
 export { default as StatusBadge } from './badges/StatusBadge';
 
+// ── Avatares ────────────────────────────────────────────────────────────────
+export {
+    Avatar,
+    AvatarBadge,
+    AvatarFallback,
+    AvatarGroup,
+    AvatarGroupCount,
+    AvatarImage,
+} from './avatars/Avatar';
+
 // ── Navegación y listados ───────────────────────────────────────────────────
 export { FilterTabs } from './tabs/FilterTabs';
 export { default as Pagination } from './pagination/Pagination';

@@ -1,7 +1,4 @@
-// Primitivos de shadcn/base-ui agrupados por familia de componente.
-// Cada carpeta expone su propio barril: `@/components/ui/avatar`, …
-//
-// Los de campo (input, input-group, combobox) ya no están aquí: viven en
-// `components/inputs/primitives`, traducidos al design system.
-export * from "./avatar"
+// Último primitivo de shadcn/base-ui que queda sin traducir al design system.
+// Los de campo viven en `components/inputs/primitives` y el avatar en
+// `components/avatars`.
 export * from "./button"

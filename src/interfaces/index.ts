@@ -1,5 +1,7 @@
 export * from "./menu.types";
 
+export * from "./avatar.interfaces";
+
 export * from "./badge.interfaces";
 
 export * from "./buttons.interfaces";
