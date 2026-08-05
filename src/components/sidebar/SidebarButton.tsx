@@ -1,66 +1,100 @@
+"use client";
+
 // ── Botón de navegación exclusivo para el Sidebar ───────────────────────────
-// Soporta icono (lucide-react) + label y los estados: default, hover,
-// selected y disabled. El estado "selected" añade un indicador vertical a
+// Renderiza un <Link> cuando recibe `href` y un <button> cuando actúa como
+// disparador de acordeón (`expandable`) — nunca uno dentro del otro.
+//
+// Dos niveles jerárquicos:
+//   • secondary → item con icono (segundo nivel del menú).
+//   • tertiary  → sub-item de sólo texto, colgado del riel vertical del padre.
+//
+// Estados: default, hover, selected, highlighted (padre con hijo activo)
+// y disabled. "selected" añade un indicador vertical en color primary.
+
+import Link from "next/link";
+
+import { cva, VariantProps } from "class-variance-authority";
+import { ChevronRight, LucideIcon } from "lucide-react";
 
 import { useSidebarLayout } from "@/context";
-import { cva, VariantProps } from "class-variance-authority";
-import { LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-// la izquierda además del fondo/texto en color primary.
+
 const sidebarButtonVariants = cva(
     // ── Base ──────────────────────────────────────────────────────────────────
     [
-        "group relative inline-flex w-full cursor-pointer select-none items-center gap-3",
-        "px-6 font-medium transition-colors duration-150",
-        "text-neutral-600",
-        "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-neutral-200",
+        "group relative flex w-full cursor-pointer select-none items-center gap-3",
+        "rounded-lg px-3 font-medium",
+        "transition-colors duration-150 ease-out motion-reduce:transition-none",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-main/30",
 
         // ── hover ─────────────────────────────────────────────────────────
-        "hover:bg-neutral-200",
+        "hover:bg-neutral-200 hover:text-neutral-800",
 
         // ── selected ──────────────────────────────────────────────────────
         "data-[selected=true]:bg-primary-main/10",
         "data-[selected=true]:text-primary-main",
         "data-[selected=true]:font-semibold",
+        "data-[selected=true]:hover:bg-primary-main/15",
+        "data-[selected=true]:hover:text-primary-main",
 
-        // ── selected + hover ─────────────────────────────────────────────
-        "data-[selected=true]:hover:bg-primary-main/20",
+        // ── highlighted: padre colapsado con una página hija activa ───────
+        "data-[highlighted=true]:text-neutral-900",
+        "data-[highlighted=true]:font-semibold",
 
         // ── disabled ──────────────────────────────────────────────────────
-        "disabled:pointer-events-none disabled:cursor-not-allowed",
-        "disabled:bg-transparent disabled:text-neutral-300",
-        "disabled:data-[selected=true]:bg-neutral-100 disabled:data-[selected=true]:text-neutral-300",
+        "disabled:pointer-events-none disabled:bg-transparent disabled:text-neutral-400",
+        "aria-disabled:pointer-events-none aria-disabled:bg-transparent aria-disabled:text-neutral-400",
     ],
     {
         variants: {
+            // ── Nivel jerárquico ──────────────────────────────────────────
+            level: {
+                secondary: "text-neutral-700",
+                tertiary: "text-neutral-600",
+            },
+
             // ── Tamaño ────────────────────────────────────────────────────
             size: {
-                large: "h-[44px] text-[16px] leading-5",
-                medium: "h-[40px] text-[14px] leading-5",
-                small: "h-[32px] text-[12px] leading-5",
+                large: "h-11 text-[16px] leading-5",
+                medium: "h-10 text-[14px] leading-5",
+                small: "h-9 text-[13px] leading-5",
             },
-            collapsed: {
+
+            // ── Modo riel (sidebar colapsado en desktop) ──────────────────
+            rail: {
                 true: "justify-center px-0",
-                false: "px-6",
+                false: "",
             },
         },
 
-        defaultVariants: { size: "medium", collapsed: false },
+        defaultVariants: { level: "secondary", size: "medium", rail: false },
     }
 );
 
-interface SidebarButtonProps
-    extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onClick">,
-    Omit<VariantProps<typeof sidebarButtonVariants>, "collapsed"> {
-    icon?: LucideIcon;
-    label: string;
-    selected?: boolean;
-    isNew?: boolean;
-    onClick?: () => void;
-};
+type SidebarButtonLevel = NonNullable<VariantProps<typeof sidebarButtonVariants>["level"]>;
+type SidebarButtonSize = NonNullable<VariantProps<typeof sidebarButtonVariants>["size"]>;
 
-// Deriva el tipo directamente de las props — se actualiza solo si cambias las variantes
-type SidebarButtonSize = NonNullable<SidebarButtonProps["size"]>;
+interface SidebarButtonProps {
+    label: string;
+    icon?: LucideIcon | undefined;
+    /** Presente → se renderiza como <Link>. Ausente → como <button>. */
+    href?: string | undefined;
+    level?: SidebarButtonLevel | undefined;
+    size?: SidebarButtonSize | undefined;
+    /** La ruta de este item es la ruta actual. */
+    selected?: boolean | undefined;
+    /** Alguna de sus páginas hijas es la ruta actual. */
+    highlighted?: boolean | undefined;
+    /** Muestra el chevron que indica que el item agrupa más menús. */
+    expandable?: boolean | undefined;
+    expanded?: boolean | undefined;
+    disabled?: boolean | undefined;
+    isNew?: boolean | undefined;
+    onClick?: (() => void) | undefined;
+    className?: string | undefined;
+    "aria-controls"?: string | undefined;
+};
 
 // ─── Tamaño de icono según el size del botón ──────────────────────────────────
 const ICON_SIZE: Record<SidebarButtonSize, number> = {
@@ -69,45 +103,111 @@ const ICON_SIZE: Record<SidebarButtonSize, number> = {
     small: 15,
 };
 
+// ─── Indicador de selección ───────────────────────────────────────────────────
+// El offset negativo lo saca de la píldora: en `secondary` aterriza en el borde
+// del sidebar; en `tertiary` justo sobre el riel que dibuja SidebarNavItem
+// (ml-[21px] + border-l + pl-[14px] → 15px a la izquierda del sub-item).
+const INDICATOR_BASE =
+    "pointer-events-none absolute top-1/2 -translate-y-1/2 bg-primary-main opacity-0 " +
+    "transition-opacity duration-150 ease-out motion-reduce:transition-none " +
+    "group-data-[selected=true]:opacity-100";
+
+const INDICATOR_BY_LEVEL: Record<SidebarButtonLevel, string> = {
+    secondary: "-left-3 h-5 w-[3px] rounded-r-full",
+    tertiary: "-left-[15px] h-8 w-[1.4px] rounded-full",
+};
+
 
 export default function SidebarButton({
-    icon: Icon,
     label,
+    icon: Icon,
+    href,
+    level = "secondary",
     size = "medium",
-    disabled = false,
     selected = false,
+    highlighted = false,
+    expandable = false,
+    expanded = false,
+    disabled = false,
     isNew = false,
     onClick,
     className,
-    ...props
+    "aria-controls": ariaControls,
 }: SidebarButtonProps) {
-    const { isCollapsed } = useSidebarLayout();
-    const iconSize = ICON_SIZE[size ?? "medium"];
+    const { isRail } = useSidebarLayout();
+
+    const iconSize = ICON_SIZE[size];
+    const hasTrailing = !isRail && (isNew || expandable);
+
+    const content = (
+        <>
+            {/* ── Indicador de selección (barra izquierda) ─────────────────── */}
+            <span aria-hidden="true" className={cn(INDICATOR_BASE, INDICATOR_BY_LEVEL[level])} />
+
+            {Icon && <Icon size={iconSize} strokeWidth={2} aria-hidden="true" className="shrink-0" />}
+
+            {!isRail && <span className="truncate">{label}</span>}
+
+            {hasTrailing && (
+                <span className="ml-auto flex shrink-0 items-center gap-2">
+                    {isNew && (
+                        <span className="inline-flex items-center rounded-full bg-primary-main px-2 py-1 text-[10px] font-semibold leading-none text-white">
+                            Nuevo
+                        </span>
+                    )}
+
+                    {expandable && (
+                        <ChevronRight
+                            size={14}
+                            strokeWidth={2.5}
+                            aria-hidden="true"
+                            className={cn(
+                                "text-current opacity-60 transition-[transform,opacity] duration-200",
+                                "group-hover:opacity-100",
+                                expanded ? "rotate-90" : "rotate-0"
+                            )}
+                        />
+                    )}
+                </span>
+            )}
+        </>
+    );
+
+    const sharedProps = {
+        className: cn(sidebarButtonVariants({ level, size, rail: isRail }), className),
+        "data-selected": selected,
+        "data-highlighted": highlighted,
+        // En modo riel el label desaparece: se conserva como tooltip nativo y
+        // como nombre accesible del control.
+        title: isRail ? label : undefined,
+        "aria-label": isRail ? label : undefined,
+    };
+
+    if (href) {
+        return (
+            <Link
+                href={href}
+                {...(onClick ? { onClick } : {})}
+                aria-current={selected ? "page" : undefined}
+                aria-disabled={disabled || undefined}
+                tabIndex={disabled ? -1 : undefined}
+                {...sharedProps}
+            >
+                {content}
+            </Link>
+        );
+    };
 
     return (
         <button
             type="button"
             disabled={disabled}
-            data-selected={selected}
             onClick={onClick}
-            className={sidebarButtonVariants({ size, collapsed: isCollapsed, className })}
-            {...props}
+            aria-expanded={expandable ? expanded : undefined}
+            aria-controls={ariaControls}
+            {...sharedProps}
         >
-            {/* ── Indicador de selección (barra izquierda) ─────────────────── */}
-            <span
-                aria-hidden="true"
-                className="pointer-events-none absolute left-0 top-1/2 h-full w-[2px] -translate-y-1/2 rounded-full bg-primary-main opacity-0 transition-opacity duration-150 group-data-[selected=true]:opacity-100"
-            />
-
-            {Icon && <Icon size={iconSize} strokeWidth={2} className="shrink-0" />}
-
-            {!isCollapsed && <span className="truncate">{label}</span>}
-
-            {!isCollapsed && isNew && (
-                <span className="ml-auto inline-flex shrink-0 items-center rounded-full bg-primary-main px-2 py-1 text-[10px] font-semibold leading-none text-white">
-                    Nuevo
-                </span>
-            )}
+            {content}
         </button>
     );
 };

@@ -7,6 +7,7 @@ import {
     PanelRightClose,
     PanelRightOpen,
     Flame,
+    X,
 } from "lucide-react";
 
 
@@ -19,6 +20,7 @@ export const ICON_TOKENS = {
     PANEL_RIGHT_OPEN: PanelRightOpen,
     PANEL_RIGHT_CLOSE: PanelRightClose,
     FLAME: Flame,
+    CLOSE: X,
 } as const;
 
 
