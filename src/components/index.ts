@@ -62,6 +62,7 @@ export * from './pagination/pagination.style';
 
 // ── Formularios ─────────────────────────────────────────────────────────────
 export { InputSelector } from './inputs/InputSelector';
+export { TextAreaField } from './inputs/TextAreaField';
 export { TextField } from './inputs/TextField';
 
 // ── Interruptores ───────────────────────────────────────────────────────────

@@ -1,5 +1,8 @@
 import {
+    ArrowLeft,
+    ArrowRight,
     Home,
+    ImageUp,
     Package,
     PackageSearch,
     ClipboardList,
@@ -37,6 +40,12 @@ export const ICON_TOKENS = {
     CREATE: Plus,
     /** Buscar dentro de una colección. */
     SEARCH: Search,
+    /** Volver a la pantalla anterior — el par de `NEXT`. */
+    BACK: ArrowLeft,
+    /** Avanzar al siguiente paso de un flujo. */
+    NEXT: ArrowRight,
+    /** Subir una imagen desde el equipo. */
+    UPLOAD_IMAGE: ImageUp,
 
     /* ── Estados ──────────────────────────────────────────────────────────── */
     /** Una búsqueda o un filtro que no devolvió nada. */

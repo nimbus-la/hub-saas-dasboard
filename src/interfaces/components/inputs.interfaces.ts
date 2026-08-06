@@ -39,6 +39,14 @@ export interface InputSelectorProps {
      * @deprecated Usa `onChange`. Se mantiene por compatibilidad.
      */
     onValueChange?: (value: string | null) => void;
+    /**
+     * Se dispara al salir del campo.
+     *
+     * Existe para los gestores de formulario, que lo usan como señal de "ya
+     * terminó de decidir" para validar. Sin él, el selector sería el único
+     * campo del sistema que no puede validarse al perder el foco.
+     */
+    onBlur?: React.FocusEventHandler<HTMLInputElement>;
 
     /** Texto de la etiqueta superior. */
     label?: string;
