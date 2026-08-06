@@ -119,7 +119,18 @@ que quedó fuera de los tokens a propósito —geometrías cerradas como el carr
 del `Switch` o la cadena horizontal del sidebar— va documentado en su
 `*.style.ts` y resumido en [`components.md`](./components.md).
 
-Fuera de `components/` sí quedan piezas sin migrar: los paneles, tablas y
-gráficos de `features/main-dashboard`. No estorban —el sistema convive con
-ellas—, pero son las que todavía usan `rounded-lg` donde el resto ya usa
-`rounded-xl`.
+Fuera de `components/`, la pantalla de productos (`features/products/`) también
+está migrada. Queda `features/main-dashboard/`: sus paneles, tablas y gráficos
+son los que todavía usan `rounded-lg` donde el resto ya usa `rounded-xl`.
+
+### Sobre los iconos
+
+`ICON_TOKENS` nombra los iconos que representan un **concepto del producto**:
+una sección del menú, una acción, un estado. Los que solo son gramática de un
+control —el chevron de un desplegable, la equis de un campo, la palomita de un
+checkbox— se importan directos de lucide en el componente que los dibuja, y
+está bien así: registrar `CHEVRON_RIGHT` no aportaría ninguna decisión, solo un
+nivel de indirección.
+
+La prueba: si cambiar ese glifo en toda la app fuera una decisión de producto,
+va al registro.

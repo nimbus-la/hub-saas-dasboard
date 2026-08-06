@@ -4,10 +4,17 @@
 // Un listado sin resultados es un callejón sin salida: además de decir que no
 // hay nada, repite qué se buscó y ofrece la salida (limpiar los filtros).
 
-import { PackageSearch } from "lucide-react";
-
 import GenericButton from "@/components/buttons/GenericButton";
 import { cn } from "@/lib/utils";
+import { ICON_SIZE, ICON_STROKE_BY_SIZE, ICON_TOKENS } from "@/tokens";
+
+import {
+    productsEmptyStateIconVariants,
+    productsEmptyStateMessageVariants,
+    productsEmptyStateTextVariants,
+    productsEmptyStateTitleVariants,
+    productsEmptyStateVariants,
+} from "./products-empty-state.style";
 
 interface ProductsEmptyStateProps {
     /** Término buscado — se cita para que se vea si hubo una errata. */
@@ -24,26 +31,22 @@ export default function ProductsEmptyState({
     const trimmedQuery = query.trim();
 
     return (
-        <div
-            className={cn(
-                "flex flex-col items-center justify-center gap-4 px-6 py-16 text-center",
-                className
-            )}
-        >
-            <div className="flex size-14 items-center justify-center rounded-full bg-neutral-200">
-                <PackageSearch
-                    size={26}
+        <div className={cn(productsEmptyStateVariants(), className)}>
+            <div className={productsEmptyStateIconVariants()}>
+                <ICON_TOKENS.NO_RESULTS
+                    size={ICON_SIZE["2xl"]}
+                    strokeWidth={ICON_STROKE_BY_SIZE["2xl"]}
                     aria-hidden="true"
                     className="text-neutral-600"
                 />
             </div>
 
-            <div className="flex max-w-sm flex-col gap-1.5">
-                <p className="text-base font-semibold text-neutral-800">
+            <div className={productsEmptyStateTextVariants()}>
+                <p className={productsEmptyStateTitleVariants()}>
                     No encontramos productos
                 </p>
 
-                <p className="text-sm text-neutral-600">
+                <p className={productsEmptyStateMessageVariants()}>
                     {trimmedQuery
                         ? `Ningún producto de esta categoría coincide con “${trimmedQuery}”. Revisa la escritura o prueba con otro término.`
                         : "Esta categoría todavía no tiene productos en la carta."}

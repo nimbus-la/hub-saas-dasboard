@@ -3,4 +3,3 @@
 export { default as ProductsEmptyState } from './ProductsEmptyState';
 export { default as ProductsGrid } from './ProductsGrid';
 export { default as ProductsHeader } from './ProductsHeader';
-export { default as ProductsSearch } from './ProductsSearch';
