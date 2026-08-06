@@ -23,7 +23,7 @@ src/components/buttons/
 |---|---|
 | Componente en `PascalCase.tsx` | Es lo que se importa |
 | Estilos en `kebab-case.style.ts` | Un archivo por componente, mismo nombre |
-| Los tipos en `src/interfaces/` | Compartidos y reutilizables; el `.tsx` no declara sus props |
+| Los props en `src/interfaces/components/` | Compartidos y reutilizables; el `.tsx` no declara los suyos |
 | Export en `components/index.ts` | Punto de entrada único |
 
 El `.tsx` no debería tener ni una clase suelta larga. Si estás escribiendo
@@ -187,11 +187,28 @@ a los botones a través de ellos. Renombrarlos rompe los campos en silencio.
 
 ## Dónde van los tipos
 
-En `src/interfaces/`, un archivo por familia, todos re-exportados desde su
-barril. Se derivan del `cva` para no mantener dos listas:
+Todo se importa desde `@/interfaces`. Dentro, el reparto es por **origen del
+tipo**, no por quién lo usa:
+
+```
+src/interfaces/
+├── components/       ← props de los componentes, un archivo por familia
+│   ├── buttons.interfaces.ts
+│   ├── cards.interfaces.ts
+│   └── …
+├── tokens/           ← la forma de las recetas del design system
+├── menu.types.ts     ← dominio
+└── data-table.types.ts  ← augmentación de @tanstack/react-table
+```
+
+La regla para decidir dónde va algo nuevo está en el sufijo: **`*.interfaces.ts`
+son props de un componente y viven en `components/`; `*.types.ts` es todo lo
+demás** —tipos de dominio, augmentación de una librería— y se queda en la raíz.
+
+Los props se derivan del `cva` para no mantener dos listas:
 
 ```ts
-// interfaces/buttons.interfaces.ts
+// interfaces/components/buttons.interfaces.ts
 import { VariantProps } from "class-variance-authority";
 import { genericButtonVariants } from "@/components/buttons/generic-button.style";
 
@@ -205,8 +222,6 @@ export interface ButtonProps
 /** Se actualiza solo si cambian las variantes. */
 export type ButtonSize = NonNullable<ButtonProps["size"]>;
 ```
-
-Los tipos de los tokens viven aparte, en `interfaces/tokens/`.
 
 ---
 
@@ -239,7 +254,7 @@ Antes de dar un componente por terminado:
 - [ ] Si lleva texto escribible, sube a 16px en móvil
 - [ ] Si flota, la capa sale de `Z_INDEX`
 - [ ] Los iconos salen de `ICON_TOKENS` y se dimensionan con `iconSize`
-- [ ] Las props están tipadas en `src/interfaces/`
+- [ ] Las props están tipadas en `src/interfaces/components/`
 - [ ] Exportado desde `components/index.ts`
 
 ---

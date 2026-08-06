@@ -38,7 +38,7 @@ export * from './tables/title-subtitle-cell.style';
 export type { ColumnAlign } from '../interfaces/data-table.types';
 // Los props viven en `@/interfaces`; se reexportan para no romper a quien ya
 // los importaba desde este barril.
-export type { DataTableProps } from '../interfaces/tables.interfaces';
+export type { DataTableProps } from '../interfaces/components/tables.interfaces';
 
 // ── Insignias ───────────────────────────────────────────────────────────────
 export { default as StatusBadge } from './badges/StatusBadge';

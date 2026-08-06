@@ -4,7 +4,7 @@ import type { VariantProps } from "class-variance-authority";
 import type { LucideIcon } from "lucide-react";
 
 import { sidebarButtonVariants } from "@/components";
-import type { MenuStructureItems } from "./menu.types";
+import type { MenuStructureItems } from "../menu.types";
 
 
 /* ── SidebarButton ─────────────────────────────────────────────────────────── */
