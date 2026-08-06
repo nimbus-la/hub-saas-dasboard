@@ -23,7 +23,7 @@ src/components/buttons/
 |---|---|
 | Componente en `PascalCase.tsx` | Es lo que se importa |
 | Estilos en `kebab-case.style.ts` | Un archivo por componente, mismo nombre |
-| Los tipos en `src/interfaces/` | Compartidos y reutilizables; el `.tsx` no declara sus props |
+| Los props en `src/interfaces/components/` | Compartidos y reutilizables; el `.tsx` no declara los suyos |
 | Export en `components/index.ts` | Punto de entrada único |
 
 El `.tsx` no debería tener ni una clase suelta larga. Si estás escribiendo
@@ -53,9 +53,9 @@ export const statusBadgeVariants = cva(
 
 ```tsx
 // StatusBadge.tsx
-export default function StatusBadge({ label, tone, className }: StatusBadgeProps) {
+export default function StatusBadge({ label, tone, size, className }: StatusBadgeProps) {
     return (
-        <span className={cn(statusBadgeVariants({ tone }), className)}>
+        <span className={cn(statusBadgeVariants({ tone, size }), className)}>
             {label}
         </span>
     );
@@ -187,11 +187,28 @@ a los botones a través de ellos. Renombrarlos rompe los campos en silencio.
 
 ## Dónde van los tipos
 
-En `src/interfaces/`, un archivo por familia, todos re-exportados desde su
-barril. Se derivan del `cva` para no mantener dos listas:
+Todo se importa desde `@/interfaces`. Dentro, el reparto es por **origen del
+tipo**, no por quién lo usa:
+
+```
+src/interfaces/
+├── components/       ← props de los componentes, un archivo por familia
+│   ├── buttons.interfaces.ts
+│   ├── cards.interfaces.ts
+│   └── …
+├── tokens/           ← la forma de las recetas del design system
+├── menu.types.ts     ← dominio
+└── data-table.types.ts  ← augmentación de @tanstack/react-table
+```
+
+La regla para decidir dónde va algo nuevo está en el sufijo: **`*.interfaces.ts`
+son props de un componente y viven en `components/`; `*.types.ts` es todo lo
+demás** —tipos de dominio, augmentación de una librería— y se queda en la raíz.
+
+Los props se derivan del `cva` para no mantener dos listas:
 
 ```ts
-// interfaces/buttons.interfaces.ts
+// interfaces/components/buttons.interfaces.ts
 import { VariantProps } from "class-variance-authority";
 import { genericButtonVariants } from "@/components/buttons/generic-button.style";
 
@@ -205,8 +222,6 @@ export interface ButtonProps
 /** Se actualiza solo si cambian las variantes. */
 export type ButtonSize = NonNullable<ButtonProps["size"]>;
 ```
-
-Los tipos de los tokens viven aparte, en `interfaces/tokens/`.
 
 ---
 
@@ -239,16 +254,69 @@ Antes de dar un componente por terminado:
 - [ ] Si lleva texto escribible, sube a 16px en móvil
 - [ ] Si flota, la capa sale de `Z_INDEX`
 - [ ] Los iconos salen de `ICON_TOKENS` y se dimensionan con `iconSize`
-- [ ] Las props están tipadas en `src/interfaces/`
+- [ ] Las props están tipadas en `src/interfaces/components/`
 - [ ] Exportado desde `components/index.ts`
 
 ---
 
-## Migrar un componente pendiente
+## Lo que enseñó la migración
 
-Quedan `badges/`, `pagination/`, `tabs/`, `cards/`, `tables/`, `sidebar/` y
-`toggles/`. El orden recomendado es de menos a más superficie: `StatusBadge` y
-`Pagination` primero, que `BADGE_SIZE` y `CONTROL_SIZE.sm` los cubren enteros.
+Ya no queda ninguna familia pendiente. Lo que sigue es lo que costó descubrir
+por el camino, que es lo que sirve para el siguiente componente.
+
+**Hay geometría que no es la retícula.** Cuatro veces apareció el mismo patrón:
+un puñado de medidas que solo funcionan juntas y que romperías al sustituirlas
+una a una por tokens. El carril del `Switch` (24 de alto − 4 de borde y relleno
+= 20 de perilla = 20 de recorrido). El alto de una pestaña subrayada. Y sobre
+todo la **cadena horizontal del sidebar**: `SIDEBAR.paddingX` (12) + medio
+icono (18/2) sitúa el riel del submenú en 21px, y de ese mismo 12 cuelgan la
+sangría del título de sección y el desplazamiento del indicador de selección.
+Se verifica midiendo: el centro del icono del padre y el borde del riel tienen
+que dar el mismo número.
+
+En estos casos se migra todo lo demás —tipografía, transiciones, foco, radios,
+capas, elevación— y la geometría se deja junta, documentada y con el porqué al
+lado. Un token mal aplicado aquí no rompe el build: descoloca dos píxeles y
+nadie lo ve hasta que la línea deja de caer donde debe.
+
+**Con una librería headless, el cuidado no está donde parece.** TanStack Table
+no trae una sola clase, así que en `tables/` no hubo nada de la trampa 4 de
+[`tailwind.md`](./tailwind.md) —especificidades prestadas—. Lo que sí hay es un
+contrato propio: `meta.headerClassName` y `meta.cellClassName`, con los que una
+columna afina su celda. Esas clases tienen que quedar **al final del `cn()`**
+para que tailwind-merge las deje ganar sobre la base; si se meten dentro del
+`cva`, una columna deja de poder ajustar su ancho y nadie se entera hasta que
+alguien lo intenta.
+
+**El alto de fila se declara, no se calcula.** `ROW_HEIGHT_CLASS.md` en el `td`
+da los 48px del escalón y actúa como mínimo, así que las filas con celdas de
+dos líneas crecen solas. Es mejor que despejar la ecuación del relleno: el
+`py-3.5` que había salía de restarle el interlineado a la altura deseada, y se
+descuadraba en cuanto la tipografía cambiaba.
+
+**No todo componente pulsable toma su alto de `CONTROL_SIZE`.** `FilterTabs`
+fue el primer caso: una pestaña subrayada no es una caja, es texto con una
+línea debajo. Fijarle `h-10` centraría el texto y despegaría el subrayado, así
+que el alto lo sigue poniendo el relleno vertical —que ya caía en la retícula
+de 4px—. Todo lo demás sí sale del sistema: tipografía, transición, foco,
+relleno horizontal y el contador, que es un `BADGE_SIZE.xs` con el radio
+cambiado a píldora.
+
+**Y el `gap` entre pestañas no era espaciado, era otra cosa.** Con hueco entre
+ellas, el subrayado del hover se dibuja como un trozo suelto flotando entre dos
+vacíos. La separación tiene que vivir dentro de cada pestaña —`px-3 sm:px-4`,
+el relleno del control— para que los bordes inferiores se toquen y la línea se
+lea continua. El relleno es simétrico también en la primera: quitarle el `pl`
+para alinearla con el título de la página la deja descentrada respecto a su
+propio subrayado, y eso se nota más que el desfase con el título. Regla
+general: **si un elemento dibuja una línea que debe leerse continua con la de
+su vecino, la separación va en relleno, nunca en `gap`.**
+
+**Pendiente de las tarjetas:** al migrar `cards/` el radio de superficie subió
+a `rounded-xl` (`RADIUS_SEMANTIC.surface`). Los paneles que aún no están
+migrados —`RecentOrdersTable`, `TopProductsCard`, `SalesChartSection`— siguen
+en `rounded-lg`, así que en el dashboard conviven dos radios. Se cierra solo
+cuando les toque el turno; no hay que tocarlos antes.
 
 El procedimiento que funcionó con los ya migrados:
 

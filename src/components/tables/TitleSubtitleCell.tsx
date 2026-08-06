@@ -4,19 +4,16 @@
 // opcional debajo. Ambos textos truncan en una línea para que todas las filas
 // conserven la misma altura sin importar el largo del contenido.
 
-import type { ReactNode } from "react";
-
+import type { TitleSubtitleCellProps } from "@/interfaces";
 import { cn } from "@/lib/utils";
 
-
-interface TitleSubtitleCellProps {
-    title: ReactNode;
-    /** Línea secundaria (correo, categoría, SKU…). Se omite si no se pasa. */
-    subtitle?: ReactNode;
-    /** Elemento visual a la izquierda: avatar, ícono o miniatura. */
-    media?: ReactNode;
-    className?: string;
-};
+import {
+    titleSubtitleCellMediaVariants,
+    titleSubtitleCellSubtitleVariants,
+    titleSubtitleCellTextVariants,
+    titleSubtitleCellTitleVariants,
+    titleSubtitleCellVariants,
+} from "./title-subtitle-cell.style";
 
 
 export default function TitleSubtitleCell({
@@ -26,16 +23,16 @@ export default function TitleSubtitleCell({
     className,
 }: TitleSubtitleCellProps) {
     return (
-        <div className={cn("flex min-w-0 items-center gap-3", className)}>
-            {media && <div className="shrink-0">{media}</div>}
+        <div className={cn(titleSubtitleCellVariants(), className)}>
+            {media && (
+                <div className={titleSubtitleCellMediaVariants()}>{media}</div>
+            )}
 
-            <div className="flex min-w-0 flex-col">
-                <span className="truncate text-sm font-semibold text-neutral-800">
-                    {title}
-                </span>
+            <div className={titleSubtitleCellTextVariants()}>
+                <span className={titleSubtitleCellTitleVariants()}>{title}</span>
 
                 {subtitle && (
-                    <span className="truncate text-xs text-neutral-500">
+                    <span className={titleSubtitleCellSubtitleVariants()}>
                         {subtitle}
                     </span>
                 )}

@@ -105,7 +105,32 @@ Iconos, que se dimensionan por prop y no por clase:
 | `inputs/` — `TextField`, `InputSelector`, `TextAreaField` | Migrado (escala `sm…xl`) |
 | `inputs/primitives/` — `InputGroup`, `Combobox` | Migrado y traducido desde shadcn |
 | `avatars/` — `Avatar` | Migrado |
-| `badges/`, `pagination/`, `tabs/`, `cards/`, `tables/`, `sidebar/`, `toggles/` | Pendientes |
+| `badges/` — `StatusBadge` | Migrado (escala `xs…2xl`, por defecto `sm`) |
+| `cards/` — `MetricCard`, `ProductCard`, `ProductThumbnail` | Migrado (superficies fijas: `SURFACE_SIZE.xl` y `lg`) |
+| `pagination/` — `Pagination` | Migrado (todo el pie en `CONTROL_SIZE.sm`) |
+| `tabs/` — `FilterTabs` | Migrado (contador en `BADGE_SIZE.xs`; el alto es de pestaña, no de control) |
+| `tables/` — `DataTable`, `DataTableCheckbox`, `TitleSubtitleCell` | Migrado (fila en `ROW_HEIGHT.md`) |
+| `toggles/` — `Switch` | Migrado (la geometría del carril es suya; el resto, del sistema) |
+| `sidebar/` — `Sidebar`, `SidebarButton`, `SidebarGroup`, `SidebarNavItem` | Migrado (armazón desde `SIDEBAR` y `Z_INDEX`) |
+| `navbar/` — `Navbar` | Migrado (armazón desde `NAVBAR`; sin clases de shadcn) |
 
-Los pendientes siguen funcionando con sus valores propios: la migración es
-progresiva y nada se rompe mientras tanto.
+La migración está completa: no queda ninguna familia con valores propios. Lo
+que quedó fuera de los tokens a propósito —geometrías cerradas como el carril
+del `Switch` o la cadena horizontal del sidebar— va documentado en su
+`*.style.ts` y resumido en [`components.md`](./components.md).
+
+Fuera de `components/`, la pantalla de productos (`features/products/`) también
+está migrada. Queda `features/main-dashboard/`: sus paneles, tablas y gráficos
+son los que todavía usan `rounded-lg` donde el resto ya usa `rounded-xl`.
+
+### Sobre los iconos
+
+`ICON_TOKENS` nombra los iconos que representan un **concepto del producto**:
+una sección del menú, una acción, un estado. Los que solo son gramática de un
+control —el chevron de un desplegable, la equis de un campo, la palomita de un
+checkbox— se importan directos de lucide en el componente que los dibuja, y
+está bien así: registrar `CHEVRON_RIGHT` no aportaría ninguna decisión, solo un
+nivel de indirección.
+
+La prueba: si cambiar ese glifo en toda la app fuera una decisión de producto,
+va al registro.

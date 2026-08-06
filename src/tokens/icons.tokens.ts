@@ -1,12 +1,15 @@
 import {
     Home,
     Package,
+    PackageSearch,
     ClipboardList,
     ShoppingBasket,
     Users,
     PanelRightClose,
     PanelRightOpen,
     Flame,
+    Plus,
+    Search,
     X,
 } from "lucide-react";
 
@@ -22,11 +25,24 @@ import type { SizeMap } from "./scale.tokens";
  */
 
 export const ICON_TOKENS = {
+    /* ── Secciones ────────────────────────────────────────────────────────── */
     DASHBOARD: Home,
     PRODUCTS: Package,
     INVENTORY: ClipboardList,
     ORDERS: ShoppingBasket,
     EMPLEOYES: Users,
+
+    /* ── Acciones ─────────────────────────────────────────────────────────── */
+    /** Crear un registro nuevo. */
+    CREATE: Plus,
+    /** Buscar dentro de una colección. */
+    SEARCH: Search,
+
+    /* ── Estados ──────────────────────────────────────────────────────────── */
+    /** Una búsqueda o un filtro que no devolvió nada. */
+    NO_RESULTS: PackageSearch,
+
+    /* ── Chrome ───────────────────────────────────────────────────────────── */
     PANEL_RIGHT_OPEN: PanelRightOpen,
     PANEL_RIGHT_CLOSE: PanelRightClose,
     FLAME: Flame,

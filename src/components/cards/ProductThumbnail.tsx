@@ -11,8 +11,15 @@
 import * as React from "react";
 import Image from "next/image";
 
+import type { ProductThumbnailProps } from "@/interfaces";
 import { getProductInitials } from "@/lib/products";
-import { cn } from "@/lib/utils";
+
+import {
+    productThumbnailFallbackVariants,
+    productThumbnailImageVariants,
+    productThumbnailVariants,
+} from "./product-thumbnail.style";
+
 
 /**
  * Ancho real de la miniatura en la rejilla.
@@ -23,14 +30,6 @@ import { cn } from "@/lib/utils";
  */
 const THUMBNAIL_SIZES = "(max-width: 48rem) 100vw, (max-width: 80rem) 33vw, 15rem";
 
-interface ProductThumbnailProps {
-    /** Nombre del producto: de aquí salen las iniciales del respaldo. */
-    name: string;
-    /** URL que devuelve el servicio. Sin ella se pintan las iniciales. */
-    src?: string | undefined;
-    /** Producto no vendible: la miniatura se apaga, el texto nunca. */
-    dimmed?: boolean;
-}
 
 export default function ProductThumbnail({
     name,
@@ -47,21 +46,10 @@ export default function ProductThumbnail({
     return (
         // Decorativa en bloque: el nombre del producto va justo debajo, y
         // anunciar "HD" antes de leerlo solo estorba.
-        <div
-            aria-hidden="true"
-            className="absolute inset-0 flex items-center justify-center"
-        >
+        <div aria-hidden="true" className={productThumbnailVariants()}>
             {/* Las iniciales viven siempre debajo: hacen de respaldo cuando no
                 hay foto y de marcador de posición mientras la foto carga. */}
-            <span
-                className={cn(
-                    "flex size-24 items-center justify-center select-none",
-                    "text-3xl font-bold tracking-wide",
-                    dimmed
-                        ? "text-neutral-600"
-                        : "text-neutral-700"
-                )}
-            >
+            <span className={productThumbnailFallbackVariants({ dimmed })}>
                 {getProductInitials(name)}
             </span>
 
@@ -72,12 +60,7 @@ export default function ProductThumbnail({
                     fill
                     sizes={THUMBNAIL_SIZES}
                     onError={() => setFailedSrc(src ?? null)}
-                    className={cn(
-                        // `cover` y no `contain`: son fotos de plato, y el
-                        // recorte se lee mejor que dos franjas de fondo.
-                        "object-cover",
-                        dimmed && "opacity-60 grayscale"
-                    )}
+                    className={productThumbnailImageVariants({ dimmed })}
                 />
             )}
         </div>

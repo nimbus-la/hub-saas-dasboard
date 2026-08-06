@@ -15,6 +15,8 @@ import * as React from "react";
 
 import Pagination from "@/components/pagination/Pagination";
 import { FilterTabs } from "@/components/tabs/FilterTabs";
+import { TextField } from "@/components/inputs/TextField";
+import { ICON_TOKENS } from "@/tokens";
 import {
     ALL_CATEGORIES,
     DEFAULT_PRODUCT_PAGE_SIZE,
@@ -30,8 +32,13 @@ import {
     ProductsEmptyState,
     ProductsGrid,
     ProductsHeader,
-    ProductsSearch,
 } from "../components";
+import {
+    productsPageBodyVariants,
+    productsPagePaginationVariants,
+    productsPageSearchVariants,
+    productsPageVariants,
+} from "./products.style";
 
 const GRID_PANEL_ID = "products-grid";
 
@@ -133,14 +140,24 @@ export default function Products({ products }: ProductsProps) {
     const categoryLabel = category === ALL_CATEGORIES ? "todas las categorías" : category;
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className={productsPageVariants()}>
             <ProductsHeader
                 totalProducts={products.length}
                 onCreateProduct={handleCreateProduct}
             />
 
-            <section className="flex min-w-0 flex-col gap-5">
-                <ProductsSearch value={query} onChange={handleQueryChange} />
+            <section className={productsPageBodyVariants()}>
+                <TextField
+                    type="search"
+                    size="md"
+                    value={query}
+                    onChange={handleQueryChange}
+                    clearable
+                    leftIcon={<ICON_TOKENS.SEARCH aria-hidden="true" />}
+                    placeholder="Buscar por nombre o categoría"
+                    aria-label="Buscar productos"
+                    className={productsPageSearchVariants()}
+                />
 
                 <FilterTabs
                     items={categoryTabs}
@@ -173,7 +190,7 @@ export default function Products({ products }: ProductsProps) {
                         onPageSizeChange={handlePageSizeChange}
                         pageSizeOptions={PRODUCT_PAGE_SIZES}
                         itemLabel={{ singular: "producto", plural: "productos" }}
-                        className="border-t border-neutral-200 pt-5"
+                        className={productsPagePaginationVariants()}
                     />
                 )}
             </section>

@@ -32,9 +32,22 @@ import {
 } from "@tanstack/react-table";
 import { ChevronDown, ChevronsUpDown, ChevronUp } from "lucide-react";
 
+import type { DataTableProps } from "@/interfaces";
 import { cn } from "@/lib/utils";
+import { ICON_SIZE, ICON_STROKE_BY_SIZE } from "@/tokens";
+
 import DataTableCheckbox from "./DataTableCheckbox";
 import { ALIGNMENT_CLASSNAMES, DEFAULT_COLUMN_ALIGN } from "../../interfaces/data-table.types";
+import {
+    dataTableCellVariants,
+    dataTableEmptyVariants,
+    dataTableHeaderCellVariants,
+    dataTableRowVariants,
+    dataTableScrollerVariants,
+    dataTableSortButtonVariants,
+    dataTableSortIconVariants,
+    dataTableVariants,
+} from "./data-table.style";
 
 
 // Ids reservados de las columnas que genera el propio contenedor.
@@ -42,28 +55,6 @@ const SELECTION_COLUMN_ID = "row-selection";
 const ACTIONS_COLUMN_ID = "row-actions";
 
 const DEFAULT_EMPTY_MESSAGE = "Aún no hay registros para mostrar.";
-
-// Ancho mínimo antes de activar el scroll horizontal (evita celdas comprimidas).
-const MIN_TABLE_WIDTH = "min-w-[40rem]";
-
-
-export interface DataTableProps<TData, TValue> {
-    data: TData[];
-    columns: ColumnDef<TData, TValue>[];
-    /** Muestra la columna de checkboxes al inicio de la tabla. */
-    enableRowSelection?: boolean;
-    /** Id estable por fila: conserva la selección al reordenar o refrescar. */
-    getRowId?: (row: TData) => string;
-    /** Notifica las filas seleccionadas — útil para acciones en lote. */
-    onSelectedRowsChange?: (selectedRows: TData[]) => void;
-    /** Orden inicial, p. ej. `[{ id: "placedAt", desc: true }]`. */
-    initialSorting?: SortingState;
-    /** Contenido de la última columna (menú de acciones de la fila). */
-    renderRowActions?: (row: TData) => ReactNode;
-    /** Texto mostrado cuando la colección viene vacía. */
-    emptyMessage?: string;
-    className?: string;
-};
 
 
 export default function DataTable<TData, TValue>({
@@ -127,10 +118,8 @@ export default function DataTable<TData, TValue>({
     const visibleColumnCount = table.getVisibleLeafColumns().length;
 
     return (
-        <div className={cn("w-full min-w-0 overflow-x-auto", className)}>
-            {/* `border-separate` permite redondear las esquinas del encabezado;
-                por eso las líneas divisorias van en las celdas y no en la fila. */}
-            <table className={cn("w-full border-separate border-spacing-0 text-sm", MIN_TABLE_WIDTH)}>
+        <div className={cn(dataTableScrollerVariants(), className)}>
+            <table className={dataTableVariants()}>
                 {/* ── Encabezado ─────────────────────────────────────────── */}
                 <thead>
                     {table.getHeaderGroups().map((headerGroup) => (
@@ -151,10 +140,10 @@ export default function DataTable<TData, TValue>({
                                         key={header.id}
                                         scope="col"
                                         aria-sort={resolveAriaSort(isSortable, sortDirection)}
+                                        // Las clases de `meta` van al final para
+                                        // que tailwind-merge las deje ganar.
                                         className={cn(
-                                            "bg-neutral-100 px-4 py-3",
-                                            "text-xs font-semibold whitespace-nowrap text-neutral-600",
-                                            "first:rounded-l-lg last:rounded-r-lg",
+                                            dataTableHeaderCellVariants(),
                                             ALIGNMENT_CLASSNAMES[align],
                                             headerClassName
                                         )}
@@ -163,12 +152,7 @@ export default function DataTable<TData, TValue>({
                                             <button
                                                 type="button"
                                                 onClick={header.column.getToggleSortingHandler()}
-                                                className={cn(
-                                                    "group inline-flex cursor-pointer items-center gap-1.5 rounded-sm",
-                                                    "transition-colors duration-150 hover:text-neutral-800",
-                                                    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-main",
-                                                    align === "right" && "flex-row-reverse"
-                                                )}
+                                                className={dataTableSortButtonVariants({ align })}
                                             >
                                                 {headerContent}
                                                 <SortIndicator direction={sortDirection} />
@@ -189,11 +173,7 @@ export default function DataTable<TData, TValue>({
                         <tr
                             key={row.id}
                             data-selected={row.getIsSelected()}
-                            className={cn(
-                                "transition-colors duration-150 hover:bg-neutral-50",
-                                "data-[selected=true]:bg-primary-lighter/25",
-                                "last:[&>td]:border-b-0"
-                            )}
+                            className={dataTableRowVariants()}
                         >
                             {row.getVisibleCells().map((cell) => {
                                 const { align = DEFAULT_COLUMN_ALIGN, cellClassName } =
@@ -203,8 +183,7 @@ export default function DataTable<TData, TValue>({
                                     <td
                                         key={cell.id}
                                         className={cn(
-                                            "border-b border-neutral-200 px-4 py-3.5",
-                                            "text-sm text-neutral-600",
+                                            dataTableCellVariants(),
                                             ALIGNMENT_CLASSNAMES[align],
                                             cellClassName
                                         )}
@@ -221,7 +200,7 @@ export default function DataTable<TData, TValue>({
                         <tr>
                             <td
                                 colSpan={visibleColumnCount}
-                                className="px-4 py-12 text-center text-sm text-neutral-500"
+                                className={dataTableEmptyVariants()}
                             >
                                 {emptyMessage}
                             </td>
@@ -299,17 +278,10 @@ function SortIndicator({ direction }: { direction: SortDirection | false }) {
 
     return (
         <Icon
-            size={14}
-            strokeWidth={2}
+            size={ICON_SIZE.sm}
+            strokeWidth={ICON_STROKE_BY_SIZE.sm}
             aria-hidden
-            className={cn(
-                "shrink-0 transition-opacity duration-150",
-                // La columna activa se distingue por opacidad y peso de gris,
-                // no por color: la paleta se mantiene neutral de principio a fin.
-                direction
-                    ? "text-neutral-700"
-                    : "text-neutral-500 opacity-40 group-hover:opacity-100"
-            )}
+            className={dataTableSortIconVariants({ active: Boolean(direction) })}
         />
     );
 }
