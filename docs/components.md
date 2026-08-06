@@ -246,9 +246,15 @@ Antes de dar un componente por terminado:
 
 ## Migrar un componente pendiente
 
-Quedan `pagination/`, `tabs/`, `cards/`, `tables/`, `sidebar/` y `toggles/`. El
-orden recomendado es de menos a más superficie: `Pagination` primero, que
+Quedan `pagination/`, `tabs/`, `tables/`, `sidebar/` y `toggles/`. El orden
+recomendado es de menos a más superficie: `Pagination` primero, que
 `CONTROL_SIZE.sm` lo cubre entero.
+
+**Pendiente de las tarjetas:** al migrar `cards/` el radio de superficie subió
+a `rounded-xl` (`RADIUS_SEMANTIC.surface`). Los paneles que aún no están
+migrados —`RecentOrdersTable`, `TopProductsCard`, `SalesChartSection`— siguen
+en `rounded-lg`, así que en el dashboard conviven dos radios. Se cierra solo
+cuando les toque el turno; no hay que tocarlos antes.
 
 El procedimiento que funcionó con los ya migrados:
 

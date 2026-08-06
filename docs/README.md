@@ -106,7 +106,8 @@ Iconos, que se dimensionan por prop y no por clase:
 | `inputs/primitives/` — `InputGroup`, `Combobox` | Migrado y traducido desde shadcn |
 | `avatars/` — `Avatar` | Migrado |
 | `badges/` — `StatusBadge` | Migrado (escala `xs…2xl`, por defecto `sm`) |
-| `pagination/`, `tabs/`, `cards/`, `tables/`, `sidebar/`, `toggles/` | Pendientes |
+| `cards/` — `MetricCard`, `ProductCard`, `ProductThumbnail` | Migrado (superficies fijas: `SURFACE_SIZE.xl` y `lg`) |
+| `pagination/`, `tabs/`, `tables/`, `sidebar/`, `toggles/` | Pendientes |
 
 Los pendientes siguen funcionando con sus valores propios: la migración es
 progresiva y nada se rompe mientras tanto.

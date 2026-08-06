@@ -1,45 +1,34 @@
-// ── Tarjeta de métrica para el Dashboard ────────────────────────────────────
-// Muestra un ícono alusivo (en un cuadro con color pastel), un valor destacado,
-// un título y un indicador de tendencia (▲/▼) con el porcentaje de variación.
-//
-// El color del ícono se define con la variante `color` (usa los tokens
-// `*-lighter` / `*-main`); el color de la tendencia se deriva del signo de `delta`.
+import { TrendingDown, TrendingUp } from "lucide-react";
 
-import { LucideIcon, TrendingDown, TrendingUp } from "lucide-react";
-import { cva, VariantProps } from "class-variance-authority";
+import type { MetricCardProps } from "@/interfaces";
 import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { ICON_SIZE, ICON_STROKE_BY_SIZE } from "@/tokens";
+
+import {
+    metricCardDeltaLabelVariants,
+    metricCardDeltaVariants,
+    metricCardFooterVariants,
+    metricCardHeaderVariants,
+    metricCardIconVariants,
+    metricCardLabelVariants,
+    metricCardTrendToneVariants,
+    metricCardTrendVariants,
+    metricCardValueVariants,
+    metricCardVariants,
+} from "./metric-card.style";
 
 
-// ── Cuadro del ícono (fondo pastel + ícono en color principal) ──────────────
-const iconBox = cva(
-    "flex size-11 shrink-0 items-center justify-center rounded-xl",
-    {
-        variants: {
-            color: {
-                success: "bg-success-lighter text-success-main",
-                info: "bg-info-lighter text-info-main",
-                warning: "bg-warning-lighter text-warning-main",
-                error: "bg-error-lighter text-error-main",
-                primary: "bg-primary-lighter text-primary-main",
-                secondary: "bg-secondary-lighter text-secondary-main",
-            },
-        },
-        defaultVariants: { color: "success" },
-    }
-);
-
-
-interface MetricCardProps extends VariantProps<typeof iconBox> {
-    icon: LucideIcon;
-    label: string;
-    value: string | number;
-    delta: number;              // Variación (ej. 12.5, -3.2). El signo define ▲/▼
-    deltaLabel?: string;        // Texto secundario (ej. "vs. mes anterior")
-    className?: string;
-};
-
-
+/**
+ * MetricCard
+ *
+ * Tarjeta de métrica del dashboard: un icono en su cuadro de color, la cifra
+ * protagonista, el título y la variación respecto al periodo anterior.
+ *
+ * La familia semántica la elige quien la usa con `color`; el color de la
+ * tendencia no, que sale del signo de `delta` — una caída pintada de verde
+ * sería una mentira que la API no debería permitir.
+ */
 export default function MetricCard({
     icon: Icon,
     label,
@@ -49,58 +38,50 @@ export default function MetricCard({
     color,
     className,
 }: MetricCardProps) {
-    const isPositive = delta >= 0;
+    const trend = delta >= 0 ? "up" : "down";
+    const trendTone = metricCardTrendToneVariants({ trend });
 
-    // Color de la tendencia según el signo de la variación
-    const trendColor = isPositive ? "text-success-main" : "text-error-main";
-
-    // Formatea números con separador de miles; los strings se dejan tal cual
-    // (así una métrica puede llegar ya formateada como importe o porcentaje).
+    // Los números se formatean con separador de miles; los strings se dejan
+    // tal cual, así una métrica puede llegar ya formateada como importe o
+    // porcentaje.
     const displayValue = typeof value === "number" ? formatNumber(value) : value;
 
+    const TrendIcon = trend === "up" ? TrendingUp : TrendingDown;
+
     return (
-        <div
-            className={cn(
-                "flex w-full min-w-0 flex-col gap-4 rounded-lg border border-neutral-200 bg-white p-6",
-                className
-            )}
-        >
-            {/* ── Ícono + valor ──────────────────────────────────────────── */}
-            <div className="flex min-w-0 items-center gap-3">
-                <div className={cn(iconBox({ color }))}>
-                    <Icon size={22} strokeWidth={2} />
+        <div className={cn(metricCardVariants(), className)}>
+            {/* ── Icono + cifra ──────────────────────────────────────────── */}
+            <div className={metricCardHeaderVariants()}>
+                <div className={metricCardIconVariants({ color })}>
+                    <Icon
+                        size={ICON_SIZE["2xl"]}
+                        strokeWidth={ICON_STROKE_BY_SIZE["2xl"]}
+                    />
                 </div>
-                <span className="min-w-0 text-[32px] font-bold leading-tight tracking-tight tabular-nums text-neutral-800 [overflow-wrap:anywhere]">
-                    {displayValue}
-                </span>
+
+                <span className={metricCardValueVariants()}>{displayValue}</span>
             </div>
 
             {/* ── Título + tendencia ─────────────────────────────────────── */}
-            <div className="flex min-w-0 flex-col gap-1.5">
-                <span className="truncate text-sm font-semibold text-neutral-800">
-                    {label}
-                </span>
+            <div className={metricCardFooterVariants()}>
+                <span className={metricCardLabelVariants()}>{label}</span>
 
-                <div className="flex min-w-0 items-center gap-2 text-sm">
-                    {isPositive &&
-                        <TrendingUp
-                            size={18}
-                            className={trendColor}
-                        />
-                    }
+                <div className={metricCardTrendVariants()}>
+                    <TrendIcon
+                        size={ICON_SIZE.lg}
+                        strokeWidth={ICON_STROKE_BY_SIZE.lg}
+                        className={trendTone}
+                        aria-hidden="true"
+                    />
 
-                    {!isPositive &&
-                        <TrendingDown
-                            size={18}
-                            className={trendColor}
-                        />
-                    }
-
-                    <span className={cn("shrink-0 font-semibold", trendColor)}>
-                        {isPositive ? "+" : ""}
+                    <span className={cn(metricCardDeltaVariants(), trendTone)}>
+                        {trend === "up" ? "+" : ""}
                         {delta}%
                     </span>
-                    <span className="truncate text-neutral-500">{deltaLabel}</span>
+
+                    <span className={metricCardDeltaLabelVariants()}>
+                        {deltaLabel}
+                    </span>
                 </div>
             </div>
         </div>

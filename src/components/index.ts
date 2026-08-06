@@ -1,9 +1,13 @@
 export * from './buttons/GenericButton';
-export * from './cards/MetricCard';
 export * from './sidebar/Sidebar';
 
 // ── Tarjetas ────────────────────────────────────────────────────────────────
 export { default as ProductCard } from './cards/ProductCard';
+export { default as ProductThumbnail } from './cards/ProductThumbnail';
+export { default as MetricCard } from './cards/MetricCard';
+export * from './cards/product-card.style';
+export * from './cards/product-thumbnail.style';
+export * from './cards/metric-card.style';
 
 // ── Botones ─────────────────────────────────────────────────────────────────
 export { default as LinkButton } from './buttons/LinkButton';
