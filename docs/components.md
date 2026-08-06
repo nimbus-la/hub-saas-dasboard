@@ -244,13 +244,25 @@ Antes de dar un componente por terminado:
 
 ---
 
-## Migrar un componente pendiente
+## Lo que enseñó la migración
 
-Queda `sidebar/`. Ojo con él: escribe a mano
-`transition-[width,transform] duration-200` y desliza el drawer con
-`-translate-x-full`, así que **hoy el drawer no anima su entrada** — es la
-trampa 4 de [`tailwind.md`](./tailwind.md). Sustituir ese literal por
-`TRANSITION.transform` lo arregla de paso.
+Ya no queda ninguna familia pendiente. Lo que sigue es lo que costó descubrir
+por el camino, que es lo que sirve para el siguiente componente.
+
+**Hay geometría que no es la retícula.** Cuatro veces apareció el mismo patrón:
+un puñado de medidas que solo funcionan juntas y que romperías al sustituirlas
+una a una por tokens. El carril del `Switch` (24 de alto − 4 de borde y relleno
+= 20 de perilla = 20 de recorrido). El alto de una pestaña subrayada. Y sobre
+todo la **cadena horizontal del sidebar**: `SIDEBAR.paddingX` (12) + medio
+icono (18/2) sitúa el riel del submenú en 21px, y de ese mismo 12 cuelgan la
+sangría del título de sección y el desplazamiento del indicador de selección.
+Se verifica midiendo: el centro del icono del padre y el borde del riel tienen
+que dar el mismo número.
+
+En estos casos se migra todo lo demás —tipografía, transiciones, foco, radios,
+capas, elevación— y la geometría se deja junta, documentada y con el porqué al
+lado. Un token mal aplicado aquí no rompe el build: descoloca dos píxeles y
+nadie lo ve hasta que la línea deja de caer donde debe.
 
 **Con una librería headless, el cuidado no está donde parece.** TanStack Table
 no trae una sola clase, así que en `tables/` no hubo nada de la trampa 4 de

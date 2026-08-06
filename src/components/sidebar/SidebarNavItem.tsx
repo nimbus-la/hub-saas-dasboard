@@ -9,17 +9,21 @@ import React from "react";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
-import { MenuStructureItems } from "@/interfaces";
+import type { SidebarNavItemProps } from "@/interfaces";
 import { getMenuIcon } from "@/utils";
 import { useSidebarLayout } from "@/context";
+import { DURATION } from "@/tokens";
+
 import SidebarButton from "./SidebarButton";
+import {
+    sidebarSubmenuVariants,
+    sidebarSubmenuWrapperVariants,
+} from "./sidebar-nav-item.style";
 
 
-interface SidebarNavItemProps {
-    item: MenuStructureItems;
-    /** Url del menú que corresponde a la ruta actual (la más específica). */
-    activeUrl: string | null;
-};
+/** framer-motion pide segundos; los tokens guardan milisegundos. */
+const seconds = (ms: number) => ms / 1000;
+
 
 export default function SidebarNavItem({ item, activeUrl }: SidebarNavItemProps) {
     const { isRail, expandSidebar } = useSidebarLayout();
@@ -101,19 +105,18 @@ export default function SidebarNavItem({ item, activeUrl }: SidebarNavItemProps)
                         transition={
                             prefersReducedMotion
                                 ? { duration: 0 }
-                                : { duration: 0.22, ease: [0.16, 1, 0.3, 1] }
+                                : { duration: seconds(DURATION.normal), ease: [0.16, 1, 0.3, 1] }
                         }
-                        className="overflow-hidden"
+                        className={sidebarSubmenuWrapperVariants()}
                     >
-                        {/* ml-[21px] centra el riel bajo el icono del padre (px-3 + 18/2). */}
-                        <ul className="my-1 ml-5.25 space-y-0.5 border-l border-neutral-300 pl-3.5">
+                        <ul className={sidebarSubmenuVariants()}>
                             {subItems.map((subItem) => (
                                 <li key={subItem.url}>
                                     <SidebarButton
                                         href={subItem.url}
                                         label={subItem.title}
                                         level="tertiary"
-                                        size="small"
+                                        size="sm"
                                         selected={subItem.url === activeUrl}
                                         disabled={!subItem.active}
                                     />

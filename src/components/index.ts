@@ -1,5 +1,14 @@
 export * from './buttons/GenericButton';
-export * from './sidebar/Sidebar';
+
+// ── Menú lateral ────────────────────────────────────────────────────────────
+export { default as Sidebar } from './sidebar/Sidebar';
+export { default as SidebarButton } from './sidebar/SidebarButton';
+export { default as SidebarGroup } from './sidebar/SidebarGroup';
+export { default as SidebarNavItem } from './sidebar/SidebarNavItem';
+export * from './sidebar/sidebar.style';
+export * from './sidebar/sidebar-button.style';
+export * from './sidebar/sidebar-group.style';
+export * from './sidebar/sidebar-nav-item.style';
 
 // ── Tarjetas ────────────────────────────────────────────────────────────────
 export { default as ProductCard } from './cards/ProductCard';

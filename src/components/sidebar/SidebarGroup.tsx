@@ -11,23 +11,32 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 
 import { useSidebarLayout } from "@/context";
+import type { SidebarGroupProps } from "@/interfaces";
+import { DURATION, ICON_SIZE, ICON_STROKE } from "@/tokens";
+
+import {
+    sidebarGroupChevronVariants,
+    sidebarGroupChevronWrapperVariants,
+    sidebarGroupHeaderVariants,
+    sidebarGroupLabelVariants,
+    sidebarGroupListVariants,
+    sidebarGroupRailSeparatorVariants,
+} from "./sidebar-group.style";
 
 
-// El título arranca a 42px — la misma sangría que las etiquetas de segundo
-// nivel en SidebarButton (px-3 + icono de 18 + gap-3). Si cambia una, cambia la
-// otra: es la clase `pl-[42px]` de abajo, literal para que Tailwind la extraiga.
-const CHEVRON_SIZE = 14;
+const CHEVRON_SIZE = ICON_SIZE.sm;
 /** Hueco entre el chevron y el título cuando éste corre en hover. */
 const CHEVRON_GAP = 3;
 
-interface SidebarGroupProps {
-    label: string;
-    /** En modo riel sustituye el título por un separador (salvo la 1ª sección). */
-    showRailSeparator?: boolean;
-    children: React.ReactNode;
-};
+/** framer-motion pide segundos; los tokens guardan milisegundos. */
+const seconds = (ms: number) => ms / 1000;
 
-export default function SidebarGroup({ label, showRailSeparator = false, children }: SidebarGroupProps) {
+
+export default function SidebarGroup({
+    label,
+    showRailSeparator = false,
+    children,
+}: SidebarGroupProps) {
     const { isRail } = useSidebarLayout();
     const prefersReducedMotion = useReducedMotion();
 
@@ -39,10 +48,13 @@ export default function SidebarGroup({ label, showRailSeparator = false, childre
         return (
             <div>
                 {showRailSeparator && (
-                    <div aria-hidden="true" className="mx-auto mb-3 h-px w-8 rounded-full bg-neutral-300" />
+                    <div
+                        aria-hidden="true"
+                        className={sidebarGroupRailSeparatorVariants()}
+                    />
                 )}
 
-                <ul aria-label={label} className="space-y-1">
+                <ul aria-label={label} className={sidebarGroupListVariants()}>
                     {children}
                 </ul>
             </div>
@@ -62,7 +74,7 @@ export default function SidebarGroup({ label, showRailSeparator = false, childre
                 // hover dejaría al usuario de teclado sin la pista de plegado.
                 whileFocus="hover"
                 animate="rest"
-                className="group relative flex w-full cursor-pointer items-center rounded-lg py-1.5 px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-main/30"
+                className={sidebarGroupHeaderVariants()}
             >
                 {/* Flecha — fuera del flujo: en reposo no reserva espacio, así el
                     título arranca alineado con las etiquetas de segundo nivel. */}
@@ -73,36 +85,37 @@ export default function SidebarGroup({ label, showRailSeparator = false, childre
                             opacity: 0,
                             x: -4,
                             transition: {
-                                duration: 0.12,
+                                duration: seconds(DURATION.instant),
                             },
                         },
                         hover: {
                             opacity: 1,
                             x: 0,
                             transition: {
-                                delay: 0.08, // Espera a que el texto empiece a moverse
-                                duration: 0.18,
+                                // Espera a que el texto empiece a moverse
+                                delay: seconds(DURATION.instant) * 0.8,
+                                duration: seconds(DURATION.normal),
                             },
                         }
                     }}
-                    transition={{ duration: 0.35 }}
-                    className="absolute left-3 flex items-center"
+                    transition={{ duration: seconds(DURATION.slow) }}
+                    className={sidebarGroupChevronWrapperVariants()}
                 >
                     <ChevronRight
                         size={CHEVRON_SIZE}
-                        strokeWidth={3}
-                        className={`text-neutral-400 transition-[transform,color] duration-200 ease-out group-hover:text-neutral-800 motion-reduce:transition-none ${isOpen ? "rotate-90" : "rotate-0"}`}
+                        strokeWidth={ICON_STROKE.bold}
+                        className={sidebarGroupChevronVariants({ open: isOpen })}
                     />
                 </motion.span>
 
                 {/* Texto — corre a la derecha para hacerle sitio al chevron */}
                 <motion.span
-                    variants={{ 
-                        rest: { x: 0 }, 
-                        hover: { x: prefersReducedMotion ? 0 : CHEVRON_SIZE + CHEVRON_GAP } 
+                    variants={{
+                        rest: { x: 0 },
+                        hover: { x: prefersReducedMotion ? 0 : CHEVRON_SIZE + CHEVRON_GAP }
                     }}
-                    transition={{ duration: 0.22, ease: "easeOut" }}
-                    className="truncate text-[11px] font-bold uppercase tracking-wide text-neutral-500 group-hover:text-neutral-800"
+                    transition={{ duration: seconds(DURATION.normal), ease: "easeOut" }}
+                    className={sidebarGroupLabelVariants()}
                 >
                     {label}
                 </motion.span>
@@ -119,11 +132,11 @@ export default function SidebarGroup({ label, showRailSeparator = false, childre
                         transition={
                             prefersReducedMotion
                                 ? { duration: 0 }
-                                : { duration: 0.24, ease: [0.16, 1, 0.3, 1] }
+                                : { duration: seconds(DURATION.normal), ease: [0.16, 1, 0.3, 1] }
                         }
                         className="overflow-hidden"
                     >
-                        <ul className="space-y-1">{children}</ul>
+                        <ul className={sidebarGroupListVariants()}>{children}</ul>
                     </motion.div>
                 )}
             </AnimatePresence>

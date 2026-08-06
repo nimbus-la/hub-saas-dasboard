@@ -12,6 +12,8 @@ export * from "./inputs.interfaces";
 
 export * from "./pagination.interfaces";
 
+export * from "./sidebar.interfaces";
+
 export * from "./tables.interfaces";
 
 export * from "./tabs.interfaces";
