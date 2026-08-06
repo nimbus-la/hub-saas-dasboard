@@ -14,6 +14,12 @@ import ProductCard from "@/components/cards/ProductCard";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/lib/products";
 
+import {
+    productsGridItemVariants,
+    productsGridListVariants,
+    productsGridVariants,
+} from "./products-grid.style";
+
 interface ProductsGridProps {
     products: Product[];
     /** Abre la edición de un producto. */
@@ -43,14 +49,14 @@ export default function ProductsGrid({
             id={panelId}
             role="tabpanel"
             aria-label={panelLabel}
-            className={cn("min-w-0", className)}
+            className={cn(productsGridVariants(), className)}
         >
             {products.length === 0 ? (
                 emptyState
             ) : (
-                <ul className="grid grid-cols-[repeat(auto-fill,minmax(min(15rem,100%),1fr))] gap-4 md:gap-5">
+                <ul className={productsGridListVariants()}>
                     {products.map((product) => (
-                        <li key={product.id} className="min-w-0">
+                        <li key={product.id} className={productsGridItemVariants()}>
                             <ProductCard
                                 product={product}
                                 onEdit={onEditProduct}
