@@ -53,9 +53,9 @@ export const statusBadgeVariants = cva(
 
 ```tsx
 // StatusBadge.tsx
-export default function StatusBadge({ label, tone, className }: StatusBadgeProps) {
+export default function StatusBadge({ label, tone, size, className }: StatusBadgeProps) {
     return (
-        <span className={cn(statusBadgeVariants({ tone }), className)}>
+        <span className={cn(statusBadgeVariants({ tone, size }), className)}>
             {label}
         </span>
     );
@@ -246,9 +246,9 @@ Antes de dar un componente por terminado:
 
 ## Migrar un componente pendiente
 
-Quedan `badges/`, `pagination/`, `tabs/`, `cards/`, `tables/`, `sidebar/` y
-`toggles/`. El orden recomendado es de menos a más superficie: `StatusBadge` y
-`Pagination` primero, que `BADGE_SIZE` y `CONTROL_SIZE.sm` los cubren enteros.
+Quedan `pagination/`, `tabs/`, `cards/`, `tables/`, `sidebar/` y `toggles/`. El
+orden recomendado es de menos a más superficie: `Pagination` primero, que
+`CONTROL_SIZE.sm` lo cubre entero.
 
 El procedimiento que funcionó con los ya migrados:
 

@@ -19,6 +19,7 @@ export type { ColumnAlign } from '../interfaces/data-table.types';
 
 // ── Insignias ───────────────────────────────────────────────────────────────
 export { default as StatusBadge } from './badges/StatusBadge';
+export { statusBadgeVariants } from './badges/status-badge.style';
 
 // ── Avatares ────────────────────────────────────────────────────────────────
 export {
