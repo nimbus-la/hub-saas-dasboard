@@ -254,16 +254,26 @@ salidas, por orden de preferencia:
 `--sidebar-*`, `--chart-*`) y su `@layer base`, que aplica
 `border-border outline-ring/50` y `bg-background text-foreground`.
 
-Ya no queda ningún componente de shadcn en el proyecto. De ese bloque solo
-siguen vivas:
+Ya no queda ningún componente de shadcn en el proyecto, y desde la migración de
+la Navbar tampoco queda ninguna clase suya en el JSX: `ring-background` y
+`bg-background` pasaron a `ring-white` y `bg-white`.
 
-- Las tres reglas del `@layer base`.
-- Dos clases en `Navbar.tsx`: `ring-background` (línea del punto de
-  notificación) y `bg-background` (fondo del selector móvil).
+De ese bloque solo siguen vivas **las tres reglas del `@layer base`**, que son
+las que lo mantienen en pie:
 
-**Pendiente:** sustituir esas dos por `ring-white` / `bg-white` y podar el
-bloque. No se ha hecho todavía porque toca `Navbar.tsx`, que aún no está
-migrado.
+```css
+* { @apply border-border outline-ring/50; }
+body { @apply bg-background text-foreground; }
+```
+
+**Pendiente:** podar el bloque. Ya no lo bloquea nada, pero no es un borrado
+limpio: esas dos reglas aplican a toda la aplicación —`border-border` le pone
+color por defecto al borde de *cualquier* elemento con `border`— así que hay
+que sustituirlas antes de quitar las variables, no después. El reemplazo
+natural es `border-neutral-200`, `outline-primary-main/50` y `bg-white
+text-neutral-800`, y conviene hacerlo con la app delante: un cambio en el color
+de borde por defecto no rompe el build y se nota en sitios que nadie estaba
+mirando.
 
 El bloque `.dark` no está en uso: la app no tiene modo oscuro y la paleta de
 marca no define tonos oscuros. Si algún día entra, se declara en los tokens y

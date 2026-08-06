@@ -100,7 +100,13 @@ export const sidebarWordmarkVariants = cva([
 ]);
 
 
-/** Botones de icono del encabezado — mismo lenguaje que los de la Navbar. */
+/**
+ * Botones de icono del encabezado.
+ *
+ * Escalón `sm` (32px) y no el `md` de los de la Navbar: colapsar y cerrar son
+ * acciones secundarias de una superficie que en móvil ni siquiera se ve, así
+ * que no compiten por ser objetivo táctil.
+ */
 export const sidebarIconButtonVariants = cva([
     "flex shrink-0 cursor-pointer items-center justify-center text-neutral-600",
     CONTROL_SIZE.sm.squareClass,

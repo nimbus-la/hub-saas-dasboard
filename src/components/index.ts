@@ -1,5 +1,9 @@
 export * from './buttons/GenericButton';
 
+// ── Barra superior ──────────────────────────────────────────────────────────
+export { default as Navbar } from './navbar/Navbar';
+export * from './navbar/navbar.style';
+
 // ── Menú lateral ────────────────────────────────────────────────────────────
 export { default as Sidebar } from './sidebar/Sidebar';
 export { default as SidebarButton } from './sidebar/SidebarButton';

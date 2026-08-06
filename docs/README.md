@@ -112,12 +112,14 @@ Iconos, que se dimensionan por prop y no por clase:
 | `tables/` — `DataTable`, `DataTableCheckbox`, `TitleSubtitleCell` | Migrado (fila en `ROW_HEIGHT.md`) |
 | `toggles/` — `Switch` | Migrado (la geometría del carril es suya; el resto, del sistema) |
 | `sidebar/` — `Sidebar`, `SidebarButton`, `SidebarGroup`, `SidebarNavItem` | Migrado (armazón desde `SIDEBAR` y `Z_INDEX`) |
+| `navbar/` — `Navbar` | Migrado (armazón desde `NAVBAR`; sin clases de shadcn) |
 
 La migración está completa: no queda ninguna familia con valores propios. Lo
 que quedó fuera de los tokens a propósito —geometrías cerradas como el carril
 del `Switch` o la cadena horizontal del sidebar— va documentado en su
 `*.style.ts` y resumido en [`components.md`](./components.md).
 
-Fuera de `components/` sí quedan pantallas sin migrar (`Navbar`, y las tablas
-y gráficos de `features/main-dashboard`). No estorban: el sistema convive con
-ellas.
+Fuera de `components/` sí quedan piezas sin migrar: los paneles, tablas y
+gráficos de `features/main-dashboard`. No estorban —el sistema convive con
+ellas—, pero son las que todavía usan `rounded-lg` donde el resto ya usa
+`rounded-xl`.
