@@ -19,12 +19,22 @@ import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { PaginationProps } from "@/interfaces";
+import { CONTROL_SIZE, ICON_STROKE_BY_SIZE } from "@/tokens";
 
 import {
     paginationArrowVariants,
+    paginationControlsVariants,
     paginationEllipsisVariants,
+    paginationLabelVariants,
+    paginationListVariants,
+    paginationPageSizeVariants,
     paginationPageVariants,
+    paginationSelectIconVariants,
     paginationSelectVariants,
+    paginationSelectWrapperVariants,
+    paginationSummaryValueVariants,
+    paginationSummaryVariants,
+    paginationVariants,
 } from "./pagination.style";
 
 const DEFAULT_PAGE_SIZE_OPTIONS = [8, 12, 24] as const;
@@ -33,6 +43,10 @@ const DEFAULT_ITEM_LABEL = { singular: "resultado", plural: "resultados" };
 
 /** Máximo de casillas visibles antes de recurrir a los puntos suspensivos. */
 const MAX_VISIBLE_PAGES = 7;
+
+/** El pie entero va en `sm`, así que los iconos salen de esa misma fila. */
+const ICON_SIZE = CONTROL_SIZE.sm.iconSize;
+const ICON_STROKE = ICON_STROKE_BY_SIZE.sm;
 
 export default function Pagination({
     page,
@@ -60,40 +74,30 @@ export default function Pagination({
     const pageItems = buildPageItems(currentPage, totalPages);
 
     return (
-        <nav
-            aria-label="Paginación"
-            className={cn(
-                "flex w-full min-w-0 flex-col gap-4",
-                "md:flex-row md:items-center md:justify-between",
-                className
-            )}
-        >
+        <nav aria-label="Paginación" className={cn(paginationVariants(), className)}>
             {/* ── Resumen ────────────────────────────────────────────────── */}
             {/* `aria-live` anuncia el nuevo rango al cambiar de página sin
                 robar el foco del botón que acaba de pulsarse. */}
-            <p aria-live="polite" className="text-xs text-neutral-600">
+            <p aria-live="polite" className={paginationSummaryVariants()}>
                 Mostrando{" "}
-                <span className="font-semibold tabular-nums text-neutral-800">
+                <span className={paginationSummaryValueVariants()}>
                     {firstItem}–{lastItem}
                 </span>{" "}
                 de{" "}
-                <span className="font-semibold tabular-nums text-neutral-800">
+                <span className={paginationSummaryValueVariants()}>
                     {formatNumber(totalItems)}
                 </span>{" "}
                 {noun}
             </p>
 
-            <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-3">
+            <div className={paginationControlsVariants()}>
                 {/* ── Tamaño de página ───────────────────────────────────── */}
-                <div className="flex shrink-0 items-center gap-2">
-                    <label
-                        htmlFor={pageSizeId}
-                        className="shrink-0 text-xs text-neutral-600"
-                    >
+                <div className={paginationPageSizeVariants()}>
+                    <label htmlFor={pageSizeId} className={paginationLabelVariants()}>
                         Por página
                     </label>
 
-                    <div className="relative w-[4.5rem]">
+                    <div className={paginationSelectWrapperVariants()}>
                         <select
                             id={pageSizeId}
                             value={pageSize}
@@ -110,17 +114,16 @@ export default function Pagination({
                         </select>
 
                         <ChevronDown
-                            size={14}
+                            size={ICON_SIZE}
+                            strokeWidth={ICON_STROKE}
                             aria-hidden="true"
-                            className="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-neutral-500"
+                            className={paginationSelectIconVariants()}
                         />
                     </div>
                 </div>
 
                 {/* ── Números de página ──────────────────────────────────── */}
-                {/* Envuelve en varias líneas antes que desbordar: con muchas
-                    páginas, nueve controles no caben en un móvil. */}
-                <ul className="flex flex-wrap items-center justify-end gap-1">
+                <ul className={paginationListVariants()}>
                     <li>
                         <button
                             type="button"
@@ -129,7 +132,11 @@ export default function Pagination({
                             onClick={() => onPageChange(currentPage - 1)}
                             className={paginationArrowVariants()}
                         >
-                            <ChevronLeft size={16} aria-hidden="true" />
+                            <ChevronLeft
+                                size={ICON_SIZE}
+                                strokeWidth={ICON_STROKE}
+                                aria-hidden="true"
+                            />
                         </button>
                     </li>
 
@@ -169,7 +176,11 @@ export default function Pagination({
                             onClick={() => onPageChange(currentPage + 1)}
                             className={paginationArrowVariants()}
                         >
-                            <ChevronRight size={16} aria-hidden="true" />
+                            <ChevronRight
+                                size={ICON_SIZE}
+                                strokeWidth={ICON_STROKE}
+                                aria-hidden="true"
+                            />
                         </button>
                     </li>
                 </ul>

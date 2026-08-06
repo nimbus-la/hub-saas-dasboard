@@ -7,9 +7,11 @@ import { cn } from "@/lib/utils";
 import type { SwitchProps } from "@/interfaces";
 
 import {
+    switchDescriptionVariants,
     switchLabelVariants,
     switchThumbVariants,
     switchTrackVariants,
+    switchVariants,
 } from "./switch.style";
 
 export function Switch({
@@ -51,10 +53,7 @@ export function Switch({
     }
 
     return (
-        // El texto va a la izquierda y el control a la derecha: en una lista de
-        // ajustes las perillas quedan alineadas en una sola columna y el ojo
-        // recorre estados, no etiquetas.
-        <div className={cn("flex items-start justify-between gap-4", className)}>
+        <div className={cn(switchVariants(), className)}>
             <div className="min-w-0">
                 <label
                     htmlFor={fieldId}
@@ -66,10 +65,7 @@ export function Switch({
                 {description && (
                     <p
                         id={descriptionId}
-                        className={cn(
-                            "mt-0.5 text-xs",
-                            disabled ? "text-neutral-400" : "text-neutral-600"
-                        )}
+                        className={switchDescriptionVariants({ disabled })}
                     >
                         {description}
                     </p>

@@ -4,7 +4,7 @@ import { cx } from "class-variance-authority";
 
 import { useSidebarLayout } from "@/context";
 import Sidebar from "../sidebar/Sidebar";
-import Navbar from "../Navbar";
+import Navbar from "../navbar/Navbar";
 
 
 export default function AppShell({ children }: { children: React.ReactNode }) {

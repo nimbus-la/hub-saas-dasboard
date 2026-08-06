@@ -157,7 +157,7 @@ obliga a mantenerla a mano.
 
 ## Trampas conocidas
 
-Cuatro cosas que ya se descubrieron por las malas.
+Cinco cosas que ya se descubrieron por las malas.
 
 ### 1. No declares `--spacing-*` con la escala de camiseta
 
@@ -213,7 +213,29 @@ ahí aterriza lo que se añada con el CLI. **Es una sala de espera, no un
 destino:** se traduce y se mueve a su familia, como se hizo con los campos
 (`inputs/primitives`) y el avatar (`avatars`).
 
-### 4. Cuidado con las especificidades prestadas
+### 4. `translate-x-*` ya no escribe en `transform`
+
+En v4, `translate`, `scale` y `rotate` dejaron de componerse dentro de la
+propiedad `transform`: cada una escribe la suya. Así que una lista de
+transición que solo nombre `transform` **no anima un desplazamiento**:
+
+```html
+<!-- ❌ la perilla salta: la clase se aplica, pero sin transición -->
+<span class="transition-[width,transform] duration-200 data-[checked]:translate-x-5">
+
+<!-- ✅ -->
+<span class="transition-[width,transform,translate,scale,rotate] duration-200 …">
+```
+
+Es de las que no se ven revisando el código: la clase existe, la regla se
+genera y el elemento acaba justo donde tiene que acabar. Lo único que falta es
+el recorrido, y eso solo se detecta mirándolo en movimiento o comprobando
+`getComputedStyle(el).transitionProperty`.
+
+`TRANSITION.transform` ya lleva la lista completa. Si escribes la transición a
+mano, no te la dejes.
+
+### 5. Cuidado con las especificidades prestadas
 
 Si un componente de fuera declara un tamaño con `:not([class*='size-'])` o con
 un selector de hijo directo, tu regla de descendencia simple pierde. Dos
@@ -232,16 +254,26 @@ salidas, por orden de preferencia:
 `--sidebar-*`, `--chart-*`) y su `@layer base`, que aplica
 `border-border outline-ring/50` y `bg-background text-foreground`.
 
-Ya no queda ningún componente de shadcn en el proyecto. De ese bloque solo
-siguen vivas:
+Ya no queda ningún componente de shadcn en el proyecto, y desde la migración de
+la Navbar tampoco queda ninguna clase suya en el JSX: `ring-background` y
+`bg-background` pasaron a `ring-white` y `bg-white`.
 
-- Las tres reglas del `@layer base`.
-- Dos clases en `Navbar.tsx`: `ring-background` (línea del punto de
-  notificación) y `bg-background` (fondo del selector móvil).
+De ese bloque solo siguen vivas **las tres reglas del `@layer base`**, que son
+las que lo mantienen en pie:
 
-**Pendiente:** sustituir esas dos por `ring-white` / `bg-white` y podar el
-bloque. No se ha hecho todavía porque toca `Navbar.tsx`, que aún no está
-migrado.
+```css
+* { @apply border-border outline-ring/50; }
+body { @apply bg-background text-foreground; }
+```
+
+**Pendiente:** podar el bloque. Ya no lo bloquea nada, pero no es un borrado
+limpio: esas dos reglas aplican a toda la aplicación —`border-border` le pone
+color por defecto al borde de *cualquier* elemento con `border`— así que hay
+que sustituirlas antes de quitar las variables, no después. El reemplazo
+natural es `border-neutral-200`, `outline-primary-main/50` y `bg-white
+text-neutral-800`, y conviene hacerlo con la app delante: un cambio en el color
+de borde por defecto no rompe el build y se nota en sitios que nadie estaba
+mirando.
 
 El bloque `.dark` no está en uso: la app no tiene modo oscuro y la paleta de
 marca no define tonos oscuros. Si algún día entra, se declara en los tokens y

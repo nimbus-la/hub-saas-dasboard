@@ -78,9 +78,19 @@ export const TRANSITION = {
     /** Aparición y desaparición. */
     opacity:
         "transition-opacity duration-200 ease-out motion-reduce:transition-none",
-    /** Desplazamientos y cambios de tamaño (sidebar colapsando). */
+    /**
+     * Desplazamientos y cambios de tamaño (sidebar colapsando, perilla de un
+     * interruptor).
+     *
+     * La lista nombra `translate`, `scale` y `rotate` además de `transform`, y
+     * hace falta: Tailwind v4 dejó de meter esas tres en la propiedad
+     * `transform` y cada una escribe la suya. Una lista que solo diga
+     * `transform` deja `translate-x-*` sin animar —el elemento salta— y no hay
+     * forma de notarlo sin medir `getComputedStyle`, porque la clase se aplica
+     * y el elemento acaba donde debe.
+     */
     transform:
-        "transition-[width,transform] duration-200 ease-out motion-reduce:transition-none",
+        "transition-[width,transform,translate,scale,rotate] duration-200 ease-out motion-reduce:transition-none",
     /** Sombra al elevar una tarjeta. */
     elevation:
         "transition-shadow duration-200 ease-out motion-reduce:transition-none",
