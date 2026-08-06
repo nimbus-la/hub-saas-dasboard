@@ -17,9 +17,15 @@ export { genericButtonVariants } from './buttons/generic-button.style';
 
 // ── Tablas ──────────────────────────────────────────────────────────────────
 export { default as DataTable } from './tables/DataTable';
-export type { DataTableProps } from './tables/DataTable';
+export { default as DataTableCheckbox } from './tables/DataTableCheckbox';
 export { default as TitleSubtitleCell } from './tables/TitleSubtitleCell';
+export * from './tables/data-table.style';
+export * from './tables/data-table-checkbox.style';
+export * from './tables/title-subtitle-cell.style';
 export type { ColumnAlign } from '../interfaces/data-table.types';
+// Los props viven en `@/interfaces`; se reexportan para no romper a quien ya
+// los importaba desde este barril.
+export type { DataTableProps } from '../interfaces/tables.interfaces';
 
 // ── Insignias ───────────────────────────────────────────────────────────────
 export { default as StatusBadge } from './badges/StatusBadge';

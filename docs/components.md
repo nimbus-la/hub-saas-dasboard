@@ -246,7 +246,22 @@ Antes de dar un componente por terminado:
 
 ## Migrar un componente pendiente
 
-Quedan `tables/`, `sidebar/` y `toggles/`.
+Quedan `sidebar/` y `toggles/`.
+
+**Con una librería headless, el cuidado no está donde parece.** TanStack Table
+no trae una sola clase, así que en `tables/` no hubo nada de la trampa 4 de
+[`tailwind.md`](./tailwind.md) —especificidades prestadas—. Lo que sí hay es un
+contrato propio: `meta.headerClassName` y `meta.cellClassName`, con los que una
+columna afina su celda. Esas clases tienen que quedar **al final del `cn()`**
+para que tailwind-merge las deje ganar sobre la base; si se meten dentro del
+`cva`, una columna deja de poder ajustar su ancho y nadie se entera hasta que
+alguien lo intenta.
+
+**El alto de fila se declara, no se calcula.** `ROW_HEIGHT_CLASS.md` en el `td`
+da los 48px del escalón y actúa como mínimo, así que las filas con celdas de
+dos líneas crecen solas. Es mejor que despejar la ecuación del relleno: el
+`py-3.5` que había salía de restarle el interlineado a la altura deseada, y se
+descuadraba en cuanto la tipografía cambiaba.
 
 **No todo componente pulsable toma su alto de `CONTROL_SIZE`.** `FilterTabs`
 fue el primer caso: una pestaña subrayada no es una caja, es texto con una
