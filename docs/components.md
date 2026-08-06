@@ -246,9 +246,9 @@ Antes de dar un componente por terminado:
 
 ## Migrar un componente pendiente
 
-Quedan `pagination/`, `tabs/`, `tables/`, `sidebar/` y `toggles/`. El orden
-recomendado es de menos a más superficie: `Pagination` primero, que
-`CONTROL_SIZE.sm` lo cubre entero.
+Quedan `tabs/`, `tables/`, `sidebar/` y `toggles/`. El orden recomendado es de
+menos a más superficie: `FilterTabs` primero, que `CONTROL_SIZE.sm` lo cubre
+entero igual que cubrió la paginación.
 
 **Pendiente de las tarjetas:** al migrar `cards/` el radio de superficie subió
 a `rounded-xl` (`RADIUS_SEMANTIC.surface`). Los paneles que aún no están

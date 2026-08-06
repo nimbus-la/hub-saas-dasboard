@@ -38,6 +38,7 @@ export {
 // ── Navegación y listados ───────────────────────────────────────────────────
 export { FilterTabs } from './tabs/FilterTabs';
 export { default as Pagination } from './pagination/Pagination';
+export * from './pagination/pagination.style';
 
 // ── Formularios ─────────────────────────────────────────────────────────────
 export { InputSelector } from './inputs/InputSelector';
