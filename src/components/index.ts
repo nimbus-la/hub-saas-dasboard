@@ -50,3 +50,7 @@ export * from './pagination/pagination.style';
 // ── Formularios ─────────────────────────────────────────────────────────────
 export { InputSelector } from './inputs/InputSelector';
 export { TextField } from './inputs/TextField';
+
+// ── Interruptores ───────────────────────────────────────────────────────────
+export { Switch } from './toggles/Switch';
+export * from './toggles/switch.style';

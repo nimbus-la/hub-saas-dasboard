@@ -16,6 +16,8 @@ export * from "./tables.interfaces";
 
 export * from "./tabs.interfaces";
 
+export * from "./toggles.interfaces";
+
 
 
 /** Tokens */

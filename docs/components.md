@@ -246,7 +246,11 @@ Antes de dar un componente por terminado:
 
 ## Migrar un componente pendiente
 
-Quedan `sidebar/` y `toggles/`.
+Queda `sidebar/`. Ojo con él: escribe a mano
+`transition-[width,transform] duration-200` y desliza el drawer con
+`-translate-x-full`, así que **hoy el drawer no anima su entrada** — es la
+trampa 4 de [`tailwind.md`](./tailwind.md). Sustituir ese literal por
+`TRANSITION.transform` lo arregla de paso.
 
 **Con una librería headless, el cuidado no está donde parece.** TanStack Table
 no trae una sola clase, así que en `tables/` no hubo nada de la trampa 4 de

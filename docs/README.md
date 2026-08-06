@@ -110,7 +110,8 @@ Iconos, que se dimensionan por prop y no por clase:
 | `pagination/` — `Pagination` | Migrado (todo el pie en `CONTROL_SIZE.sm`) |
 | `tabs/` — `FilterTabs` | Migrado (contador en `BADGE_SIZE.xs`; el alto es de pestaña, no de control) |
 | `tables/` — `DataTable`, `DataTableCheckbox`, `TitleSubtitleCell` | Migrado (fila en `ROW_HEIGHT.md`) |
-| `sidebar/`, `toggles/` | Pendientes |
+| `toggles/` — `Switch` | Migrado (la geometría del carril es suya; el resto, del sistema) |
+| `sidebar/` | Pendiente |
 
 Los pendientes siguen funcionando con sus valores propios: la migración es
 progresiva y nada se rompe mientras tanto.
