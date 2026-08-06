@@ -39,9 +39,9 @@ export default function useOrders(
             previous.map((order) =>
                 order.id === id
                     ? {
-                          ...order,
-                          status: "paid",
-                      }
+                        ...order,
+                        status: "paid",
+                    }
                     : order,
             ),
         );

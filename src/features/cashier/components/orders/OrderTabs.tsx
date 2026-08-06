@@ -41,8 +41,8 @@ export default function OrderTabs({
                         type="button"
                         onClick={() => onValueChange(tab.value)}
                         className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${active
-                                ? "bg-primary text-white"
-                                : "text-neutral-600 hover:bg-neutral-100"
+                            ? "bg-primary text-white"
+                            : "text-neutral-600 hover:bg-neutral-100"
                             }`}
                     >
                         {tab.label}

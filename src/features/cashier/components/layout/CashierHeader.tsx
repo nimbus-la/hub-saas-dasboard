@@ -22,8 +22,8 @@ export default function CashierHeader({
 
                 <div
                     className={`flex h-14 w-14 items-center justify-center rounded-xl ${isOpen
-                            ? "bg-success-lighter text-success-main"
-                            : "bg-error-lighter text-error-main"
+                        ? "bg-success-lighter text-success-main"
+                        : "bg-error-lighter text-error-main"
                         }`}
                 >
                     <Store size={26} />
@@ -47,8 +47,8 @@ export default function CashierHeader({
 
                 <div
                     className={`rounded-full px-4 py-2 text-sm font-medium ${isOpen
-                            ? "bg-success-lighter text-success-main"
-                            : "bg-error-lighter text-error-main"
+                        ? "bg-success-lighter text-success-main"
+                        : "bg-error-lighter text-error-main"
                         }`}
                 >
                     {isOpen ? "Caja Abierta" : "Caja Cerrada"}

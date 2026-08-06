@@ -30,10 +30,9 @@ export default function PaymentMethodCard({
                 relative w-full rounded-2xl border bg-white p-6 text-left
                 transition-all duration-200
 
-                ${
-                    selected
-                        ? "border-primary shadow-lg ring-2 ring-primary/10"
-                        : "border-neutral-200 hover:border-primary/40 hover:shadow-md"
+                ${selected
+                    ? "border-primary shadow-lg ring-2 ring-primary/10"
+                    : "border-neutral-200 hover:border-primary/40 hover:shadow-md"
                 }
             `}
         >
