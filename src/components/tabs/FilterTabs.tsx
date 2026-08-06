@@ -1,23 +1,38 @@
 "use client";
 
-// ── Pestañas de filtrado ────────────────────────────────────────────────────
-// Grupo de pestañas controlado que segmenta una colección (categorías, estados,
-// periodos…). Implementa el patrón ARIA de tabs con activación automática: las
-// flechas mueven el foco y filtran a la vez, que es lo que se espera cuando la
-// pestaña no abre una vista nueva sino que acota la que ya está en pantalla.
-//
-// El componente no conoce el dominio: recibe las opciones y el valor activo.
-//
-// Uso mínimo:
-//   <FilterTabs items={items} value={category} onChange={setCategory}
-//               label="Categorías" panelId="products-grid" />
-
 import * as React from "react";
 
-import { cn } from "@/lib/utils";
 import type { FilterTabsProps } from "@/interfaces";
+import { cn } from "@/lib/utils";
+import {
+    filterTabCountVariants,
+    filterTabsListVariants,
+    filterTabsScrollerVariants,
+    filterTabsVariants,
+    filterTabVariants,
+} from "./filter-tabs.style";
 
-import { filterTabCountVariants, filterTabVariants } from "./filter-tabs.style";
+
+/**
+ * Pestañas de filtrado
+ * 
+ * Grupo de pestañas controlado que segmenta una colección (categorías, estados,
+ * periodos…). Implementa el patrón ARIA de tabs con activación automática: las
+ * flechas mueven el foco y filtran a la vez, que es lo que se espera cuando la
+ * pestaña no abre una vista nueva sino que acota la que ya está en pantalla.
+ * 
+ * El componente no conoce el dominio: recibe las opciones y el valor activo.
+ * 
+ * Uso mínimo:
+ *   <FilterTabs 
+ *        items={items} 
+ *        value={category} 
+ *        onChange={setCategory}
+ *        label="Categorías" 
+ *        panelId="products-grid" 
+ *   />
+ */
+
 
 export function FilterTabs({
     items,
@@ -73,17 +88,13 @@ export function FilterTabs({
     );
 
     return (
-        // La línea divisoria vive fuera del contenedor con scroll; dentro solo
-        // van las pestañas, que lo arrastran en horizontal cuando no caben.
-        // El tirón de 1px hace que el subrayado de la pestaña activa tape la
-        // línea en lugar de apilarse encima.
-        <div className={cn("w-full min-w-0 border-b border-neutral-200", className)}>
-            <div className="-mb-px w-full min-w-0 overflow-x-auto pt-1">
+        <div className={cn(filterTabsVariants(), className)}>
+            <div className={filterTabsScrollerVariants()}>
                 <div
                     role="tablist"
                     aria-label={label}
                     onKeyDown={handleKeyDown}
-                    className="flex min-w-max items-end gap-5 px-0.5 sm:gap-6"
+                    className={filterTabsListVariants()}
                 >
                     {items.map((item) => {
                         const isSelected = item.value === value;

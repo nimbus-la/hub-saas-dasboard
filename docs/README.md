@@ -108,7 +108,8 @@ Iconos, que se dimensionan por prop y no por clase:
 | `badges/` — `StatusBadge` | Migrado (escala `xs…2xl`, por defecto `sm`) |
 | `cards/` — `MetricCard`, `ProductCard`, `ProductThumbnail` | Migrado (superficies fijas: `SURFACE_SIZE.xl` y `lg`) |
 | `pagination/` — `Pagination` | Migrado (todo el pie en `CONTROL_SIZE.sm`) |
-| `tabs/`, `tables/`, `sidebar/`, `toggles/` | Pendientes |
+| `tabs/` — `FilterTabs` | Migrado (contador en `BADGE_SIZE.xs`; el alto es de pestaña, no de control) |
+| `tables/`, `sidebar/`, `toggles/` | Pendientes |
 
 Los pendientes siguen funcionando con sus valores propios: la migración es
 progresiva y nada se rompe mientras tanto.

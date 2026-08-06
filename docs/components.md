@@ -246,9 +246,25 @@ Antes de dar un componente por terminado:
 
 ## Migrar un componente pendiente
 
-Quedan `tabs/`, `tables/`, `sidebar/` y `toggles/`. El orden recomendado es de
-menos a más superficie: `FilterTabs` primero, que `CONTROL_SIZE.sm` lo cubre
-entero igual que cubrió la paginación.
+Quedan `tables/`, `sidebar/` y `toggles/`.
+
+**No todo componente pulsable toma su alto de `CONTROL_SIZE`.** `FilterTabs`
+fue el primer caso: una pestaña subrayada no es una caja, es texto con una
+línea debajo. Fijarle `h-10` centraría el texto y despegaría el subrayado, así
+que el alto lo sigue poniendo el relleno vertical —que ya caía en la retícula
+de 4px—. Todo lo demás sí sale del sistema: tipografía, transición, foco,
+relleno horizontal y el contador, que es un `BADGE_SIZE.xs` con el radio
+cambiado a píldora.
+
+**Y el `gap` entre pestañas no era espaciado, era otra cosa.** Con hueco entre
+ellas, el subrayado del hover se dibuja como un trozo suelto flotando entre dos
+vacíos. La separación tiene que vivir dentro de cada pestaña —`px-3 sm:px-4`,
+el relleno del control— para que los bordes inferiores se toquen y la línea se
+lea continua. El relleno es simétrico también en la primera: quitarle el `pl`
+para alinearla con el título de la página la deja descentrada respecto a su
+propio subrayado, y eso se nota más que el desfase con el título. Regla
+general: **si un elemento dibuja una línea que debe leerse continua con la de
+su vecino, la separación va en relleno, nunca en `gap`.**
 
 **Pendiente de las tarjetas:** al migrar `cards/` el radio de superficie subió
 a `rounded-xl` (`RADIUS_SEMANTIC.surface`). Los paneles que aún no están

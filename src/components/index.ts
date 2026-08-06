@@ -37,6 +37,7 @@ export {
 
 // ── Navegación y listados ───────────────────────────────────────────────────
 export { FilterTabs } from './tabs/FilterTabs';
+export * from './tabs/filter-tabs.style';
 export { default as Pagination } from './pagination/Pagination';
 export * from './pagination/pagination.style';
 
