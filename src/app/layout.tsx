@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 
 import "@/style/style.css";
-import { SidebarLayoutProvider } from "@/context";
+import { HttpClientProvider, QueryProvider, SidebarLayoutProvider } from "@/context";
 import AppShell from "@/components/layout/AppShell";
 import { cn } from "@/lib/utils";
 
@@ -30,11 +30,23 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body>
-        <SidebarLayoutProvider>
-          <AppShell>
-            {children}
-          </AppShell>
-        </SidebarLayoutProvider>
+        {/*
+          Orden de los proveedores, de fuera a dentro:
+
+          1. `HttpClientProvider` — no depende de nadie y todo depende de él.
+          2. `QueryProvider`      — sus hooks resuelven el cliente HTTP del
+                                    proveedor anterior.
+          3. `SidebarLayoutProvider` — estado de interfaz, ajeno a los datos.
+        */}
+        <HttpClientProvider>
+          <QueryProvider>
+            <SidebarLayoutProvider>
+              <AppShell>
+                {children}
+              </AppShell>
+            </SidebarLayoutProvider>
+          </QueryProvider>
+        </HttpClientProvider>
       </body>
     </html>
   );

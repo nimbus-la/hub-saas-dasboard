@@ -20,6 +20,12 @@ export * from "./components";
 export * from "./menu.types";
 
 
+/** Infraestructura */
+export * from "./http/http.interfaces";
+export * from "./http/http-error.interfaces";
+export * from "./http/fetch-http-client.interfaces";
+
+
 /** Tokens */
 export * from "./tokens/sizes-token.interface";
 export * from "./tokens/elevation-token.interface";
