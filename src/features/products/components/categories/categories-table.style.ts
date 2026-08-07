@@ -4,7 +4,6 @@ import {
     FONT_WEIGHT_CLASS,
     RADIUS_SEMANTIC,
     SPACING_CLASS,
-    TYPOGRAPHY,
 } from "@/tokens";
 
 

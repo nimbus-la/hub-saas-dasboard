@@ -41,6 +41,34 @@ export const toCategoryFormValues = (category: Category): CategoryFormValues => 
     active: category.active,
 });
 
+
+/** Lo que el formulario escribe de una categoría. El id y la fecha los pone la pantalla. */
+export type CategoryFormFields = Omit<Category, "id" | "placedAt">;
+
+
+/**
+ * El camino de vuelta: de lo que se escribió a lo que se guarda.
+ *
+ * Recorta los extremos —un nombre con espacios delante se ordena antes que
+ * todos los demás en la tabla y nadie entiende por qué— y, si la descripción
+ * queda vacía, **la propiedad desaparece** en lugar de viajar como `""`.
+ *
+ * Esa distinción importa dos veces. En el tipo, porque
+ * `exactOptionalPropertyTypes` no acepta `description: undefined` donde la
+ * propiedad es opcional. Y en pantalla, porque la tabla decide si pinta su
+ * guion de "sin descripción" preguntando por la ausencia, no por el texto
+ * vacío.
+ */
+export const toCategoryFields = (values: CategoryFormValues): CategoryFormFields => {
+    const description = values.description.trim();
+
+    return {
+        name: values.name.trim(),
+        active: values.active,
+        ...(description ? { description } : {}),
+    };
+};
+
 /* -------------------------------------------------------------------------- */
 /*  Reglas de validación                                                       */
 /* -------------------------------------------------------------------------- */

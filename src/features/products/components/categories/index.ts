@@ -4,3 +4,4 @@
 // mismo reparto que hay entre `Products` y su rejilla.
 export { default as CategoriesTable } from './CategoriesTable';
 export { default as CategoriesToolbar } from './CategoriesToolbar';
+export { default as CategoryFormModal } from './CategoryFormModal';

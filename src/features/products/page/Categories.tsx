@@ -18,6 +18,8 @@ import {
     DEFAULT_CATEGORY_STATUS_FILTER,
     filterCategories,
     formatCategoryCount,
+    isDuplicateCategoryName,
+    nextCategoryId,
     type Category,
     type CategoryStatusFilter,
 } from "@/lib/categories";
@@ -25,7 +27,12 @@ import {
 import {
     CategoriesTable,
     CategoriesToolbar,
+    CategoryFormModal,
 } from "../components/categories";
+import {
+    toCategoryFields,
+    type CategoryFormValues,
+} from "../libs/category-form";
 import {
     categoriesPageBodyVariants,
     categoriesPageVariants,
@@ -92,9 +99,66 @@ export default function Categories({ categories: initialCategories }: Categories
     }, []);
 
     // ── Formulario ──────────────────────────────────────────────────────────
-    const handleCreateCategory = React.useCallback(() => { }, []);
+    // Un solo modal para el alta y la edición: lo que decide el modo es
+    // `formTarget`. `null` es un alta y no "todavía no se sabe" —el modal está
+    // cerrado hasta que alguien pulsa—, así que no hace falta un tercer estado.
+    const [formTarget, setFormTarget] = React.useState<Category | null>(null);
+    const [isFormOpen, setIsFormOpen] = React.useState(false);
 
-    const handleEditCategory = React.useCallback((category: Category) => { }, []);
+    const handleCreateCategory = React.useCallback(() => {
+        setFormTarget(null);
+        setIsFormOpen(true);
+    }, []);
+
+    const handleEditCategory = React.useCallback((category: Category) => {
+        setFormTarget(category);
+        setIsFormOpen(true);
+    }, []);
+
+    /*
+     * La unicidad del nombre la resuelve la pantalla porque es la única que
+     * tiene la lista entera. Al editar se excluye la propia categoría: sin eso,
+     * guardar sin tocar el nombre chocaría consigo misma.
+     */
+    const isNameTaken = React.useCallback(
+        (name: string) =>
+            isDuplicateCategoryName(categories, name, formTarget?.id),
+        [categories, formTarget]
+    );
+
+    const handleFormSubmit = React.useCallback(
+        (values: CategoryFormValues) => {
+            const fields = toCategoryFields(values);
+
+            // La fecha que pinta la tabla es la de la última actualización, así
+            // que la toca tanto el alta como la edición.
+            const placedAt = new Date().toISOString();
+
+            // Aquí entran las llamadas al servicio (`POST /categories` y
+            // `PATCH /categories/:id`). Hasta entonces el id lo continúa
+            // `nextCategoryId`, que es lo único de esto con fecha de caducidad.
+            setCategories((current) => {
+                if (!formTarget) {
+                    return [
+                        { id: nextCategoryId(current), placedAt, ...fields },
+                        ...current,
+                    ];
+                }
+
+                // Se reconstruye la fila entera en vez de fusionarla: al vaciar
+                // la descripción, `fields` ya no trae la propiedad, y un
+                // `{ ...category, ...fields }` habría conservado la anterior.
+                return current.map((category) =>
+                    category.id === formTarget.id
+                        ? { id: category.id, placedAt, ...fields }
+                        : category
+                );
+            });
+
+            setIsFormOpen(false);
+        },
+        [formTarget]
+    );
 
 
     // ── Borrado ─────────────────────────────────────────────────────────────
@@ -163,6 +227,17 @@ export default function Categories({ categories: initialCategories }: Categories
                     }
                 />
             </section>
+
+            {/* El modal se monta siempre: `useCategoryForm` recarga el borrador
+                al abrir, así que la misma instancia sirve para el alta y para
+                cualquier fila sin arrastrar lo que se escribió en la anterior. */}
+            <CategoryFormModal
+                open={isFormOpen}
+                onOpenChange={setIsFormOpen}
+                category={formTarget ?? undefined}
+                isNameTaken={isNameTaken}
+                onSubmit={handleFormSubmit}
+            />
 
             {/* El diálogo cuelga de la pantalla y no de la fila: la tabla solo
                 avisa de que alguien pidió borrar, y quien sabe qué hacer con
