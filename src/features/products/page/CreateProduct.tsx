@@ -4,12 +4,12 @@ import * as React from "react";
 import Link from "next/link";
 
 import GenericButton from "@/components/buttons/GenericButton";
+import PageHeader from "@/components/layout/PageHeader";
 import { ICON_TOKENS } from "@/tokens";
 import { PRODUCT_FORM_STEPS } from "@/features/products/libs/product-form";
 
 import {
     ProductBasicsStep,
-    ProductFormHeader,
     ProductFormStepper,
     ProductStepPlaceholder,
 } from "../components/form";
@@ -85,7 +85,7 @@ export default function CreateProduct() {
 
     return (
         <div className={createProductPageVariants()}>
-            <ProductFormHeader
+            <PageHeader
                 title={COPY.title}
                 subtitle={COPY.subtitle}
                 backHref={PRODUCTS_LIST_HREF}

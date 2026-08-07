@@ -113,15 +113,25 @@ Iconos, que se dimensionan por prop y no por clase:
 | `toggles/` — `Switch` | Migrado (la geometría del carril es suya; el resto, del sistema) |
 | `sidebar/` — `Sidebar`, `SidebarButton`, `SidebarGroup`, `SidebarNavItem` | Migrado (armazón desde `SIDEBAR` y `Z_INDEX`) |
 | `navbar/` — `Navbar` | Migrado (armazón desde `NAVBAR`; sin clases de shadcn) |
+| `layout/` — `PageHeader` | Nace en el sistema (encabezado de pantalla: flecha, título, insignia y acciones) |
+| `modals/` — `Modal`, `ConfirmDialog` | Nace en el sistema, sobre Base UI (`rounded-2xl`, `shadow-2xl`, capa `Z_INDEX.modal`) |
 
 La migración está completa: no queda ninguna familia con valores propios. Lo
 que quedó fuera de los tokens a propósito —geometrías cerradas como el carril
 del `Switch` o la cadena horizontal del sidebar— va documentado en su
 `*.style.ts` y resumido en [`components.md`](./components.md).
 
-Fuera de `components/`, la pantalla de productos (`features/products/`) también
-está migrada. Queda `features/main-dashboard/`: sus paneles, tablas y gráficos
-son los que todavía usan `rounded-lg` donde el resto ya usa `rounded-xl`.
+Fuera de `components/`, la sección de productos (`features/products/`) también
+está migrada: catálogo, alta por pasos y categorías. Queda
+`features/main-dashboard/`: sus paneles, tablas y gráficos son los que todavía
+usan `rounded-lg` donde el resto ya usa `rounded-xl`.
+
+Las dos familias nuevas salieron de la pantalla de categorías, y las dos por el
+mismo motivo: la segunda pantalla que necesitaba lo mismo. `PageHeader` era el
+encabezado del formulario de producto —`ProductFormHeader`, ya borrado— y
+`Modal` es lo que faltaba para que un diálogo no lo montara cada pantalla a
+mano. Cuando algo se necesita dos veces deja de pertenecer a la pantalla que lo
+vio nacer.
 
 ### Sobre los iconos
 

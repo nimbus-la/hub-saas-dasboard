@@ -68,3 +68,9 @@ export { TextField } from './inputs/TextField';
 // ── Interruptores ───────────────────────────────────────────────────────────
 export { Switch } from './toggles/Switch';
 export * from './toggles/switch.style';
+
+// ── Diálogos ────────────────────────────────────────────────────────────────
+
+// ── Armazón ─────────────────────────────────────────────────────────────────
+export { default as PageHeader } from './layout/PageHeader';
+export * from './layout/page-header.style';

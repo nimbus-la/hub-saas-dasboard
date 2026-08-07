@@ -18,6 +18,10 @@ export * from "./cards.interfaces";
 
 export * from "./inputs.interfaces";
 
+export * from "./layout.interfaces";
+
+export * from "./modals.interfaces";
+
 export * from "./navbar.interfaces";
 
 export * from "./pagination.interfaces";

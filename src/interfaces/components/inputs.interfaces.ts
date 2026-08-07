@@ -80,6 +80,16 @@ export interface InputSelectorProps {
 
     name?: string;
     id?: string;
+
+    /**
+     * Nombre accesible cuando el selector no lleva etiqueta visible.
+     *
+     * Pasa al `<input>` del combobox, no al contenedor: es el control el que
+     * tiene que anunciarse. Un selector sin `label` ni `aria-label` se anuncia
+     * solo por su placeholder, que desaparece en cuanto hay algo elegido.
+     */
+    "aria-label"?: string;
+
     /** Clases del contenedor externo. */
     className?: string;
     /** Clases del campo (InputGroup). */

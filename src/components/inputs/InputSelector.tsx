@@ -66,6 +66,7 @@ export function InputSelector({
     fullWidth = true,
     name,
     id,
+    "aria-label": ariaLabel,
     className,
     triggerClassName,
     inputClassName,
@@ -146,6 +147,7 @@ export function InputSelector({
                         placeholder={placeholder}
                         disabled={disabled}
                         showClear={clearable}
+                        aria-label={ariaLabel}
                         aria-invalid={invalid || undefined}
                         aria-describedby={describedBy}
                         className={cn(

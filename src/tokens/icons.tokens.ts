@@ -3,10 +3,15 @@ import {
     ArrowRight,
     Home,
     ImageUp,
+    ListFilter,
     Package,
     PackageSearch,
     ClipboardList,
     ShoppingBasket,
+    SquarePen,
+    Tags,
+    Trash2,
+    TriangleAlert,
     Users,
     PanelRightClose,
     PanelRightOpen,
@@ -31,6 +36,8 @@ export const ICON_TOKENS = {
     /* ── Secciones ────────────────────────────────────────────────────────── */
     DASHBOARD: Home,
     PRODUCTS: Package,
+    /** Categorías de la carta — la agrupación, no el producto. */
+    CATEGORIES: Tags,
     INVENTORY: ClipboardList,
     ORDERS: ShoppingBasket,
     EMPLEOYES: Users,
@@ -38,8 +45,14 @@ export const ICON_TOKENS = {
     /* ── Acciones ─────────────────────────────────────────────────────────── */
     /** Crear un registro nuevo. */
     CREATE: Plus,
+    /** Editar un registro existente. */
+    EDIT: SquarePen,
+    /** Eliminar un registro. Siempre detrás de una confirmación. */
+    DELETE: Trash2,
     /** Buscar dentro de una colección. */
     SEARCH: Search,
+    /** Acotar una colección por un criterio cerrado. */
+    FILTER: ListFilter,
     /** Volver a la pantalla anterior — el par de `NEXT`. */
     BACK: ArrowLeft,
     /** Avanzar al siguiente paso de un flujo. */
@@ -50,6 +63,8 @@ export const ICON_TOKENS = {
     /* ── Estados ──────────────────────────────────────────────────────────── */
     /** Una búsqueda o un filtro que no devolvió nada. */
     NO_RESULTS: PackageSearch,
+    /** Aviso de una acción irreversible. */
+    WARNING: TriangleAlert,
 
     /* ── Chrome ───────────────────────────────────────────────────────────── */
     PANEL_RIGHT_OPEN: PanelRightOpen,
