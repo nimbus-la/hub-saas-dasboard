@@ -8,8 +8,8 @@
 // reglas. El modal decide cómo se pintan.
 
 import type { RegisterOptions } from "react-hook-form";
+import { Category } from "../interfaces";
 
-import type { Category } from "@/lib/categories";
 
 /* -------------------------------------------------------------------------- */
 /*  Valores del formulario                                                     */
@@ -18,32 +18,47 @@ import type { Category } from "@/lib/categories";
 /**
  * Lo que el formulario tiene en la mano en cada momento.
  *
- * `active` viaja siempre, también al crear: una categoría nueva nace activa —
+ * `isActive` viaja siempre, también al crear: una categoría nueva nace activa —
  * nadie da de alta algo que no piensa ofrecer— y el interruptor solo aparece
  * al editar, que es cuando retirarla de la carta es una decisión de verdad.
  */
 export interface CategoryFormValues {
     name: string;
     description: string;
-    active: boolean;
+    isActive: boolean;
 }
 
 export const EMPTY_CATEGORY_FORM_VALUES: CategoryFormValues = {
     name: "",
     description: "",
-    active: true,
+    isActive: true,
 };
 
 /** Convierte una categoría guardada en los valores que edita el formulario. */
 export const toCategoryFormValues = (category: Category): CategoryFormValues => ({
     name: category.name,
-    description: category.description ?? "",
-    active: category.active,
+    description: category.description,
+    isActive: category.isActive,
 });
 
 
-/** Lo que el formulario escribe de una categoría. El id y la fecha los pone la pantalla. */
-export type CategoryFormFields = Omit<Category, "id" | "placedAt">;
+/**
+ * Lo que el formulario manda al backend. El id y la fecha los pone el servidor.
+ *
+ * Ya no se deriva de `Category` con un `Omit`. Desde que el mapper garantiza
+ * que `Category.description` siempre es una cadena, los dos tipos dejaron de
+ * ser el mismo: el dominio nunca tiene la descripción ausente —el mapper la
+ * normaliza a `""`— pero lo que se **envía** sí la omite, porque mandar `""`
+ * le diría al backend "guarda una descripción vacía" en vez de "no tiene".
+ *
+ * Coincide en forma con `CategoryPayload` del servicio, así que lo que sale de
+ * `toCategoryFields` entra en la mutación sin conversión.
+ */
+export interface CategoryFormFields {
+    name: string;
+    description?: string;
+    isActive: boolean;
+}
 
 
 /**
@@ -64,7 +79,7 @@ export const toCategoryFields = (values: CategoryFormValues): CategoryFormFields
 
     return {
         name: values.name.trim(),
-        active: values.active,
+        isActive: values.isActive,
         ...(description ? { description } : {}),
     };
 };

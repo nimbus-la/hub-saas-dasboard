@@ -3,26 +3,21 @@
 // ── Pantalla de categorías ──────────────────────────────────────────────────
 // Orquesta el listado: búsqueda, filtro por estado, tabla y los dos diálogos
 // —el formulario y la confirmación de borrado—. Los componentes de abajo son
-// de presentación; todo el estado vive aquí para que el filtro, el resumen y
-// la tabla nunca se contradigan.
+// de presentación; el estado de interfaz vive aquí para que el filtro, el
+// resumen y la tabla nunca se contradigan.
 //
-// Las categorías llegan por props desde el Server Component de la ruta: cuando
-// `getCategories` hable con la API, esta pantalla no cambia. Las altas, las
-// ediciones y los borrados se resuelven todavía en memoria; cada uno lleva
-// anotado dónde entra la llamada al servicio.
+// Los datos ya no llegan por props ni se guardan en un `useState`: los sirve
+// `useCategories()`, que lee de la caché que el Server Component de la ruta
+// dejó precargada. Esa es la diferencia que hace que crear funcione: al
+// terminar el alta, la mutación invalida el listado y la tabla se repinta sola
+// con lo que devolvió el backend. Con una copia en `useState` habría dos
+// verdades y habría que sincronizarlas a mano.
 
 import * as React from "react";
 
 import { ConfirmDialog, PageHeader, StatusBadge } from "@/components";
-import {
-    DEFAULT_CATEGORY_STATUS_FILTER,
-    filterCategories,
-    formatCategoryCount,
-    isDuplicateCategoryName,
-    nextCategoryId,
-    type Category,
-    type CategoryStatusFilter,
-} from "@/lib/categories";
+import { getApiErrorMessage } from "@/lib/http";
+
 
 import {
     CategoriesTable,
@@ -34,9 +29,17 @@ import {
     type CategoryFormValues,
 } from "../libs/category-form";
 import {
+    useCategories,
+    useCreateCategory,
+    useDeleteCategory,
+    useUpdateCategory,
+} from "../queries/categories.queries";
+import {
     categoriesPageBodyVariants,
     categoriesPageVariants,
 } from "./categories.style";
+import { Category } from "../interfaces";
+import { CategoryStatusFilter, DEFAULT_CATEGORY_STATUS_FILTER, filterCategories, formatCategoryCount, isDuplicateCategoryName } from "../libs";
 
 /** Destino de la flecha de regreso. La misma ruta que declara el menú lateral. */
 const PRODUCTS_LIST_HREF = "/products";
@@ -46,10 +49,13 @@ const COPY = {
     subtitle:
         "Agrupa la carta en secciones. Desactivar una categoría la retira del menú sin borrar sus productos.",
     backLabel: "Volver a la lista de productos",
+    loading: "Cargando categorías…",
+    loadError: "No se pudieron cargar las categorías.",
     emptyCatalog:
         "Todavía no hay categorías. Crea la primera para empezar a agrupar la carta.",
     emptyFiltered:
         "Ninguna categoría coincide con la búsqueda. Prueba con otro texto o cambia el filtro de estado.",
+    saveError: "No se pudo guardar la categoría.",
     deleteTitle: "Eliminar categoría",
     deleteConfirm: "Eliminar",
     deleteCancel: "Cancelar",
@@ -73,12 +79,21 @@ const deleteDescription = (category: Category): string =>
     `Si solo quieres retirarla de la carta, desactívala en su lugar.`;
 
 
-interface CategoriesProps {
-    categories: Category[];
-}
+export default function Categories() {
+    // ── Datos ───────────────────────────────────────────────────────────────
+    const {
+        data: categories = [],
+        isPending,
+        isError,
+        error,
+    } = useCategories();
 
-export default function Categories({ categories: initialCategories }: CategoriesProps) {
-    const [categories, setCategories] = React.useState(initialCategories);
+    console.log("🚀 ~ file: Categories.tsx:108 ~ Categories ~ categories:", categories);
+
+    const createCategory = useCreateCategory();
+    const updateCategory = useUpdateCategory();
+    const deleteCategory = useDeleteCategory();
+
     const [query, setQuery] = React.useState("");
     const [status, setStatus] = React.useState<CategoryStatusFilter>(
         DEFAULT_CATEGORY_STATUS_FILTER
@@ -86,6 +101,8 @@ export default function Categories({ categories: initialCategories }: Categories
 
 
     // ── Filtrado ────────────────────────────────────────────────────────────
+    // Sigue en memoria: son unas decenas de registros y traerlos todos una vez
+    // es más rápido que ir al servidor en cada tecla del buscador.
     const visibleCategories = React.useMemo(
         () => filterCategories(categories, { query, status }),
         [categories, query, status]
@@ -98,6 +115,24 @@ export default function Categories({ categories: initialCategories }: Categories
         setStatus(DEFAULT_CATEGORY_STATUS_FILTER);
     }, []);
 
+    /**
+     * Qué dice la tabla cuando no pinta filas.
+     *
+     * Son cuatro situaciones distintas y la diferencia importa: una tabla vacía
+     * porque está cargando, porque la API falló, porque no hay catálogo o
+     * porque el filtro no encontró nada piden reacciones opuestas de quien
+     * mira. Un único "sin resultados" para las cuatro es el camino corto a que
+     * alguien dé por perdidas sus categorías durante un corte de red.
+     */
+    const emptyMessage = isPending
+        ? COPY.loading
+        : isError
+            ? getApiErrorMessage(error, COPY.loadError)
+            : hasFilters
+                ? COPY.emptyFiltered
+                : COPY.emptyCatalog;
+
+
     // ── Formulario ──────────────────────────────────────────────────────────
     // Un solo modal para el alta y la edición: lo que decide el modo es
     // `formTarget`. `null` es un alta y no "todavía no se sabe" —el modal está
@@ -105,59 +140,70 @@ export default function Categories({ categories: initialCategories }: Categories
     const [formTarget, setFormTarget] = React.useState<Category | null>(null);
     const [isFormOpen, setIsFormOpen] = React.useState(false);
 
+    /**
+     * Error del backend al guardar.
+     *
+     * Vive aquí y no dentro del formulario porque no es un problema del valor
+     * que se escribió —eso ya lo dicen las reglas de react-hook-form— sino del
+     * intento de guardarlo. Se limpia al abrir el modal para que el fallo de un
+     * intento anterior no reciba al siguiente.
+     */
+    const [submitError, setSubmitError] = React.useState<string | null>(null);
+
     const handleCreateCategory = React.useCallback(() => {
         setFormTarget(null);
+        setSubmitError(null);
         setIsFormOpen(true);
     }, []);
 
     const handleEditCategory = React.useCallback((category: Category) => {
         setFormTarget(category);
+        setSubmitError(null);
         setIsFormOpen(true);
     }, []);
 
     /*
-     * La unicidad del nombre la resuelve la pantalla porque es la única que
-     * tiene la lista entera. Al editar se excluye la propia categoría: sin eso,
-     * guardar sin tocar el nombre chocaría consigo misma.
+     * La unicidad del nombre la comprueba la pantalla porque es la única que
+     * tiene la lista entera, y así el aviso sale al escribir en lugar de al
+     * enviar. No sustituye a la validación del backend —entre que se cargó la
+     * lista y se pulsa Guardar, otra persona pudo crear la misma categoría—:
+     * ese choque llega como error de la mutación y se muestra en el modal.
      */
     const isNameTaken = React.useCallback(
-        (name: string) =>
-            isDuplicateCategoryName(categories, name, formTarget?.id),
+        (name: string) => isDuplicateCategoryName(categories, name, formTarget?.id),
         [categories, formTarget]
     );
 
+    /**
+     * Guarda el alta o la edición.
+     *
+     * Es `async` para que react-hook-form mantenga `isSubmitting` en `true`
+     * mientras la petición viaja: es lo que deshabilita el botón de envío y
+     * evita el doble clic que crearía la categoría dos veces.
+     *
+     * El modal se cierra **sólo si el guardado salió bien**. Si falla, se queda
+     * abierto con lo que se escribió y el motivo encima: cerrarlo tirando el
+     * formulario obligaría a reescribirlo entero.
+     */
     const handleFormSubmit = React.useCallback(
-        (values: CategoryFormValues) => {
-            const fields = toCategoryFields(values);
+        async (values: CategoryFormValues) => {
+            const payload = toCategoryFields(values);
 
-            // La fecha que pinta la tabla es la de la última actualización, así
-            // que la toca tanto el alta como la edición.
-            const placedAt = new Date().toISOString();
+            setSubmitError(null);
 
-            // Aquí entran las llamadas al servicio (`POST /categories` y
-            // `PATCH /categories/:id`). Hasta entonces el id lo continúa
-            // `nextCategoryId`, que es lo único de esto con fecha de caducidad.
-            setCategories((current) => {
-                if (!formTarget) {
-                    return [
-                        { id: nextCategoryId(current), placedAt, ...fields },
-                        ...current,
-                    ];
+            try {
+                if (formTarget) {
+                    await updateCategory.mutateAsync({ id: formTarget.id, payload });
+                } else {
+                    await createCategory.mutateAsync(payload);
                 }
 
-                // Se reconstruye la fila entera en vez de fusionarla: al vaciar
-                // la descripción, `fields` ya no trae la propiedad, y un
-                // `{ ...category, ...fields }` habría conservado la anterior.
-                return current.map((category) =>
-                    category.id === formTarget.id
-                        ? { id: category.id, placedAt, ...fields }
-                        : category
-                );
-            });
-
-            setIsFormOpen(false);
+                setIsFormOpen(false);
+            } catch (mutationError) {
+                setSubmitError(getApiErrorMessage(mutationError, COPY.saveError));
+            }
         },
-        [formTarget]
+        [formTarget, createCategory, updateCategory]
     );
 
 
@@ -175,19 +221,23 @@ export default function Categories({ categories: initialCategories }: Categories
         setIsDeleteOpen(true);
     }, []);
 
-    const handleDeleteConfirm = React.useCallback(() => {
+    /*
+     * El diálogo se cierra al resolverse la promesa y no antes: hasta entonces
+     * `loading` mantiene el botón ocupado. Por eso cerrar es cosa de esta
+     * pantalla y no del propio diálogo.
+     */
+    const handleDeleteConfirm = React.useCallback(async () => {
         if (!deleteTarget) return;
 
-        // Aquí entra la llamada al servicio (`DELETE /categories/:id`). Cuando
-        // exista, el diálogo se cierra al resolverse la promesa y no antes, y
-        // el `loading` de ConfirmDialog pasa a tener sentido: por eso cerrar es
-        // cosa de esta pantalla y no del propio diálogo.
-        setCategories((current) =>
-            current.filter((category) => category.id !== deleteTarget.id)
-        );
-
-        setIsDeleteOpen(false);
-    }, [deleteTarget]);
+        try {
+            await deleteCategory.mutateAsync(deleteTarget.id);
+            setIsDeleteOpen(false);
+        } catch {
+            // El diálogo se queda abierto para poder reintentar. El detalle del
+            // fallo no cabe aquí; queda en `deleteCategory.error` para cuando
+            // la pantalla tenga dónde mostrar avisos.
+        }
+    }, [deleteTarget, deleteCategory]);
 
     return (
         <div className={categoriesPageVariants()}>
@@ -222,9 +272,7 @@ export default function Categories({ categories: initialCategories }: Categories
                     categories={visibleCategories}
                     onEditCategory={handleEditCategory}
                     onDeleteCategory={handleDeleteRequest}
-                    emptyMessage={
-                        hasFilters ? COPY.emptyFiltered : COPY.emptyCatalog
-                    }
+                    emptyMessage={emptyMessage}
                 />
             </section>
 
@@ -237,12 +285,12 @@ export default function Categories({ categories: initialCategories }: Categories
                 category={formTarget ?? undefined}
                 isNameTaken={isNameTaken}
                 onSubmit={handleFormSubmit}
+                submitError={submitError}
             />
 
             {/* El diálogo cuelga de la pantalla y no de la fila: la tabla solo
                 avisa de que alguien pidió borrar, y quien sabe qué hacer con
-                esa intención —y tiene la lista para quitarle el elemento— es
-                esta pantalla. */}
+                esa intención es esta pantalla. */}
             {deleteTarget && (
                 <ConfirmDialog
                     open={isDeleteOpen}
@@ -252,6 +300,7 @@ export default function Categories({ categories: initialCategories }: Categories
                     confirmLabel={COPY.deleteConfirm}
                     cancelLabel={COPY.deleteCancel}
                     onConfirm={handleDeleteConfirm}
+                    loading={deleteCategory.isPending}
                 />
             )}
         </div>

@@ -1,6 +1,8 @@
+import { EnvelopeHttpClient } from "./envelope-http-client";
 import { FetchHttpClient } from "./fetch-http-client";
 import type { HttpClient } from "@/interfaces";
 
+export * from "./envelope-http-client";
 export * from "./fetch-http-client";
 export * from "./http-error";
 
@@ -45,22 +47,34 @@ const BASE_URL =
  * autocompletado sólo ofrece lo que está en el contrato, y es imposible que
  * una pantalla acabe dependiendo sin querer de un detalle de `fetch`.
  *
- * Para migrar a otra librería, este `new` es lo único que cambia:
+ * Se compone en dos capas, de dentro hacia fuera:
  *
- *     export const httpClient: HttpClient = new AxiosHttpClient({ ... });
+ * 1. `FetchHttpClient` — habla por la red. Sólo sabe de HTTP.
+ * 2. `EnvelopeHttpClient` — saca `data` del sobre de este backend y convierte
+ *    un `code` de fallo en un error lanzado.
+ *
+ * Cada una tiene un motivo distinto para cambiar. Para migrar a otra librería
+ * de red se sustituye la de dentro y la de fuera no se entera:
+ *
+ *     new EnvelopeHttpClient(new AxiosHttpClient({ ... }))
+ *
+ * Y el día que el backend deje de envolver sus respuestas, se quita la de
+ * fuera y ni un servicio se toca.
  */
-export const httpClient: HttpClient = new FetchHttpClient({
-    baseUrl: BASE_URL,
-    headers: {
-        Accept: "application/json",
-    },
+export const httpClient: HttpClient = new EnvelopeHttpClient(
+    new FetchHttpClient({
+        baseUrl: BASE_URL,
+        headers: {
+            Accept: "application/json",
+        },
 
-    // Aquí entra el token cuando exista sesión. Se hace en el interceptor y no
-    // en `headers` porque `headers` se evalúa una sola vez al arrancar el
-    // módulo, y el token cambia durante la vida de la aplicación.
-    //
-    // onRequest: async (request) => ({
-    //     ...request,
-    //     headers: { ...request.headers, Authorization: `Bearer ${await getToken()}` },
-    // }),
-});
+        // Aquí entra el token cuando exista sesión. Se hace en el interceptor y
+        // no en `headers` porque `headers` se evalúa una sola vez al arrancar
+        // el módulo, y el token cambia durante la vida de la aplicación.
+        //
+        // onRequest: async (request) => ({
+        //     ...request,
+        //     headers: { ...request.headers, Authorization: `Bearer ${await getToken()}` },
+        // }),
+    })
+);

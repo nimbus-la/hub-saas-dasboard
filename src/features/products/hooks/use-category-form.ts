@@ -16,7 +16,7 @@ import {
     toCategoryFormValues,
     type CategoryFormValues,
 } from "@/features/products/libs/category-form";
-import type { Category } from "@/lib/categories";
+import type { Category } from "@/features/products/interfaces";
 
 interface UseCategoryFormOptions {
     /** El modal está abierto. Es la señal para (re)cargar el borrador. */

@@ -39,3 +39,20 @@ export const categoryFormModalToggleVariants = cva([
     SURFACE_SIZE.lg.paddingClass,
     RADIUS_SEMANTIC.surface,
 ]);
+
+
+/**
+ * Aviso del fallo al guardar.
+ *
+ * Va arriba del todo y no junto al botón de envío porque el pie del modal
+ * puede quedar fuera de la vista si el formulario crece: el motivo por el que
+ * no se guardó tiene que estar donde se mira al volver, que es el primer campo.
+ *
+ * Rojo sobre fondo rojo claro y no solo texto rojo: es el mismo lenguaje que
+ * usan los errores de campo, así que se reconoce sin leerlo.
+ */
+export const categoryFormModalErrorVariants = cva([
+    "border border-red-200 bg-red-50 text-sm text-red-700",
+    SURFACE_SIZE.lg.paddingClass,
+    RADIUS_SEMANTIC.surface,
+]);

@@ -11,9 +11,10 @@ import {
     CATEGORY_MODAL_COPY,
     type CategoryFormValues,
 } from "@/features/products/libs/category-form";
-import type { Category } from "@/lib/categories";
+import type { Category } from "@/features/products/interfaces";
 
 import {
+    categoryFormModalErrorVariants,
     categoryFormModalToggleVariants,
     categoryFormModalVariants,
 } from "./category-form-modal.style";
@@ -69,8 +70,23 @@ interface CategoryFormModalProps {
      */
     isNameTaken: (name: string) => boolean;
 
-    /** Recibe los valores ya validados. Cerrar el modal es cosa de quien lo abre. */
-    onSubmit: (values: CategoryFormValues) => void;
+    /**
+     * Recibe los valores ya validados. Cerrar el modal es cosa de quien lo abre.
+     *
+     * Puede devolver una promesa: mientras esté pendiente, react-hook-form
+     * mantiene `isSubmitting` y el botón de envío se deshabilita solo. Es lo
+     * que impide que un segundo clic cree la categoría dos veces.
+     */
+    onSubmit: (values: CategoryFormValues) => void | Promise<void>;
+
+    /**
+     * Motivo por el que el guardado no salió.
+     *
+     * Lo pone quien envía, no el formulario: no es un problema del valor que se
+     * escribió —de eso ya avisan las reglas de cada campo— sino del intento de
+     * guardarlo. `null` cuando no hay nada que contar.
+     */
+    submitError?: string | null;
 
     className?: string;
 }
@@ -81,6 +97,7 @@ export default function CategoryFormModal({
     category,
     isNameTaken,
     onSubmit,
+    submitError = null,
     className,
 }: CategoryFormModalProps) {
     const mode = category ? "edit" : "create";
@@ -143,6 +160,15 @@ export default function CategoryFormModal({
                 onSubmit={handleSubmit(onSubmit)}
                 className={categoryFormModalVariants()}
             >
+                {/* `role="alert"` para que los lectores de pantalla lo anuncien
+                    al aparecer: quien no ve el modal necesita enterarse de que
+                    el envío falló sin tener que ir a buscarlo. */}
+                {submitError && (
+                    <p role="alert" className={categoryFormModalErrorVariants()}>
+                        {submitError}
+                    </p>
+                )}
+
                 <Controller
                     control={control}
                     name="name"
@@ -185,7 +211,7 @@ export default function CategoryFormModal({
                 {mode === "edit" && (
                     <Controller
                         control={control}
-                        name="active"
+                        name="isActive"
                         render={({ field }) => (
                             <div className={categoryFormModalToggleVariants()}>
                                 <Switch

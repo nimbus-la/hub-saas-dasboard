@@ -145,6 +145,20 @@ export function getApiErrorMessage(error: unknown, fallback: string): string {
     if (typeof body === "object" && body !== null) {
         const record = body as Record<string, unknown>;
 
+        // El `messages` del sobre puede ser una lista. Se unen todas en una
+        // frase en vez de quedarse con la primera: cuando el backend rechaza
+        // un formulario suele mandar una por campo, y enseñar sólo una deja al
+        // usuario corrigiendo de uno en uno.
+        const listed = record["messages"];
+
+        if (Array.isArray(listed)) {
+            const texts = listed.filter(
+                (item): item is string => typeof item === "string" && item.trim().length > 0
+            );
+
+            if (texts.length > 0) return texts.join(" ");
+        }
+
         for (const key of HTTP_ERROR_MESSAGE_KEYS) {
             const value = record[key];
 

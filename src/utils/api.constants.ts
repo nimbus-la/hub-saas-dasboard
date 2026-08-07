@@ -62,13 +62,33 @@ export const HTTP_RETRYABLE_STATUSES = [408, 425, 429];
 
 
 /**
+ * Código de resultado correcto del sobre de respuesta.
+ *
+ * Cualquier otro valor es un fallo, aunque la respuesta HTTP haya sido `200`.
+ * Es una cadena porque los ceros a la izquierda son significativos: como número
+ * sería `0` y dejaría de coincidir.
+ */
+export const API_SUCCESS_CODE = "0000";
+
+
+/**
  * Claves donde los backends suelen poner el mensaje legible de un error.
  *
  * Se prueban en orden hasta encontrar una cadena con contenido. No hay un
  * estándar para esto, así que la lista es empírica: se amplía cuando aparezca
  * un backend que use otra.
+ *
+ * `messages` va primero porque es la del sobre de este backend, y en él puede
+ * llegar como lista además de como texto suelto — ese caso lo resuelve aparte
+ * `getApiErrorMessage`.
  */
-export const HTTP_ERROR_MESSAGE_KEYS = ["message", "error", "detail", "title"] as const;
+export const HTTP_ERROR_MESSAGE_KEYS = [
+    "messages",
+    "message",
+    "error",
+    "detail",
+    "title",
+] as const;
 
 
 /**
