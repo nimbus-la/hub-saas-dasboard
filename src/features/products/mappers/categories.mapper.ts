@@ -1,4 +1,4 @@
-import type { Category, CategoryApiResponse } from "../interfaces";
+import type { Category, CategoryApiResponse, CategoryFormValues, CreateCategoryPayload, UpdateCategoryPayload } from "../interfaces";
 
 
 /**
@@ -47,6 +47,55 @@ export const toCategory = (category: CategoryApiResponse): Category => ({
 });
 
 
+
 /** El listado completo. */
 export const toCategoryList = (categories: CategoryApiResponse[]): Category[] =>
     categories.map(toCategory);
+
+
+
+
+/** Convierte una categoría guardada en los valores que edita el formulario. */
+export const toCategoryFormValues = (category: Category): CategoryFormValues => ({
+    name: category.name,
+    description: category.description,
+    isActive: category.isActive,
+});
+
+
+
+/**
+ * El camino de vuelta: de lo que se escribió a lo que se manda al **crear**.
+ *
+ * Recorta los extremos —un nombre con espacios delante se ordena antes que
+ * todos los demás en la tabla y nadie entiende por qué— y, si la descripción
+ * queda vacía, **la propiedad desaparece** en lugar de viajar como `""`: son
+ * dos cosas distintas para el backend, "no tiene" y "tiene una vacía".
+ *
+ * `isActive` no se incluye: al crear lo decide el servidor.
+ */
+export const toCreateCategoryPayload = (
+    values: CategoryFormValues
+): CreateCategoryPayload => {
+    const description = values.description.trim();
+
+    return {
+        name: values.name.trim(),
+        ...(description ? { description } : {}),
+    };
+};
+
+
+/**
+ * Lo mismo, más el estado, para la **edición**.
+ *
+ * Reutiliza el de creación en lugar de repetir el recorte del nombre y la
+ * omisión de la descripción. Así la diferencia entre los dos queda en una sola
+ * línea, que es exactamente lo que se diferencian.
+ */
+export const toUpdateCategoryPayload = (
+    values: CategoryFormValues
+): UpdateCategoryPayload => ({
+    ...toCreateCategoryPayload(values),
+    estado: values.isActive,
+});

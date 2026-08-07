@@ -25,10 +25,6 @@ import {
     CategoryFormModal,
 } from "../components/categories";
 import {
-    toCategoryFields,
-    type CategoryFormValues,
-} from "../libs/category-form";
-import {
     useCategories,
     useCreateCategory,
     useDeleteCategory,
@@ -38,8 +34,15 @@ import {
     categoriesPageBodyVariants,
     categoriesPageVariants,
 } from "./categories.style";
-import { Category } from "../interfaces";
-import { CategoryStatusFilter, DEFAULT_CATEGORY_STATUS_FILTER, filterCategories, formatCategoryCount, isDuplicateCategoryName } from "../libs";
+import type { Category, CategoryFormValues } from "../interfaces";
+import {
+    DEFAULT_CATEGORY_STATUS_FILTER,
+    filterCategories,
+    formatCategoryCount,
+    isDuplicateCategoryName,
+    type CategoryStatusFilter,
+} from "../libs";
+import { toCreateCategoryPayload, toUpdateCategoryPayload } from "../mappers";
 
 /** Destino de la flecha de regreso. La misma ruta que declara el menú lateral. */
 const PRODUCTS_LIST_HREF = "/products";
@@ -80,7 +83,6 @@ const deleteDescription = (category: Category): string =>
 
 
 export default function Categories() {
-    // ── Datos ───────────────────────────────────────────────────────────────
     const {
         data: categories = [],
         isPending,
@@ -88,16 +90,12 @@ export default function Categories() {
         error,
     } = useCategories();
 
-    console.log("🚀 ~ file: Categories.tsx:108 ~ Categories ~ categories:", categories);
-
     const createCategory = useCreateCategory();
     const updateCategory = useUpdateCategory();
     const deleteCategory = useDeleteCategory();
 
-    const [query, setQuery] = React.useState("");
-    const [status, setStatus] = React.useState<CategoryStatusFilter>(
-        DEFAULT_CATEGORY_STATUS_FILTER
-    );
+    const [query, setQuery] = React.useState<string>("");
+    const [status, setStatus] = React.useState<CategoryStatusFilter>(DEFAULT_CATEGORY_STATUS_FILTER);
 
 
     // ── Filtrado ────────────────────────────────────────────────────────────
@@ -187,15 +185,20 @@ export default function Categories() {
      */
     const handleFormSubmit = React.useCallback(
         async (values: CategoryFormValues) => {
-            const payload = toCategoryFields(values);
-
             setSubmitError(null);
 
             try {
+                // Cada modo arma su propio cuerpo. El alta no manda `isActive`
+                // —el backend da de alta toda categoría como activa— y la
+                // edición sí, que es el único momento en que alguien decide
+                // sobre el interruptor.
                 if (formTarget) {
-                    await updateCategory.mutateAsync({ id: formTarget.id, payload });
+                    await updateCategory.mutateAsync({
+                        id: formTarget.id,
+                        payload: toUpdateCategoryPayload(values),
+                    });
                 } else {
-                    await createCategory.mutateAsync(payload);
+                    await createCategory.mutateAsync(toCreateCategoryPayload(values));
                 }
 
                 setIsFormOpen(false);

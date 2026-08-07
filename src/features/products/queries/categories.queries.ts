@@ -10,9 +10,12 @@ import {
     categoryKeys,
     createCategoriesService,
     type CategoriesService,
-    type CategoryPayload,
 } from "../services/categories.service";
-import { Category } from "../interfaces";
+import type {
+    Category,
+    CreateCategoryPayload,
+    UpdateCategoryPayload,
+} from "../interfaces";
 
 
 /**
@@ -97,7 +100,7 @@ export function useCreateCategory() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (payload: CategoryPayload) => service.create(payload),
+        mutationFn: (payload: CreateCategoryPayload) => service.create(payload),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: categoryKeys.list() }),
     });
 };
@@ -108,7 +111,7 @@ export function useUpdateCategory() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ id, payload }: { id: string; payload: CategoryPayload }) =>
+        mutationFn: ({ id, payload }: { id: string; payload: UpdateCategoryPayload }) =>
             service.update(id, payload),
 
         onSuccess: (updated: Category) => {

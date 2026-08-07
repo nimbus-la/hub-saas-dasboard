@@ -9,9 +9,8 @@ import {
     CATEGORY_ACTIVE_HINT,
     CATEGORY_FORM_RULES,
     CATEGORY_MODAL_COPY,
-    type CategoryFormValues,
 } from "@/features/products/libs/category-form";
-import type { Category } from "@/features/products/interfaces";
+import type { Category, CategoryFormValues } from "@/features/products/interfaces";
 
 import {
     categoryFormModalErrorVariants,

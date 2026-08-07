@@ -1,5 +1,10 @@
 import type { HttpClient, HttpRequestConfig } from "@/interfaces";
-import type { Category, CategoryApiResponse } from "../interfaces";
+import type {
+    Category,
+    CategoryApiResponse,
+    CreateCategoryPayload,
+    UpdateCategoryPayload,
+} from "../interfaces";
 import { toCategory, toCategoryList } from "../mappers/categories.mapper";
 
 
@@ -39,20 +44,43 @@ const RESOURCE = "/categories";
 const TENANT_ID = "019fceb3-99f6-70eb-9dc6-04f24e1e7f67";
 
 
-/**
- * Datos que se mandan al crear o editar.
+/*
+ * El inquilino viaja de dos formas según el método, porque así lo espera el
+ * backend: en la query cuando la petición no tiene cuerpo, y dentro del cuerpo
+ * cuando sí lo tiene.
  *
- * No es `Category`: `id` y `placedAt` los pone el backend, y aceptarlos aquí
- * invitaría a que una pantalla intentara inventárselos.
- *
- * Coincide en forma con lo que devuelve `toCategoryFields` del formulario, así
- * que lo que sale del modal entra aquí sin conversión ni casts.
+ * Los dos ayudantes existen para que ningún método lo escriba a mano. Con la
+ * repetición, olvidarlo en uno nuevo no da ningún error: ese endpoint
+ * simplemente deja de encontrar datos o —peor— encuentra los de otro
+ * inquilino, que es un fallo que no se ve hasta que ya hay dos clientes.
  */
-export interface CategoryPayload {
-    name: string;
-    description?: string;
-    isActive: boolean;
-}
+
+/**
+ * Inquilino en la query string. Para `GET` y `DELETE`, que no llevan cuerpo.
+ *
+ * Se fusiona sobre los parámetros que traiga la llamada en vez de
+ * reemplazarlos, para que un filtro futuro no lo borre sin querer.
+ */
+const withTenantParam = (config?: HttpRequestConfig): HttpRequestConfig => ({
+    ...config,
+    params: { ...config?.params, tenantId: TENANT_ID },
+});
+
+/**
+ * Inquilino dentro del cuerpo. Para `POST` y `PATCH`.
+ *
+ * Se añade aquí y no en `CreateCategoryPayload` a propósito: el payload
+ * describe **lo que decide el formulario**, y el inquilino no lo decide nadie
+ * en pantalla. Meterlo en el tipo obligaría a `toCreateCategoryPayload` a
+ * conocerlo, y la conversión de un formulario no tiene por qué saber de
+ * multi-tenencia.
+ */
+const withTenantBody = <TPayload extends object>(
+    payload: TPayload
+): TPayload & { tenantId: string } => ({
+    ...payload,
+    tenantId: TENANT_ID,
+});
 
 
 /**
@@ -81,10 +109,10 @@ export const categoryKeys = {
 export interface CategoriesService {
     list(config?: HttpRequestConfig): Promise<Category[]>;
     detail(id: string, config?: HttpRequestConfig): Promise<Category>;
-    create(payload: CategoryPayload, config?: HttpRequestConfig): Promise<Category>;
+    create(payload: CreateCategoryPayload, config?: HttpRequestConfig): Promise<Category>;
     update(
         id: string,
-        payload: CategoryPayload,
+        payload: UpdateCategoryPayload,
         config?: HttpRequestConfig
     ): Promise<Category>;
     remove(id: string, config?: HttpRequestConfig): Promise<void>;
@@ -105,41 +133,50 @@ export function createCategoriesService(http: HttpClient): CategoriesService {
          * datos sin normalizar y cualquier otro consumidor tendría que
          * acordarse de repetir la transformación.
          */
-        list: async (config) => {
-            const response = await http.get<CategoryApiResponse[]>(RESOURCE, {
-                ...config,
-                params: { tenantId: TENANT_ID },
-            });
-
-            return toCategoryList(response);
-        },
+        list: async (config) =>
+            toCategoryList(
+                await http.get<CategoryApiResponse[]>(RESOURCE, withTenantParam(config))
+            ),
 
         detail: async (id, config) =>
             toCategory(
                 await http.get<CategoryApiResponse>(
                     `${RESOURCE}/${encodeURIComponent(id)}`,
-                    config
+                    withTenantParam(config)
                 )
             ),
 
         // El alta y la edición también pasan por el mapper: devuelven la
         // categoría guardada, y esa acaba en la caché igual que las del
         // listado. Sin esto sería la única con la forma del backend.
+        //
+        // Aquí el inquilino va en el cuerpo y **no** en la query: mandarlo por
+        // los dos sitios serían dos fuentes del mismo dato que pueden
+        // discrepar, y el día que discrepen nadie sabría cuál gana.
         create: async (payload, config) =>
-            toCategory(await http.post<CategoryApiResponse>(RESOURCE, payload, config)),
+            toCategory(
+                await http.post<CategoryApiResponse>(
+                    RESOURCE,
+                    withTenantBody(payload),
+                    config
+                )
+            ),
 
         update: async (id, payload, config) =>
             toCategory(
-                await http.put<CategoryApiResponse>(
+                await http.patch<CategoryApiResponse>(
                     `${RESOURCE}/${encodeURIComponent(id)}`,
-                    payload,
+                    withTenantBody(payload),
                     config
                 )
             ),
 
         // Sin mapper: no devuelve cuerpo que traducir.
         remove: (id, config) =>
-            http.delete<void>(`${RESOURCE}/${encodeURIComponent(id)}`, config),
+            http.delete<void>(
+                `${RESOURCE}/${encodeURIComponent(id)}`,
+                withTenantParam(config)
+            ),
     };
 };
 

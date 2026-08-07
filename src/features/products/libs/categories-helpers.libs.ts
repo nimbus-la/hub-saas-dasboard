@@ -1,7 +1,9 @@
 import { formatNumber } from "@/lib/format";
 import type { BadgeTone } from "@/interfaces";
 
-import type { Category } from "../interfaces";
+import type {
+    Category,
+} from "../interfaces";
 import {
     CATEGORY_STATUS_LABELS,
     CATEGORY_STATUS_TONES,

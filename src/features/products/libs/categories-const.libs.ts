@@ -1,4 +1,5 @@
 import type { BadgeTone } from "@/interfaces";
+import { CategoryFormValues } from "../interfaces";
 
 
 /**
@@ -89,3 +90,11 @@ export const CATEGORY_STATUS_OPTIONS: {
         { value: "active", label: CATEGORY_STATUS_LABELS.active },
         { value: "inactive", label: CATEGORY_STATUS_LABELS.inactive },
     ];
+
+
+
+export const EMPTY_CATEGORY_FORM_VALUES: CategoryFormValues = {
+    name: "",
+    description: "",
+    isActive: true,
+};

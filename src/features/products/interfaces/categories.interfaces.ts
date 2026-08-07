@@ -41,3 +41,34 @@ export interface Category {
     isActive: boolean;
     placedAt: string; // ISO 8601
 }
+
+
+/**
+ * Lo que se manda al **crear**.
+ *
+ * Sin `isActive`: el backend da de alta toda categoría como activa, y mandarlo
+ * desde aquí sería duplicar esa regla en dos sitios que pueden discrepar. Que
+ * el tipo ni siquiera admita el campo es más fuerte que acordarse de no
+ * ponerlo — mandarlo pasa a ser un error de compilación.
+ *
+ * `id` y `placedAt` tampoco están: los pone el servidor.
+ */
+export interface CreateCategoryPayload {
+    name: string;
+    /** Se omite cuando está vacía: `""` significaría "guarda una vacía". */
+    description?: string;
+}
+
+
+/**
+ * Lo que se manda al **editar**: lo mismo, más el estado.
+ *
+ * Aquí `isActive` sí es obligatorio, y por eso son dos tipos y no uno con el
+ * campo opcional. El interruptor del modal solo aparece al editar, así que este
+ * es el único momento en que alguien decide sobre él; con un `isActive?`
+ * compartido, olvidarlo en la llamada compilaría sin protestar y la categoría
+ * se guardaría perdiendo su estado.
+ */
+export type UpdateCategoryPayload = CreateCategoryPayload & {
+    estado: boolean;
+};
