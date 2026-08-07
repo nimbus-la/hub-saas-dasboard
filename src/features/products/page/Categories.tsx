@@ -13,8 +13,7 @@
 
 import * as React from "react";
 
-import StatusBadge from "@/components/badges/StatusBadge";
-import PageHeader from "@/components/layout/PageHeader";
+import { ConfirmDialog, PageHeader, StatusBadge } from "@/components";
 import {
     DEFAULT_CATEGORY_STATUS_FILTER,
     filterCategories,
@@ -46,7 +45,25 @@ const COPY = {
         "Ninguna categoría coincide con la búsqueda. Prueba con otro texto o cambia el filtro de estado.",
     deleteTitle: "Eliminar categoría",
     deleteConfirm: "Eliminar",
+    deleteCancel: "Cancelar",
 } as const;
+
+
+/**
+ * Qué se pierde al borrar.
+ *
+ * Nombra la categoría en lugar de decir "esta categoría": el diálogo se abre
+ * desde una fila cualquiera de una tabla de ocho iguales, y quien pulsa quiere
+ * comprobar que apuntó a la correcta antes de confirmar.
+ *
+ * Y ofrece la salida buena. Desactivar es lo que se quiere hacer nueve de cada
+ * diez veces —la categoría deja de ofrecerse pero conserva sus productos—, así
+ * que el diálogo lo dice justo donde alguien está a punto de borrar por no
+ * saber que existía esa opción.
+ */
+const deleteDescription = (category: Category): string =>
+    `Se eliminará «${category.name}» y sus productos quedarán sin categoría. ` +
+    `Si solo quieres retirarla de la carta, desactívala en su lugar.`;
 
 
 interface CategoriesProps {
@@ -81,7 +98,32 @@ export default function Categories({ categories: initialCategories }: Categories
 
 
     // ── Borrado ─────────────────────────────────────────────────────────────
-    const handleDeleteRequest = React.useCallback((category: Category) => { }, []);
+    // Dos estados y no uno: `deleteTarget` dice qué se va a borrar y
+    // `isDeleteOpen` si el diálogo se ve. Vaciar el objetivo al cerrar dejaría
+    // el diálogo sin título ni descripción durante su animación de salida —se
+    // vería vaciarse antes de desaparecer—, así que el objetivo se queda hasta
+    // que la siguiente fila lo reemplaza.
+    const [deleteTarget, setDeleteTarget] = React.useState<Category | null>(null);
+    const [isDeleteOpen, setIsDeleteOpen] = React.useState(false);
+
+    const handleDeleteRequest = React.useCallback((category: Category) => {
+        setDeleteTarget(category);
+        setIsDeleteOpen(true);
+    }, []);
+
+    const handleDeleteConfirm = React.useCallback(() => {
+        if (!deleteTarget) return;
+
+        // Aquí entra la llamada al servicio (`DELETE /categories/:id`). Cuando
+        // exista, el diálogo se cierra al resolverse la promesa y no antes, y
+        // el `loading` de ConfirmDialog pasa a tener sentido: por eso cerrar es
+        // cosa de esta pantalla y no del propio diálogo.
+        setCategories((current) =>
+            current.filter((category) => category.id !== deleteTarget.id)
+        );
+
+        setIsDeleteOpen(false);
+    }, [deleteTarget]);
 
     return (
         <div className={categoriesPageVariants()}>
@@ -121,6 +163,22 @@ export default function Categories({ categories: initialCategories }: Categories
                     }
                 />
             </section>
+
+            {/* El diálogo cuelga de la pantalla y no de la fila: la tabla solo
+                avisa de que alguien pidió borrar, y quien sabe qué hacer con
+                esa intención —y tiene la lista para quitarle el elemento— es
+                esta pantalla. */}
+            {deleteTarget && (
+                <ConfirmDialog
+                    open={isDeleteOpen}
+                    onOpenChange={setIsDeleteOpen}
+                    title={COPY.deleteTitle}
+                    description={deleteDescription(deleteTarget)}
+                    confirmLabel={COPY.deleteConfirm}
+                    cancelLabel={COPY.deleteCancel}
+                    onConfirm={handleDeleteConfirm}
+                />
+            )}
         </div>
     );
 };
