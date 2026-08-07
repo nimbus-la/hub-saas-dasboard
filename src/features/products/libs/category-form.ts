@@ -8,66 +8,7 @@
 // reglas. El modal decide cómo se pintan.
 
 import type { RegisterOptions } from "react-hook-form";
-
-import type { Category } from "@/lib/categories";
-
-/* -------------------------------------------------------------------------- */
-/*  Valores del formulario                                                     */
-/* -------------------------------------------------------------------------- */
-
-/**
- * Lo que el formulario tiene en la mano en cada momento.
- *
- * `active` viaja siempre, también al crear: una categoría nueva nace activa —
- * nadie da de alta algo que no piensa ofrecer— y el interruptor solo aparece
- * al editar, que es cuando retirarla de la carta es una decisión de verdad.
- */
-export interface CategoryFormValues {
-    name: string;
-    description: string;
-    active: boolean;
-}
-
-export const EMPTY_CATEGORY_FORM_VALUES: CategoryFormValues = {
-    name: "",
-    description: "",
-    active: true,
-};
-
-/** Convierte una categoría guardada en los valores que edita el formulario. */
-export const toCategoryFormValues = (category: Category): CategoryFormValues => ({
-    name: category.name,
-    description: category.description ?? "",
-    active: category.active,
-});
-
-
-/** Lo que el formulario escribe de una categoría. El id y la fecha los pone la pantalla. */
-export type CategoryFormFields = Omit<Category, "id" | "placedAt">;
-
-
-/**
- * El camino de vuelta: de lo que se escribió a lo que se guarda.
- *
- * Recorta los extremos —un nombre con espacios delante se ordena antes que
- * todos los demás en la tabla y nadie entiende por qué— y, si la descripción
- * queda vacía, **la propiedad desaparece** en lugar de viajar como `""`.
- *
- * Esa distinción importa dos veces. En el tipo, porque
- * `exactOptionalPropertyTypes` no acepta `description: undefined` donde la
- * propiedad es opcional. Y en pantalla, porque la tabla decide si pinta su
- * guion de "sin descripción" preguntando por la ausencia, no por el texto
- * vacío.
- */
-export const toCategoryFields = (values: CategoryFormValues): CategoryFormFields => {
-    const description = values.description.trim();
-
-    return {
-        name: values.name.trim(),
-        active: values.active,
-        ...(description ? { description } : {}),
-    };
-};
+import { CategoryFormValues } from "../interfaces";
 
 /* -------------------------------------------------------------------------- */
 /*  Reglas de validación                                                       */

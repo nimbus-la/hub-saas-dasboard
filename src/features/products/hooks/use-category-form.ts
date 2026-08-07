@@ -11,12 +11,11 @@ import { useForm } from "react-hook-form";
 
 import {
     CATEGORY_FORM_RULES,
-    EMPTY_CATEGORY_FORM_VALUES,
     duplicateCategoryNameMessage,
-    toCategoryFormValues,
-    type CategoryFormValues,
 } from "@/features/products/libs/category-form";
-import type { Category } from "@/lib/categories";
+import type { Category, CategoryFormValues } from "../interfaces";
+import { EMPTY_CATEGORY_FORM_VALUES } from "../libs";
+import { toCategoryFormValues } from "../mappers";
 
 interface UseCategoryFormOptions {
     /** El modal está abierto. Es la señal para (re)cargar el borrador. */

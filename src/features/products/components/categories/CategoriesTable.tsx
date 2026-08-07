@@ -6,12 +6,7 @@ import StatusBadge from "@/components/badges/StatusBadge";
 import GenericButton from "@/components/buttons/GenericButton";
 import DataTable from "@/components/tables/DataTable";
 import { cn } from "@/lib/utils";
-import {
-    EMPTY_DESCRIPTION,
-    formatCategoryStatus,
-    getCategoryStatusTone,
-    type Category,
-} from "@/lib/categories";
+
 import { ICON_TOKENS } from "@/tokens";
 
 import {
@@ -23,6 +18,8 @@ import {
     categoriesTablePanelVariants,
 } from "./categories-table.style";
 import { formatDate } from "@/lib/format";
+import { Category } from "../../interfaces";
+import { EMPTY_DESCRIPTION, formatCategoryStatus, getCategoryStatusTone } from "../../libs";
 
 
 /**
@@ -83,13 +80,13 @@ const categoryColumns: ColumnDef<Category>[] = [
         },
     },
     {
-        accessorKey: "active",
+        accessorKey: "isActive",
         header: "Estado",
         meta: { headerClassName: "w-32", cellClassName: "w-32" },
         cell: ({ row }) => (
             <StatusBadge
-                tone={getCategoryStatusTone(row.original.active)}
-                label={formatCategoryStatus(row.original.active)}
+                tone={getCategoryStatusTone(row.original.isActive)}
+                label={formatCategoryStatus(row.original.isActive)}
             />
         ),
     },
@@ -97,11 +94,30 @@ const categoryColumns: ColumnDef<Category>[] = [
         accessorKey: "placedAt",
         header: "Fecha de actualización",
         meta: { headerClassName: "w-32", cellClassName: "w-32" },
-        cell: ({ row }) => (
-            <time dateTime={row.original.placedAt} className="tabular-nums">
-                {formatDate(row.original.placedAt)}
-            </time>
-        ),
+        cell: ({ row }) => {
+            const { placedAt } = row.original;
+
+            // Sin guarda esto revienta la tabla entera: `formatDate("")` acaba
+            // en `Intl.DateTimeFormat.format(Invalid Date)`, que lanza
+            // `RangeError`. Mientras el backend no publique la fecha, la
+            // ausencia se pinta igual que la de la descripción.
+            if (!placedAt) {
+                return (
+                    <span
+                        className={categoriesTableEmptyDescriptionVariants()}
+                        aria-label="Sin fecha de actualización"
+                    >
+                        {EMPTY_DESCRIPTION}
+                    </span>
+                );
+            }
+
+            return (
+                <time dateTime={placedAt} className="tabular-nums">
+                    {formatDate(placedAt)}
+                </time>
+            );
+        },
     },
 ];
 
