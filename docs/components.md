@@ -312,6 +312,25 @@ propio subrayado, y eso se nota más que el desfase con el título. Regla
 general: **si un elemento dibuja una línea que debe leerse continua con la de
 su vecino, la separación va en relleno, nunca en `gap`.**
 
+**Un componente cerrado puede borrar la mitad del CSS que traía.** El
+`alert-dialog` de shadcn resolvía la cabecera con una rejilla y cuatro
+variantes cruzadas (`has-data-[slot=…]:grid-rows-[auto_auto_1fr]`,
+`sm:group-data-[size=default]/alert-dialog-content:place-items-start`…) para
+que el icono se colocara al lado del texto en escritorio y encima en móvil.
+Eso es el precio de exponer piezas sueltas: el CSS tiene que cubrir todas las
+composiciones posibles. `ConfirmDialog` recibe icono, título y descripción por
+props y tiene un solo formato, así que esas variantes dejan de hacer falta. La
+regla que salió de ahí: **si la decisión ya está tomada, tómala en el
+componente y no en el selector.**
+
+**El primitivo importa tanto como el estilo.** `Modal` se monta sobre
+`Dialog` y `ConfirmDialog` sobre `AlertDialog`, que es el mismo diálogo con una
+diferencia: la alerta no se cierra al pulsar fuera. Un clic despistado no puede
+ser la respuesta a "¿seguro que quieres borrar esto?". Base UI ni siquiera
+expone ahí el `disablePointerDismissal` del diálogo normal, y eso es una pista:
+cuando la librería quita una prop, está diciendo cuál es el componente correcto
+para el caso.
+
 **Pendiente de las tarjetas:** al migrar `cards/` el radio de superficie subió
 a `rounded-xl` (`RADIUS_SEMANTIC.surface`). Los paneles que aún no están
 migrados —`RecentOrdersTable`, `TopProductsCard`, `SalesChartSection`— siguen

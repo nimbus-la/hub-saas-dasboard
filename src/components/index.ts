@@ -62,8 +62,23 @@ export * from './pagination/pagination.style';
 
 // ── Formularios ─────────────────────────────────────────────────────────────
 export { InputSelector } from './inputs/InputSelector';
+export { TextAreaField } from './inputs/TextAreaField';
 export { TextField } from './inputs/TextField';
 
 // ── Interruptores ───────────────────────────────────────────────────────────
 export { Switch } from './toggles/Switch';
 export * from './toggles/switch.style';
+
+
+
+// ── Diálogos ────────────────────────────────────────────────────────────────
+export { default as Modal } from './modals/Modal';
+export { default as ConfirmDialog } from './modals/ConfirmDialog';
+export * from './modals/modal.style';
+export * from './modals/confirm-dialog.style';
+
+
+
+// ── Armazón ─────────────────────────────────────────────────────────────────
+export { default as PageHeader } from './layout/PageHeader';
+export * from './layout/page-header.style';

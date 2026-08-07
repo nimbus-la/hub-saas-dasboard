@@ -50,6 +50,7 @@ export function InputSelector({
     defaultValue,
     onChange,
     onValueChange,
+    onBlur,
     label,
     required = false,
     placeholder = "Selecciona una opción",
@@ -65,11 +66,13 @@ export function InputSelector({
     fullWidth = true,
     name,
     id,
+    "aria-label": ariaLabel,
     className,
     triggerClassName,
     inputClassName,
     contentClassName,
-}: InputSelectorProps) {
+    ref,
+}: InputSelectorProps & { ref?: React.Ref<HTMLInputElement> }) {
     const reactId = React.useId()
     const fieldId = id ?? reactId
 
@@ -133,11 +136,18 @@ export function InputSelector({
                 name={name}
             >
                 <div ref={anchorRef}>
+                    {/* El `ref` llega al <input> del combobox, no al ancla:
+                        es lo que permite que un gestor de formularios lleve el
+                        foco hasta aquí cuando el campo falla la validación.
+                        Mismo contrato que `TextField` y `TextAreaField`. */}
                     <ComboboxInput
+                        ref={ref}
                         id={fieldId}
+                        onBlur={onBlur}
                         placeholder={placeholder}
                         disabled={disabled}
                         showClear={clearable}
+                        aria-label={ariaLabel}
                         aria-invalid={invalid || undefined}
                         aria-describedby={describedBy}
                         className={cn(

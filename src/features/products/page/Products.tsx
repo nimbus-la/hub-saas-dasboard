@@ -12,6 +12,7 @@
 // `getProducts` hable con la API, esta pantalla no cambia.
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 
 import Pagination from "@/components/pagination/Pagination";
 import { FilterTabs } from "@/components/tabs/FilterTabs";
@@ -32,7 +33,7 @@ import {
     ProductsEmptyState,
     ProductsGrid,
     ProductsHeader,
-} from "../components";
+} from "../components/list";
 import {
     productsPageBodyVariants,
     productsPagePaginationVariants,
@@ -42,11 +43,15 @@ import {
 
 const GRID_PANEL_ID = "products-grid";
 
+/** Formulario de alta. La misma ruta que declara el menú lateral. */
+const CREATE_PRODUCT_HREF = "/products/create";
+
 interface ProductsProps {
     products: Product[];
 }
 
 export default function Products({ products }: ProductsProps) {
+    const router = useRouter();
     const [query, setQuery] = React.useState("");
     const [category, setCategory] = React.useState<string>(ALL_CATEGORIES);
     const [page, setPage] = React.useState(1);
@@ -123,8 +128,8 @@ export default function Products({ products }: ProductsProps) {
     }, []);
 
     const handleCreateProduct = React.useCallback(() => {
-        // Enlazar con el formulario de alta cuando exista su ruta.
-    }, []);
+        router.push(CREATE_PRODUCT_HREF);
+    }, [router]);
 
     const handleEditProduct = React.useCallback((product: Product) => {
         // Enlazar con el formulario de edición cuando exista su ruta.

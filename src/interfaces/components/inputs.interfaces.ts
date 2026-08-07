@@ -39,6 +39,14 @@ export interface InputSelectorProps {
      * @deprecated Usa `onChange`. Se mantiene por compatibilidad.
      */
     onValueChange?: (value: string | null) => void;
+    /**
+     * Se dispara al salir del campo.
+     *
+     * Existe para los gestores de formulario, que lo usan como señal de "ya
+     * terminó de decidir" para validar. Sin él, el selector sería el único
+     * campo del sistema que no puede validarse al perder el foco.
+     */
+    onBlur?: React.FocusEventHandler<HTMLInputElement>;
 
     /** Texto de la etiqueta superior. */
     label?: string;
@@ -72,6 +80,16 @@ export interface InputSelectorProps {
 
     name?: string;
     id?: string;
+
+    /**
+     * Nombre accesible cuando el selector no lleva etiqueta visible.
+     *
+     * Pasa al `<input>` del combobox, no al contenedor: es el control el que
+     * tiene que anunciarse. Un selector sin `label` ni `aria-label` se anuncia
+     * solo por su placeholder, que desaparece en cuanto hay algo elegido.
+     */
+    "aria-label"?: string;
+
     /** Clases del contenedor externo. */
     className?: string;
     /** Clases del campo (InputGroup). */
