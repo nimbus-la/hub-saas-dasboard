@@ -114,7 +114,7 @@ Iconos, que se dimensionan por prop y no por clase:
 | `sidebar/` — `Sidebar`, `SidebarButton`, `SidebarGroup`, `SidebarNavItem` | Migrado (armazón desde `SIDEBAR` y `Z_INDEX`) |
 | `navbar/` — `Navbar` | Migrado (armazón desde `NAVBAR`; sin clases de shadcn) |
 | `layout/` — `PageHeader` | Nace en el sistema (encabezado de pantalla: flecha, título, insignia y acciones) |
-| `modals/` — `Modal`, `ConfirmDialog` | Nace en el sistema, sobre Base UI (`rounded-2xl`, `shadow-2xl`, capa `Z_INDEX.modal`) |
+| `modals/` — `Modal`, `ConfirmDialog` | Migrado y traducido desde shadcn (`dialog` y `alert-dialog`), sobre Base UI (`rounded-2xl`, `shadow-2xl`, capa `Z_INDEX.modal`) |
 
 La migración está completa: no queda ninguna familia con valores propios. Lo
 que quedó fuera de los tokens a propósito —geometrías cerradas como el carril
@@ -132,6 +132,12 @@ encabezado del formulario de producto —`ProductFormHeader`, ya borrado— y
 `Modal` es lo que faltaba para que un diálogo no lo montara cada pantalla a
 mano. Cuando algo se necesita dos veces deja de pertenecer a la pantalla que lo
 vio nacer.
+
+`modals/` entró por la sala de espera: el `dialog` y el `alert-dialog` de
+shadcn se tradujeron al sistema y se movieron aquí, y con ellos se fue el
+último `components/ui/`. El `button` que los acompañaba se borró sin traducir
+—`GenericButton` ya hacía su trabajo—, que es lo que toca cuando lo que baja el
+CLI duplica algo que el sistema ya tiene.
 
 ### Sobre los iconos
 

@@ -69,7 +69,15 @@ export { TextField } from './inputs/TextField';
 export { Switch } from './toggles/Switch';
 export * from './toggles/switch.style';
 
+
+
 // ── Diálogos ────────────────────────────────────────────────────────────────
+export { default as Modal } from './modals/Modal';
+export { default as ConfirmDialog } from './modals/ConfirmDialog';
+export * from './modals/modal.style';
+export * from './modals/confirm-dialog.style';
+
+
 
 // ── Armazón ─────────────────────────────────────────────────────────────────
 export { default as PageHeader } from './layout/PageHeader';

@@ -211,7 +211,9 @@ hiciera lo que hiciera el campo.
 El alias `ui` de `components.json` sigue apuntando a `components/ui`, así que
 ahí aterriza lo que se añada con el CLI. **Es una sala de espera, no un
 destino:** se traduce y se mueve a su familia, como se hizo con los campos
-(`inputs/primitives`) y el avatar (`avatars`).
+(`inputs/primitives`), el avatar (`avatars`) y los diálogos (`modals/`). Lo que
+duplique algo que el sistema ya tiene no se traduce: se borra, como el `button`
+que bajó junto a los diálogos y que `GenericButton` ya cubría.
 
 ### 4. `translate-x-*` ya no escribe en `transform`
 

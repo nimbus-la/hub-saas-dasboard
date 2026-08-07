@@ -1,7 +1,9 @@
 import type { ReactNode, RefObject } from "react";
 
 import type { VariantProps } from "class-variance-authority";
+import type { LucideIcon } from "lucide-react";
 
+import type { confirmDialogMediaVariants } from "@/components/modals/confirm-dialog.style";
 import type { modalPopupVariants } from "@/components/modals/modal.style";
 
 
@@ -55,6 +57,17 @@ export interface ModalProps {
     disableDismiss?: boolean;
 
     children?: ReactNode;
+
+    /**
+     * Acciones del pie.
+     *
+     * Van aparte de `children` porque el pie tiene geometría propia —se apila
+     * en móvil con la acción principal arriba— y no es algo que deba rehacer
+     * cada pantalla. Sin esta prop no se pinta el bloque: un diálogo puede no
+     * tener más salida que la equis.
+     */
+    footer?: ReactNode;
+
     /**
      * Clases del panel.
      *
@@ -67,11 +80,23 @@ export interface ModalProps {
 }
 
 
+/**
+ * Tono de una confirmación.
+ *
+ * Se deriva de las variantes del medallón para no mantener dos listas: el día
+ * que entre un tercer tono, este tipo se entera solo.
+ */
+export type ConfirmDialogTone = NonNullable<
+    VariantProps<typeof confirmDialogMediaVariants>["tone"]
+>;
+
+
 /** Diálogo de confirmación de una acción sin vuelta atrás. */
 export interface ConfirmDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
 
+    /** La pregunta, en una línea: "Eliminar categoría". */
     title: string;
     /** Qué se va a borrar y qué se pierde con ello. */
     description: string;
@@ -80,7 +105,22 @@ export interface ConfirmDialogProps {
     confirmLabel: string;
     cancelLabel?: string;
 
+    /**
+     * Ejecuta la acción. **No cierra el diálogo**: eso lo hace quien lo usa
+     * cuando la operación termina, que es lo único que permite mostrar el
+     * `loading` mientras tanto.
+     */
     onConfirm: () => void;
+
+    /**
+     * Icono del medallón.
+     *
+     * Sale de `ICON_TOKENS`, no de lucide directamente: el glifo que representa
+     * "eliminar" es una decisión de producto y vive en el registro. Si no se
+     * pasa, cada tono usa el suyo —papelera en `danger`, triángulo en
+     * `primary`—, así que el caso de borrado ya viene resuelto.
+     */
+    icon?: LucideIcon;
 
     /**
      * Tono de la acción.
@@ -88,7 +128,7 @@ export interface ConfirmDialogProps {
      * `danger` para lo irreversible —borrar, revocar—; `primary` para
      * confirmaciones que solo piden una segunda lectura.
      */
-    tone?: "danger" | "primary";
+    tone?: ConfirmDialogTone;
 
     /** Bloquea los botones mientras la acción está en vuelo. */
     loading?: boolean;
