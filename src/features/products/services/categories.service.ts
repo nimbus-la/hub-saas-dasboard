@@ -1,18 +1,15 @@
 import type { HttpClient, HttpRequestConfig } from "@/interfaces";
-import type {
-    Category,
-    CategoryApiResponse,
-    CreateCategoryPayload,
-    UpdateCategoryPayload,
-} from "../interfaces";
-import { toCategory, toCategoryList } from "../mappers/categories.mapper";
+import type { Category, CategoryApiResponse, CreateCategoryPayload, UpdateCategoryPayload } from "../interfaces";
+import { toCategory, toCategoryList } from "../mappers";
+import { ENDPOINTS } from "@/utils";
 
 
 /**
  * Servicio de categorías
  *
- * Traduce el dominio a rutas del backend. Es la única capa que sabe que las
- * categorías viven en `/categories` y que crear una es un POST.
+ * Traduce el dominio a llamadas al backend. Es la única capa que sabe que crear
+ * una categoría es un POST y que editarla es un PATCH; la ruta sale de
+ * `ENDPOINTS`, donde están todas juntas y localizables.
  *
  * No importa el cliente HTTP: lo recibe. Esa es la inyección de dependencias
  * del proyecto, y hace que el mismo servicio sirva en los dos sitios donde
@@ -26,10 +23,6 @@ import { toCategory, toCategoryList } from "../mappers/categories.mapper";
  * tampoco importa nada de React ni de TanStack Query.
  */
 
-
-
-/** Ruta base del recurso. Un solo sitio que tocar si el backend la mueve. */
-const RESOURCE = "/categories";
 
 
 /**
@@ -135,13 +128,16 @@ export function createCategoriesService(http: HttpClient): CategoriesService {
          */
         list: async (config) =>
             toCategoryList(
-                await http.get<CategoryApiResponse[]>(RESOURCE, withTenantParam(config))
+                await http.get<CategoryApiResponse[]>(
+                    ENDPOINTS.PRODUCTS_CATEGORY,
+                    withTenantParam(config)
+                )
             ),
 
         detail: async (id, config) =>
             toCategory(
                 await http.get<CategoryApiResponse>(
-                    `${RESOURCE}/${encodeURIComponent(id)}`,
+                    `${ENDPOINTS.PRODUCTS_CATEGORY}/${encodeURIComponent(id)}`,
                     withTenantParam(config)
                 )
             ),
@@ -156,7 +152,7 @@ export function createCategoriesService(http: HttpClient): CategoriesService {
         create: async (payload, config) =>
             toCategory(
                 await http.post<CategoryApiResponse>(
-                    RESOURCE,
+                    ENDPOINTS.PRODUCTS_CATEGORY,
                     withTenantBody(payload),
                     config
                 )
@@ -165,7 +161,7 @@ export function createCategoriesService(http: HttpClient): CategoriesService {
         update: async (id, payload, config) =>
             toCategory(
                 await http.patch<CategoryApiResponse>(
-                    `${RESOURCE}/${encodeURIComponent(id)}`,
+                    `${ENDPOINTS.PRODUCTS_CATEGORY}/${encodeURIComponent(id)}`,
                     withTenantBody(payload),
                     config
                 )
@@ -174,7 +170,7 @@ export function createCategoriesService(http: HttpClient): CategoriesService {
         // Sin mapper: no devuelve cuerpo que traducir.
         remove: (id, config) =>
             http.delete<void>(
-                `${RESOURCE}/${encodeURIComponent(id)}`,
+                `${ENDPOINTS.PRODUCTS_CATEGORY}/${encodeURIComponent(id)}`,
                 withTenantParam(config)
             ),
     };
