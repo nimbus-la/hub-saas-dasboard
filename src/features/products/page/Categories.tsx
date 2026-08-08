@@ -17,6 +17,7 @@ import * as React from "react";
 
 import { ConfirmDialog, PageHeader, StatusBadge } from "@/components";
 import { getApiErrorMessage } from "@/lib/http";
+import { formatMessage, messages } from "@/messages";
 
 
 import {
@@ -47,39 +48,8 @@ import { toCreateCategoryPayload, toUpdateCategoryPayload } from "../mappers";
 /** Destino de la flecha de regreso. La misma ruta que declara el menú lateral. */
 const PRODUCTS_LIST_HREF = "/products";
 
-const COPY = {
-    title: "Categorías",
-    subtitle:
-        "Agrupa la carta en secciones. Desactivar una categoría la retira del menú sin borrar sus productos.",
-    backLabel: "Volver a la lista de productos",
-    loading: "Cargando categorías…",
-    loadError: "No se pudieron cargar las categorías.",
-    emptyCatalog:
-        "Todavía no hay categorías. Crea la primera para empezar a agrupar la carta.",
-    emptyFiltered:
-        "Ninguna categoría coincide con la búsqueda. Prueba con otro texto o cambia el filtro de estado.",
-    saveError: "No se pudo guardar la categoría.",
-    deleteTitle: "Eliminar categoría",
-    deleteConfirm: "Eliminar",
-    deleteCancel: "Cancelar",
-} as const;
-
-
-/**
- * Qué se pierde al borrar.
- *
- * Nombra la categoría en lugar de decir "esta categoría": el diálogo se abre
- * desde una fila cualquiera de una tabla de ocho iguales, y quien pulsa quiere
- * comprobar que apuntó a la correcta antes de confirmar.
- *
- * Y ofrece la salida buena. Desactivar es lo que se quiere hacer nueve de cada
- * diez veces —la categoría deja de ofrecerse pero conserva sus productos—, así
- * que el diálogo lo dice justo donde alguien está a punto de borrar por no
- * saber que existía esa opción.
- */
-const deleteDescription = (category: Category): string =>
-    `Se eliminará «${category.name}» y sus productos quedarán sin categoría. ` +
-    `Si solo quieres retirarla de la carta, desactívala en su lugar.`;
+/** Todo lo que dice esta pantalla. Ver `@/messages`. */
+const COPY = messages.products.categories;
 
 
 export default function Categories() {
@@ -298,10 +268,12 @@ export default function Categories() {
                 <ConfirmDialog
                     open={isDeleteOpen}
                     onOpenChange={setIsDeleteOpen}
-                    title={COPY.deleteTitle}
-                    description={deleteDescription(deleteTarget)}
-                    confirmLabel={COPY.deleteConfirm}
-                    cancelLabel={COPY.deleteCancel}
+                    title={COPY.delete.title}
+                    description={formatMessage(COPY.delete.description, {
+                        name: deleteTarget.name,
+                    })}
+                    confirmLabel={COPY.delete.confirm}
+                    cancelLabel={COPY.delete.cancel}
                     onConfirm={handleDeleteConfirm}
                     loading={deleteCategory.isPending}
                 />

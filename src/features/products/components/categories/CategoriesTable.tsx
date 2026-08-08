@@ -6,6 +6,7 @@ import StatusBadge from "@/components/badges/StatusBadge";
 import GenericButton from "@/components/buttons/GenericButton";
 import DataTable from "@/components/tables/DataTable";
 import { cn } from "@/lib/utils";
+import { formatMessage, messages } from "@/messages";
 
 import { ICON_TOKENS } from "@/tokens";
 
@@ -20,6 +21,10 @@ import {
 import { formatDate } from "@/lib/format";
 import { Category } from "../../interfaces";
 import { EMPTY_DESCRIPTION, formatCategoryStatus, getCategoryStatusTone } from "../../libs";
+
+
+/** Lo que dice esta tabla. Ver `@/messages`. */
+const COPY = messages.products.categories.table;
 
 
 /**
@@ -38,7 +43,7 @@ import { EMPTY_DESCRIPTION, formatCategoryStatus, getCategoryStatusTone } from "
 const categoryColumns: ColumnDef<Category>[] = [
     {
         accessorKey: "name",
-        header: "Nombre",
+        header: COPY.name,
         meta: { headerClassName: "w-56", cellClassName: "w-56" },
         cell: ({ row }) => (
             <span className={categoriesTableNameVariants()}>
@@ -48,7 +53,7 @@ const categoryColumns: ColumnDef<Category>[] = [
     },
     {
         accessorKey: "description",
-        header: "Descripción",
+        header: COPY.description,
         // Sin ordenamiento: ordenar alfabéticamente un texto libre no responde
         // a ninguna pregunta que alguien se haga delante de esta tabla.
         enableSorting: false,
@@ -59,7 +64,7 @@ const categoryColumns: ColumnDef<Category>[] = [
                 return (
                     <span
                         className={categoriesTableEmptyDescriptionVariants()}
-                        aria-label="Sin descripción"
+                        aria-label={COPY.noDescription}
                     >
                         {EMPTY_DESCRIPTION}
                     </span>
@@ -81,7 +86,7 @@ const categoryColumns: ColumnDef<Category>[] = [
     },
     {
         accessorKey: "isActive",
-        header: "Estado",
+        header: COPY.status,
         meta: { headerClassName: "w-32", cellClassName: "w-32" },
         cell: ({ row }) => (
             <StatusBadge
@@ -92,7 +97,7 @@ const categoryColumns: ColumnDef<Category>[] = [
     },
     {
         accessorKey: "placedAt",
-        header: "Fecha de actualización",
+        header: COPY.updatedAt,
         meta: { headerClassName: "w-32", cellClassName: "w-32" },
         cell: ({ row }) => {
             const { placedAt } = row.original;
@@ -105,7 +110,7 @@ const categoryColumns: ColumnDef<Category>[] = [
                 return (
                     <span
                         className={categoriesTableEmptyDescriptionVariants()}
-                        aria-label="Sin fecha de actualización"
+                        aria-label={COPY.noUpdatedAt}
                     >
                         {EMPTY_DESCRIPTION}
                     </span>
@@ -157,8 +162,10 @@ export default function CategoriesTable({
                             variant="ghost"
                             size="sm"
                             icon={ICON_TOKENS.EDIT}
-                            aria-label={`Editar ${category.name}`}
-                            title="Editar"
+                            aria-label={formatMessage(COPY.editCategory, {
+                                name: category.name,
+                            })}
+                            title={COPY.edit}
                             onClick={() => onEditCategory(category)}
                         />
 
@@ -167,8 +174,10 @@ export default function CategoriesTable({
                             variant="danger"
                             size="sm"
                             icon={ICON_TOKENS.DELETE}
-                            aria-label={`Eliminar ${category.name}`}
-                            title="Eliminar"
+                            aria-label={formatMessage(COPY.deleteCategory, {
+                                name: category.name,
+                            })}
+                            title={COPY.delete}
                             onClick={() => onDeleteCategory(category)}
                             className={categoriesTableDeleteVariants()}
                         />

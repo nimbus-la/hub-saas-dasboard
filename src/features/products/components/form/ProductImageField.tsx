@@ -6,6 +6,7 @@ import { Trash2 } from "lucide-react";
 
 import GenericButton from "@/components/buttons/GenericButton";
 import { cn } from "@/lib/utils";
+import { formatMessage, messages } from "@/messages";
 import {
     AVATAR_SIZE,
     ICON_SIZE,
@@ -49,6 +50,9 @@ import {
  * de cliente y de que revoque la URL cuando deja de usarla — cada `File`
  * previsualizado y no revocado se queda en memoria hasta recargar la página.
  */
+
+/** Lo que dice este campo. Ver `@/messages`. */
+const COPY = messages.products.create.image;
 
 interface ProductImageFieldProps {
     value: File | null;
@@ -170,12 +174,11 @@ export default function ProductImageField({
     return (
         <div className={cn(productImageFieldVariants(), className)}>
             <label htmlFor={fieldId} className={productImageLabelVariants()}>
-                Imagen del producto
+                {COPY.label}
             </label>
 
             <p id={hintId} className={productImageHintVariants()}>
-                Se publica en la carta y en el catálogo; mientras no la
-                subas, el producto se muestra con las iniciales de su nombre.
+                {COPY.hint}
             </p>
 
             {/*
@@ -219,7 +222,7 @@ export default function ProductImageField({
                         </p>
 
                         <p className={productImageFileMetaVariants()}>
-                            {formatFileSize(value.size)} · Listo para publicar
+                            {formatFileSize(value.size)} · {COPY.ready}
                         </p>
                     </div>
 
@@ -228,7 +231,7 @@ export default function ProductImageField({
                             type="button"
                             variant="ghost"
                             size="sm"
-                            label="Cambiar"
+                            label={messages.common.actions.change}
                             onClick={openFilePicker}
                         />
 
@@ -236,7 +239,7 @@ export default function ProductImageField({
                             type="button"
                             variant="danger"
                             size="sm"
-                            label="Quitar"
+                            label={messages.common.actions.remove}
                             startIcon={Trash2}
                             onClick={handleRemove}
                         />
@@ -262,13 +265,14 @@ export default function ProductImageField({
 
                     <div className={productImageDropzoneTextVariants()}>
                         <p className={productImageDropzoneTitleVariants()}>
-                            Arrastra la foto aquí o búscala en tu equipo
+                            {COPY.dropzoneTitle}
                         </p>
 
                         <p className={productImageDropzoneCaptionVariants()}>
-                            {PRODUCT_IMAGE_FORMATS_LABEL} · hasta{" "}
-                            {formatFileSize(PRODUCT_IMAGE_MAX_BYTES)} · se recorta
-                            en cuadrado
+                            {formatMessage(COPY.dropzoneCaption, {
+                                formats: PRODUCT_IMAGE_FORMATS_LABEL,
+                                max: formatFileSize(PRODUCT_IMAGE_MAX_BYTES),
+                            })}
                         </p>
                     </div>
 
@@ -279,7 +283,7 @@ export default function ProductImageField({
                         type="button"
                         variant="ghost"
                         size="sm"
-                        label="Seleccionar archivo"
+                        label={messages.common.actions.selectFile}
                         aria-describedby={hintId}
                         // La zona entera es pulsable; sin frenar la propagación
                         // el clic del botón abriría el selector dos veces.

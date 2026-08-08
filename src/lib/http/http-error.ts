@@ -1,9 +1,6 @@
 import type { HttpErrorKind, HttpErrorOptions, HttpMethod } from "@/interfaces";
-import {
-    HTTP_ERROR_COPY,
-    HTTP_ERROR_MESSAGE_KEYS,
-    HTTP_RETRYABLE_STATUSES,
-} from "@/utils";
+import { messages } from "@/messages";
+import { HTTP_ERROR_MESSAGE_KEYS, HTTP_RETRYABLE_STATUSES } from "@/utils";
 
 
 /**
@@ -135,8 +132,8 @@ export function isRetryableError(error: unknown): boolean {
 export function getApiErrorMessage(error: unknown, fallback: string): string {
     if (!isHttpError(error)) return fallback;
 
-    if (error.kind === "network") return HTTP_ERROR_COPY.network;
-    if (error.kind === "timeout") return HTTP_ERROR_COPY.timeout;
+    if (error.kind === "network") return messages.errors.http.network;
+    if (error.kind === "timeout") return messages.errors.http.timeout;
 
     const { body } = error;
 

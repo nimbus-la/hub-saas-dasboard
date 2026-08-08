@@ -1,4 +1,4 @@
-import { formatNumber } from "@/lib/format";
+import { formatPlural, messages } from "@/messages";
 import type { BadgeTone } from "@/interfaces";
 
 import type {
@@ -45,7 +45,7 @@ export const matchesCategoryStatus = (
 
 /** `1 categoría` · `8 categorías` */
 export const formatCategoryCount = (count: number): string =>
-    `${formatNumber(count)} ${count === 1 ? "categoría" : "categorías"}`;
+    formatPlural(messages.products.categories.count, count);
 
 
 

@@ -6,6 +6,7 @@ import type { AlertProps } from "@/interfaces";
 import { DURATION, ICON_SIZE, ICON_STROKE, ICON_STROKE_BY_SIZE, ICON_TOKENS } from "@/tokens";
 import { ALERT_DURATION, ASSERTIVE_TONES, DEFAULT_ICON, MEDIA_SIZE } from "@/utils";
 import { cn } from "@/lib/utils";
+import { messages } from "@/messages";
 
 import {
     alertActionsVariants,
@@ -56,7 +57,7 @@ export default function Alert({
     actions,
     duration = ALERT_DURATION,
     dismissible = true,
-    closeLabel = "Cerrar aviso",
+    closeLabel = messages.components.alert.close,
     pauseOnHover = true,
     showProgress = true,
     onClose,

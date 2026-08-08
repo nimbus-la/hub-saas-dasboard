@@ -1,5 +1,9 @@
 import type { BadgeTone } from "@/interfaces";
+import { messages } from "@/messages";
+
 import { CategoryFormValues } from "../interfaces";
+
+const copy = messages.products.categories;
 
 
 /**
@@ -61,10 +65,7 @@ export const CATEGORY_STATUS_TO_IS_ACTIVE: Record<
 // nombran el estado, no el valor del campo. Un `CATEGORY_STATUS_LABELS[true]`
 // obligaría a leer el tipo para saber qué significa.
 
-export const CATEGORY_STATUS_LABELS = {
-    active: "Activa",
-    inactive: "Inactiva",
-} as const;
+export const CATEGORY_STATUS_LABELS = copy.status;
 
 export const CATEGORY_STATUS_TONES: Record<
     keyof typeof CATEGORY_STATUS_LABELS,
@@ -86,7 +87,7 @@ export const CATEGORY_STATUS_OPTIONS: {
     value: CategoryStatusFilter;
     label: string;
 }[] = [
-        { value: "all", label: "Todos los estados" },
+        { value: "all", label: copy.toolbar.allStatuses },
         { value: "active", label: CATEGORY_STATUS_LABELS.active },
         { value: "inactive", label: CATEGORY_STATUS_LABELS.inactive },
     ];

@@ -1,6 +1,7 @@
 import { Check } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { messages } from "@/messages";
 import { formatStepPosition, type ProductFormStep } from "@/features/products/libs/product-form";
 import { ICON_SIZE, ICON_STROKE } from "@/tokens";
 
@@ -47,7 +48,7 @@ export default function ProductFormStepper({
 }: ProductFormStepperProps) {
     return (
         <nav
-            aria-label="Progreso del alta de producto"
+            aria-label={messages.products.create.stepperLabel}
             className={cn(stepperVariants(), className)}
         >
             <ol className={stepperListVariants()}>

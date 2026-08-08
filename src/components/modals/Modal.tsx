@@ -4,6 +4,7 @@ import { Dialog } from "@base-ui/react/dialog";
 
 import type { ModalProps } from "@/interfaces";
 import { cn } from "@/lib/utils";
+import { messages } from "@/messages";
 import { CONTROL_SIZE, ICON_STROKE_BY_SIZE, ICON_TOKENS } from "@/tokens";
 
 import {
@@ -42,7 +43,7 @@ export default function Modal({
     description,
     size,
     initialFocus,
-    closeLabel = "Cerrar",
+    closeLabel = messages.components.modal.close,
     disableDismiss = false,
     footer,
     children,

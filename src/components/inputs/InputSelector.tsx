@@ -3,6 +3,7 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
+import { messages } from "@/messages"
 import {
     Combobox,
     ComboboxContent,
@@ -53,7 +54,7 @@ export function InputSelector({
     onBlur,
     label,
     required = false,
-    placeholder = "Selecciona una opción",
+    placeholder = messages.components.inputSelector.placeholder,
     helperText,
     error = false,
     disabled = false,
@@ -61,7 +62,7 @@ export function InputSelector({
     clearable = false,
     leftIcon,
     leadingIcon,
-    emptyMessage = "Sin resultados",
+    emptyMessage = messages.components.inputSelector.empty,
     size = "md",
     fullWidth = true,
     name,

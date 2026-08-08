@@ -10,6 +10,7 @@ import { DATA_MENU, collectMenuUrls, getActiveMenuUrl } from "@/utils";
 import { useSidebarLayout } from "@/context";
 import { CONTROL_SIZE, ICON_TOKENS } from "@/tokens";
 import { cn } from "@/lib/utils";
+import { messages } from "@/messages";
 
 import SidebarGroup from "./SidebarGroup";
 import SidebarNavItem from "./SidebarNavItem";
@@ -96,7 +97,7 @@ export default function Sidebar() {
                 <div className={sidebarHeaderVariants({ rail: isRail })}>
                     <Link
                         href="/"
-                        aria-label="Vorea — ir al inicio"
+                        aria-label={messages.navigation.sidebar.home}
                         className={sidebarLogoVariants()}
                     >
                         <ICON_TOKENS.FLAME
@@ -107,7 +108,9 @@ export default function Sidebar() {
                         />
 
                         {!isRail && (
-                            <span className={sidebarWordmarkVariants()}>Vorea</span>
+                            <span className={sidebarWordmarkVariants()}>
+                                {messages.navigation.app.name}
+                            </span>
                         )}
                     </Link>
 
@@ -117,7 +120,7 @@ export default function Sidebar() {
                             <button
                                 type="button"
                                 onClick={toggleCollapsed}
-                                aria-label="Colapsar menú lateral"
+                                aria-label={messages.navigation.sidebar.collapse}
                                 className={cn(sidebarIconButtonVariants(), "hidden md:flex")}
                             >
                                 <ICON_TOKENS.PANEL_RIGHT_OPEN
@@ -130,7 +133,7 @@ export default function Sidebar() {
                             <button
                                 type="button"
                                 onClick={closeMobile}
-                                aria-label="Cerrar menú"
+                                aria-label={messages.navigation.sidebar.close}
                                 className={cn(sidebarIconButtonVariants(), "md:hidden")}
                             >
                                 <ICON_TOKENS.CLOSE
@@ -144,7 +147,7 @@ export default function Sidebar() {
 
                 {/* ── Navegación ─────────────────────────────────────────── */}
                 <nav
-                    aria-label="Navegación principal"
+                    aria-label={messages.navigation.sidebar.primaryNav}
                     className={sidebarNavVariants()}
                 >
                     <div className={sidebarSectionsVariants()}>
@@ -171,7 +174,7 @@ export default function Sidebar() {
                     <button
                         type="button"
                         onClick={toggleCollapsed}
-                        aria-label="Expandir menú lateral"
+                        aria-label={messages.navigation.sidebar.expand}
                         className={sidebarExpandButtonVariants()}
                     >
                         <ICON_TOKENS.PANEL_RIGHT_CLOSE

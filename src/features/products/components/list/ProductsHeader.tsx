@@ -9,6 +9,7 @@ import GenericButton from "@/components/buttons/GenericButton";
 import StatusBadge from "@/components/badges/StatusBadge";
 import { cn } from "@/lib/utils";
 import { formatProductCount } from "@/lib/products";
+import { messages } from "@/messages";
 import { ICON_TOKENS } from "@/tokens";
 
 import {
@@ -36,7 +37,9 @@ export default function ProductsHeader({
         <div className={cn(productsHeaderVariants(), className)}>
             <div className={productsHeaderTextVariants()}>
                 <div className={productsHeaderTitleRowVariants()}>
-                    <h1 className={productsHeaderTitleVariants()}>Productos</h1>
+                    <h1 className={productsHeaderTitleVariants()}>
+                        {messages.products.list.title}
+                    </h1>
 
                     <StatusBadge
                         size="xs"
@@ -47,15 +50,14 @@ export default function ProductsHeader({
                 </div>
 
                 <p className={productsHeaderDescriptionVariants()}>
-                    Gestiona la carta de tus sucursales y avisa al equipo cuando falte
-                    un insumo.
+                    {messages.products.list.description}
                 </p>
             </div>
 
             {/* Cuando exista el formulario, basta con navegar a su ruta desde
                 `onCreateProduct` para que el botón deje de ser un gancho. */}
             <GenericButton
-                label="Crear producto"
+                label={messages.products.list.createProduct}
                 startIcon={ICON_TOKENS.CREATE}
                 onClick={onCreateProduct}
                 className="shrink-0"
