@@ -1,6 +1,5 @@
 import { cva } from "class-variance-authority";
 
-import { genericButtonVariants } from "@/components/buttons/generic-button.style";
 import {
     DURATION_CLASS,
     SPACING_CLASS,
