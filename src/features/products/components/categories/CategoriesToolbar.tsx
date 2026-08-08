@@ -5,6 +5,7 @@ import LinkButton from "@/components/buttons/LinkButton";
 import { InputSelector } from "@/components/inputs/InputSelector";
 import { TextField } from "@/components/inputs/TextField";
 import { cn } from "@/lib/utils";
+import { formatMessage, messages } from "@/messages";
 
 import { ICON_TOKENS } from "@/tokens";
 
@@ -16,6 +17,10 @@ import {
     categoriesToolbarVariants,
 } from "./categories-toolbar.style";
 import { CATEGORY_STATUS_OPTIONS, CategoryStatusFilter, formatCategoryCount } from "../../libs";
+
+
+/** Lo que dice esta barra. Ver `@/messages`. */
+const COPY = messages.products.categories.toolbar;
 
 
 /**
@@ -67,8 +72,8 @@ export default function CategoriesToolbar({
                     onChange={onQueryChange}
                     clearable
                     leftIcon={<ICON_TOKENS.SEARCH aria-hidden="true" />}
-                    placeholder="Buscar por nombre o descripción"
-                    aria-label="Buscar categorías"
+                    placeholder={COPY.searchPlaceholder}
+                    aria-label={COPY.searchLabel}
                     className={categoriesToolbarSearchVariants()}
                 />
 
@@ -80,15 +85,15 @@ export default function CategoriesToolbar({
                     }
                     options={CATEGORY_STATUS_OPTIONS}
                     leftIcon={<ICON_TOKENS.FILTER aria-hidden="true" />}
-                    placeholder="Todos los estados"
-                    aria-label="Filtrar categorías por estado"
-                    emptyMessage="Ningún estado coincide"
+                    placeholder={COPY.allStatuses}
+                    aria-label={COPY.filterLabel}
+                    emptyMessage={COPY.filterEmpty}
                     className={categoriesToolbarFilterVariants()}
                 />
 
                 <GenericButton
                     type="button"
-                    label="Crear categoría"
+                    label={COPY.create}
                     startIcon={ICON_TOKENS.CREATE}
                     onClick={onCreateCategory}
                     className={categoriesToolbarActionVariants()}
@@ -100,12 +105,15 @@ export default function CategoriesToolbar({
             {hasFilters && (
                 <p aria-live="polite" className={categoriesToolbarSummaryVariants()}>
                     <span className="tabular-nums">
-                        {formatCategoryCount(visibleCount)} de {totalCount}
+                        {formatMessage(COPY.summary, {
+                            visible: formatCategoryCount(visibleCount),
+                            total: totalCount,
+                        })}
                     </span>
 
                     <LinkButton
                         size="sm"
-                        label="Limpiar filtros"
+                        label={messages.common.actions.clearFilters}
                         onClick={onClearFilters}
                     />
                 </p>

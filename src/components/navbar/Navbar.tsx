@@ -7,6 +7,7 @@ import { Bell, MapPin, Menu, X } from "lucide-react";
 import { useSidebarLayout } from "@/context";
 import type { NavbarProps } from "@/interfaces";
 import { cn } from "@/lib/utils";
+import { messages } from "@/messages";
 import { ICON_SIZE, ICON_STROKE } from "@/tokens";
 
 import { InputSelector } from "../inputs/InputSelector";
@@ -68,13 +69,16 @@ export default function Navbar({
 
     return (
         <header className={navbarVariants()}>
-            <nav aria-label="Barra superior" className={navbarInnerVariants()}>
+            <nav
+                aria-label={messages.navigation.navbar.label}
+                className={navbarInnerVariants()}
+            >
                 {/* ─── Izquierda: menú móvil + selector ─────────────────────── */}
                 <div className={cn(navbarSectionVariants(), "min-w-0")}>
                     <button
                         type="button"
                         onClick={toggleMobileOpen}
-                        aria-label="Abrir menú"
+                        aria-label={messages.navigation.navbar.openMenu}
                         className={cn(navbarIconButtonVariants(), "md:hidden")}
                     >
                         <Menu
@@ -88,7 +92,7 @@ export default function Navbar({
                     <div className={navbarBranchSelectorVariants()}>
                         <InputSelector
                             leftIcon={<MapPin strokeWidth={CHROME_ICON_STROKE} />}
-                            placeholder="Selecionar sucursal"
+                            placeholder={messages.navigation.navbar.branchPlaceholder}
                             options={sucursales}
                             size="sm"
                             className="w-full"
@@ -102,7 +106,7 @@ export default function Navbar({
                     <button
                         type="button"
                         onClick={() => setIsSelectorOpen(true)}
-                        aria-label="Seleccionar sucursal"
+                        aria-label={messages.navigation.navbar.selectBranch}
                         aria-expanded={isSelectorOpen}
                         className={cn(navbarIconButtonVariants(), "sm:hidden")}
                     >
@@ -117,7 +121,7 @@ export default function Navbar({
                     <button
                         type="button"
                         onClick={() => console.log('Hola!')}
-                        aria-label="Ver notificaciones"
+                        aria-label={messages.navigation.navbar.notifications}
                         className={cn(navbarIconButtonVariants(), "relative")}
                     >
                         <Bell
@@ -166,7 +170,7 @@ export default function Navbar({
                         <div className="min-w-0 flex-1">
                             <InputSelector
                                 leftIcon={<MapPin strokeWidth={CHROME_ICON_STROKE} />}
-                                placeholder="Selecionar sucursal"
+                                placeholder={messages.navigation.navbar.branchPlaceholder}
                                 options={sucursales}
                                 size="sm"
                             />
@@ -176,7 +180,7 @@ export default function Navbar({
                             type="button"
                             autoFocus
                             onClick={() => setIsSelectorOpen(false)}
-                            aria-label="Cerrar selector de sucursal"
+                            aria-label={messages.navigation.navbar.closeBranchSelector}
                             className={navbarIconButtonVariants()}
                         >
                             <X

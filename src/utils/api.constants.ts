@@ -91,17 +91,11 @@ export const HTTP_ERROR_MESSAGE_KEYS = [
 ] as const;
 
 
-/**
- * Mensajes de reserva para los fallos que el backend no puede explicar.
- *
- * Cuando no hubo respuesta no hay cuerpo del que sacar un texto, así que lo
- * pone la aplicación. Están redactados en términos de lo que le pasa a quien
- * lee —no "ERR_CONNECTION_REFUSED"— y sugieren la acción siguiente.
- */
-export const HTTP_ERROR_COPY = {
-    network: "No se pudo conectar con el servidor. Revisa tu conexión.",
-    timeout: "El servidor tardó demasiado en responder. Vuelve a intentarlo.",
-} as const;
+// Los mensajes de reserva para los fallos que el backend no puede explicar
+// —red caída, tiempo agotado— no están aquí: son texto de cara al usuario y
+// viven con el resto en `messages.errors.http`. Este archivo guarda números y
+// códigos, que es lo que gobierna *cómo* se habla con el backend, no lo que se
+// dice cuando la conversación falla.
 
 
 

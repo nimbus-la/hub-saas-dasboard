@@ -11,6 +11,10 @@
 import type { RegisterOptions } from "react-hook-form";
 
 import { PRODUCT_CATEGORIES } from "@/lib/products";
+import { formatMessage, messages } from "@/messages";
+
+/** Atajo al bloque del catálogo que da nombre a todo lo de este archivo. */
+const copy = messages.products.create;
 
 /* -------------------------------------------------------------------------- */
 /*  Valores del formulario                                                     */
@@ -67,22 +71,19 @@ export interface ProductFormStep {
 
 const BASICS_STEP: ProductFormStep = {
     id: "basics",
-    label: "Datos básicos",
-    hint: "Nombre, categoría e imagen",
+    ...copy.steps.basics,
     fields: ["name", "category", "description"],
 };
 
 const PRICING_STEP: ProductFormStep = {
     id: "pricing",
-    label: "Precio y disponibilidad",
-    hint: "Precio de venta y estado en la carta",
+    ...copy.steps.pricing,
     fields: [],
 };
 
 const RECIPE_STEP: ProductFormStep = {
     id: "recipe",
-    label: "Receta e insumos",
-    hint: "Ingredientes que componen el plato",
+    ...copy.steps.recipe,
     fields: [],
 };
 
@@ -117,7 +118,12 @@ export function getProductFormStep(index: number): ProductFormStep {
 
 /** `Paso 1 de 3` — para el resumen accesible y las pantallas estrechas. */
 export const formatStepPosition = (index: number): string =>
-    `Paso ${index + 1} de ${PRODUCT_FORM_STEP_COUNT}`;
+    formatMessage(copy.stepPosition, {
+        // Como texto y no como número: son posiciones, no cantidades, y pasarlas
+        // sin convertir las metería por el separador de miles.
+        current: String(index + 1),
+        total: String(PRODUCT_FORM_STEP_COUNT),
+    });
 
 /* -------------------------------------------------------------------------- */
 /*  Reglas de validación                                                       */
@@ -159,26 +165,32 @@ type FieldRules<K extends keyof ProductFormValues> = RegisterOptions<
  */
 export const PRODUCT_FORM_RULES = {
     name: {
-        required: "Escribe el nombre con el que se venderá el producto.",
+        required: copy.validation.nameRequired,
         maxLength: {
             value: PRODUCT_NAME_LIMITS.max,
-            message: `El nombre no puede pasar de ${PRODUCT_NAME_LIMITS.max} caracteres.`,
+            message: formatMessage(copy.validation.nameMax, {
+                max: PRODUCT_NAME_LIMITS.max,
+            }),
         },
         // Se valida sobre el texto sin espacios de los extremos: tres espacios
         // seguidos cumplen cualquier `minLength` y no son un nombre.
         validate: (value: string) =>
             value.trim().length >= PRODUCT_NAME_LIMITS.min ||
-            `El nombre necesita al menos ${PRODUCT_NAME_LIMITS.min} caracteres.`,
+            formatMessage(copy.validation.nameMin, {
+                min: PRODUCT_NAME_LIMITS.min,
+            }),
     } satisfies FieldRules<"name">,
 
     category: {
-        required: "Elige la categoría en la que se agrupa dentro de la carta.",
+        required: copy.validation.categoryRequired,
     } satisfies FieldRules<"category">,
 
     description: {
         maxLength: {
             value: PRODUCT_DESCRIPTION_MAX,
-            message: `La descripción supera los ${PRODUCT_DESCRIPTION_MAX} caracteres.`,
+            message: formatMessage(copy.validation.descriptionMax, {
+                max: PRODUCT_DESCRIPTION_MAX,
+            }),
         },
     } satisfies FieldRules<"description">,
 } as const;
@@ -207,7 +219,7 @@ export const PRODUCT_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 export const PRODUCT_IMAGE_ACCEPT = PRODUCT_IMAGE_TYPES.join(",");
 
 /** `PNG, JPG o WEBP` — la misma lista, en prosa. */
-export const PRODUCT_IMAGE_FORMATS_LABEL = "PNG, JPG o WEBP";
+export const PRODUCT_IMAGE_FORMATS_LABEL = copy.image.formats;
 
 /** `4,2 MB` · `860 KB` — peso del archivo elegido. */
 export function formatFileSize(bytes: number): string {
@@ -236,11 +248,16 @@ export function validateProductImage(file: File): string | null {
     );
 
     if (!isAllowedType) {
-        return `Ese formato no se puede publicar. Sube la foto en ${PRODUCT_IMAGE_FORMATS_LABEL}.`;
+        return formatMessage(copy.image.invalidType, {
+            formats: PRODUCT_IMAGE_FORMATS_LABEL,
+        });
     }
 
     if (file.size > PRODUCT_IMAGE_MAX_BYTES) {
-        return `La foto pesa ${formatFileSize(file.size)} y el máximo son ${formatFileSize(PRODUCT_IMAGE_MAX_BYTES)}. Redúcela e inténtalo de nuevo.`;
+        return formatMessage(copy.image.tooLarge, {
+            size: formatFileSize(file.size),
+            max: formatFileSize(PRODUCT_IMAGE_MAX_BYTES),
+        });
     }
 
     return null;

@@ -6,6 +6,7 @@
 
 import GenericButton from "@/components/buttons/GenericButton";
 import { cn } from "@/lib/utils";
+import { formatMessage, messages } from "@/messages";
 import { ICON_SIZE, ICON_STROKE_BY_SIZE, ICON_TOKENS } from "@/tokens";
 
 import {
@@ -15,6 +16,9 @@ import {
     productsEmptyStateTitleVariants,
     productsEmptyStateVariants,
 } from "./products-empty-state.style";
+
+/** Lo que dice el callejón sin salida. Ver `@/messages`. */
+const COPY = messages.products.list.empty;
 
 interface ProductsEmptyStateProps {
     /** Término buscado — se cita para que se vea si hubo una errata. */
@@ -43,13 +47,13 @@ export default function ProductsEmptyState({
 
             <div className={productsEmptyStateTextVariants()}>
                 <p className={productsEmptyStateTitleVariants()}>
-                    No encontramos productos
+                    {COPY.title}
                 </p>
 
                 <p className={productsEmptyStateMessageVariants()}>
                     {trimmedQuery
-                        ? `Ningún producto de esta categoría coincide con “${trimmedQuery}”. Revisa la escritura o prueba con otro término.`
-                        : "Esta categoría todavía no tiene productos en la carta."}
+                        ? formatMessage(COPY.withQuery, { query: trimmedQuery })
+                        : COPY.withoutQuery}
                 </p>
             </div>
 
@@ -59,7 +63,7 @@ export default function ProductsEmptyState({
             <GenericButton
                 variant="primary"
                 size="md"
-                label="Limpiar filtros"
+                label={messages.common.actions.clearFilters}
                 onClick={onClearFilters}
             />
         </div>

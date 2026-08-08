@@ -11,6 +11,7 @@ directorio.
 | [`design-tokens.md`](./design-tokens.md) | Qué valores existen y cómo se llaman: escala, espaciado, radios, tipografía, iconos, capas, movimiento |
 | [`tailwind.md`](./tailwind.md) | Cómo está montado Tailwind aquí, por qué unos tokens viven en CSS y otros en TS, y las trampas que ya costaron un rato |
 | [`components.md`](./components.md) | Cómo se construye un componente con el sistema, con ejemplos completos |
+| [`messages.md`](./messages.md) | Dónde vive cada texto de la interfaz, cómo se interpolan datos y plurales, y qué falta para añadir un idioma |
 
 Empieza por esta página. Cubre el 90% del día a día en cinco minutos.
 
@@ -34,13 +35,17 @@ src/style/style.css   →  VALORES de color, tipografía, radios y sombras
 
 src/tokens/           →  RECETAS (qué token usa cada componente),
                          el espaciado y los números que JavaScript necesita
+
+src/messages/         →  TEXTOS: todo lo que la interfaz dice, por módulo
+                         y tipado para que un idioma nuevo no pueda quedarse
+                         a medias
 ```
 
 La regla para decidir dónde va algo nuevo: **¿lo necesita JavaScript como
 número?** Si no, va solo al CSS. Los detalles y la única excepción —el
 espaciado— están en [`tailwind.md`](./tailwind.md).
 
-### Las cinco reglas
+### Las seis reglas
 
 1. **No inventes valores.** Si algo "necesita" 18px de separación, casi siempre
    le tocan 16 o 24. La escala está en [`design-tokens.md`](./design-tokens.md).
@@ -52,6 +57,9 @@ espaciado— están en [`tailwind.md`](./tailwind.md).
    `CONTROL_SIZE.md.heightClass`, no `"h-10"`.
 5. **La tipografía es un token, no dos decisiones.** `text-body-md` fija tamaño,
    interlineado, grosor y tracking a la vez. No los elijas por separado.
+6. **Los textos no se escriben en el componente.** Salen de `@/messages`, igual
+   que los tamaños salen de `@/tokens`. Los detalles están en
+   [`messages.md`](./messages.md).
 
 ### Arranque rápido
 

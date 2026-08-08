@@ -5,10 +5,10 @@ import ProductThumbnail from "@/components/cards/ProductThumbnail";
 import GenericButton from "@/components/buttons/GenericButton";
 import { formatCurrency } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { formatMessage, messages } from "@/messages";
 import {
     formatIngredients,
     isProductUnavailable,
-    PRODUCT_STATUS_LABELS,
     PRODUCT_STATUS_TONES,
 } from "@/lib/products";
 import type { ProductCardProps } from "@/interfaces";
@@ -45,6 +45,13 @@ export default function ProductCard({
 
     const hasActions = Boolean(onEdit || onDelete);
 
+    // La misma frase hace de etiqueta accesible y de `title`: el botón no lleva
+    // texto visible, así que ambas tienen que decir lo mismo.
+    const deleteLabel = formatMessage(
+        messages.components.productCard.deleteProduct,
+        { name: product.name }
+    );
+
     // Id derivado del producto en lugar de `useId`: así la tarjeta sigue
     // sirviendo en un Server Component.
     const titleId = `product-card-${product.id}-title`;
@@ -66,7 +73,7 @@ export default function ProductCard({
                     explica por qué la tarjeta está apagada. */}
                 <StatusBadge
                     tone={PRODUCT_STATUS_TONES[product.status]}
-                    label={PRODUCT_STATUS_LABELS[product.status]}
+                    label={messages.products.status[product.status]}
                     className={productCardBadgeVariants()}
                 />
             </div>
@@ -95,7 +102,9 @@ export default function ProductCard({
                     </span>
 
                     <span className={productCardPriceVariants()}>
-                        <span className="sr-only">Precio: </span>
+                        <span className="sr-only">
+                            {messages.components.productCard.pricePrefix}
+                        </span>
                         {formatCurrency(product.price)}
                     </span>
                 </div>
@@ -117,7 +126,9 @@ export default function ProductCard({
                         {/* El icono no se anuncia; sin este prefijo la nota
                             llegaría al lector de pantalla sin decir qué es. */}
                         <span className="min-w-0 flex-1">
-                            <span className="sr-only">Alerta: </span>
+                            <span className="sr-only">
+                                {messages.components.productCard.alertPrefix}
+                            </span>
                             {product.alert}
                         </span>
                     </p>
@@ -131,12 +142,15 @@ export default function ProductCard({
                         <GenericButton
                             variant="secondary"
                             fullWidth
-                            label="Editar"
+                            label={messages.components.productCard.edit}
                             startIcon={Pencil}
                             // El nombre completo en la etiqueta accesible: veinte
                             // botones "Editar" seguidos no distinguen nada. Empieza
                             // por el texto visible (WCAG 2.5.3).
-                            aria-label={`Editar ${product.name}`}
+                            aria-label={formatMessage(
+                                messages.components.productCard.editProduct,
+                                { name: product.name }
+                            )}
                             onClick={() => onEdit(product)}
                             className="border border-neutral-300 text-neutral-700"
                         />
@@ -148,8 +162,8 @@ export default function ProductCard({
                             icon={Trash2}
                             // Sin etiqueta visible por espacio, pero el destructivo
                             // se separa del primario por color y posición.
-                            aria-label={`Eliminar ${product.name}`}
-                            title={`Eliminar ${product.name}`}
+                            aria-label={deleteLabel}
+                            title={deleteLabel}
                             onClick={() => onDelete(product)}
                         />
                     )}

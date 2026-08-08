@@ -8,7 +8,7 @@
 // origen remoto hay que declararlo en `images.remotePatterns` de
 // next.config.ts (allí se explica cómo).
 
-import { formatNumber } from "@/lib/format";
+import { formatPlural, messages } from "@/messages";
 import type { BadgeTone } from "@/interfaces";
 
 /**
@@ -50,14 +50,9 @@ export interface Product {
 
 // ── Presentación de los estados ─────────────────────────────────────────────
 // El tono se resuelve aquí (no en la tarjeta) para que cualquier vista que
-// muestre un producto — tarjeta, tabla o detalle — pinte el mismo color.
-
-export const PRODUCT_STATUS_LABELS: Record<ProductStatus, string> = {
-    disponible: "Disponible",
-    "stock-bajo": "Stock bajo",
-    "no-disponible": "No disponible",
-    inactivo: "Inactivo",
-};
+// muestre un producto — tarjeta, tabla o detalle — pinte el mismo color. El
+// rótulo sale de `messages.products.status`, que usa estos mismos valores como
+// claves.
 
 export const PRODUCT_STATUS_TONES: Record<ProductStatus, BadgeTone> = {
     disponible: "success",
@@ -146,7 +141,7 @@ export function getProducts(): Product[] {
 
 /** `1 producto` · `22 productos` */
 export const formatProductCount = (count: number): string =>
-    `${formatNumber(count)} ${count === 1 ? "producto" : "productos"}`;
+    formatPlural(messages.products.count, count);
 
 /**
  * Palabras que no aportan identidad a unas iniciales.
@@ -186,11 +181,8 @@ export function getProductInitials(name: string): string {
 }
 
 /** `Sin ingredientes` · `1 ingrediente` · `9 ingredientes` */
-export const formatIngredients = (count: number): string => {
-    if (count === 0) return "Sin ingredientes";
-
-    return `${formatNumber(count)} ${count === 1 ? "ingrediente" : "ingredientes"}`;
-};
+export const formatIngredients = (count: number): string =>
+    formatPlural(messages.products.ingredients, count);
 
 /**
  * Filtra por nombre y categoría.

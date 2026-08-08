@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+
+import { messages } from "@/messages";
 import { connection } from "next/server";
 import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 
@@ -7,10 +9,7 @@ import { categoriesQueryOptions } from "@/features/products/services/categories.
 import { httpClient } from "@/lib/http";
 import { getQueryClient } from "@/lib/query/query-client";
 
-export const metadata: Metadata = {
-    title: "Categorías · Vorea",
-    description: "Secciones en las que se agrupa la carta de tus sucursales.",
-};
+export const metadata: Metadata = messages.products.metadata.categories;
 
 export default async function CategoriesPage() {
     /*

@@ -11,6 +11,7 @@ import {
     CATEGORY_MODAL_COPY,
 } from "@/features/products/libs/category-form";
 import type { Category, CategoryFormValues } from "@/features/products/interfaces";
+import { messages } from "@/messages";
 
 import {
     categoryFormModalErrorVariants,
@@ -38,17 +39,8 @@ import {
 /** Une el `<form>` del cuerpo con su botón de envío, que vive en el pie. */
 const FORM_ID = "category-form";
 
-const COPY = {
-    cancel: "Cancelar",
-    nameLabel: "Nombre",
-    namePlaceholder: "Ej. Bebidas calientes",
-    nameHelper: "Así aparecerá como sección de la carta.",
-    descriptionLabel: "Descripción",
-    descriptionPlaceholder: "Ej. Cafés, tés e infusiones preparados al momento.",
-    descriptionHelper: "Opcional. Una frase de apoyo bajo el nombre de la sección.",
-    activeLabel: "Categoría activa",
-    closeLabel: "Cerrar el formulario de categoría",
-} as const;
+/** Lo que dice este modal. Ver `@/messages`. */
+const COPY = messages.products.categories.form;
 
 
 interface CategoryFormModalProps {
@@ -124,7 +116,7 @@ export default function CategoryFormModal({
             description={copy.description}
             size="lg"
             initialFocus={nameFieldRef}
-            closeLabel={COPY.closeLabel}
+            closeLabel={COPY.close}
             // Con cambios sin guardar, un clic fuera tira el trabajo. `Escape`,
             // la equis y "Cancelar" siguen cerrando: quitar también esas tres
             // dejaría el modal sin salida por teclado.
@@ -135,7 +127,7 @@ export default function CategoryFormModal({
                     <GenericButton
                         type="button"
                         variant="ghost"
-                        label={COPY.cancel}
+                        label={messages.common.actions.cancel}
                         onClick={() => onOpenChange(false)}
                         className="border border-neutral-300"
                     />
@@ -179,11 +171,11 @@ export default function CategoryFormModal({
                                 field.ref(node);
                                 nameFieldRef.current = node;
                             }}
-                            label={COPY.nameLabel}
+                            label={COPY.name.label}
                             required
                             error={fieldState.error?.message ?? false}
-                            placeholder={COPY.namePlaceholder}
-                            helperText={COPY.nameHelper}
+                            placeholder={COPY.name.placeholder}
+                            helperText={COPY.name.helper}
                             autoComplete="off"
                         />
                     )}
@@ -196,9 +188,9 @@ export default function CategoryFormModal({
                     render={({ field, fieldState }) => (
                         <TextAreaField
                             {...field}
-                            label={COPY.descriptionLabel}
+                            label={COPY.description.label}
                             error={fieldState.error?.message ?? false}
-                            placeholder={COPY.descriptionPlaceholder}
+                            placeholder={COPY.description.placeholder}
                             rows={3}
                         />
                     )}
