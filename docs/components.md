@@ -323,6 +323,57 @@ props y tiene un solo formato, así que esas variantes dejan de hacer falta. La
 regla que salió de ahí: **si la decisión ya está tomada, tómala en el
 componente y no en el selector.**
 
+**Dos ejes de color solo se cruzan donde hace falta.** El `Alert` tiene
+`variant` —tintada o blanca— y `tone` —qué significa—, y el reflejo es escribir
+las diez combinaciones. No: `variant` decide la superficie, `tone` decide el
+icono y la barra de cuenta atrás, y solo se cruzan en la tintada, que es la
+única donde el tono pinta el fondo. Cinco `compoundVariants` en vez de diez, y
+el día que entre una tercera superficie no hay que repintar los cinco tonos
+otra vez. La pregunta que lo resuelve es **qué parte cambia con cada eje**,
+no cuántas combinaciones hay.
+
+**Sobre un fondo tintado, el texto va a `-darker`.** Es la medida, no el gusto:
+`-dark` sobre el `-lighter` de su propia familia se queda en 3,7:1 —el verde y
+el ámbar son los que peor caen— y un párrafo necesita 4,5:1. En `-darker` la
+peor pareja de las cinco da 6,9:1. Y por eso el título y la descripción del
+aviso comparten color y se distinguen por grosor: bajarle la opacidad al
+párrafo para apagarlo lo devuelve justo por debajo del umbral. La familia
+entera acaba usando tres tonos con un papel fijo: `-lighter` el fondo, `-light`
+el relleno del medallón, `-darker` todo lo que hay que leer. El `-dark` se
+queda para la equis, que es un control y no un texto.
+
+**Un icono puede ser el medallón.** El aviso no monta un círculo de color con
+un glifo dentro —que es lo que hace el diálogo de confirmación—: dibuja el
+propio icono de estado a 40px, relleno en `-light` y perfilado en `-darker`.
+Sale gratis lo que de la otra forma habría que construir: **cada tono trae su
+silueta** —círculo, triángulo, octógono—, y eso es lo que distingue un error de
+una confirmación sin depender del color.
+
+Con dos avisos: el tamaño sale de `CONTROL_SIZE` y no de `ICON_SIZE`, porque la
+escala de iconos se corta en 24px a propósito —un icono acompaña a un texto y
+esto no acompaña a nada—. Y el relleno **no** se puede aplicar al icono entero:
+lucide no garantiza que el contorno sea el primer `path` del SVG, así que en
+`OctagonX` el octógono se pinta encima de una de las aspas y el aspa
+desaparece. Se dibuja dos veces —abajo la silueta con el trazo a cero, arriba
+el dibujo completo sin relleno— y el orden de los `path` deja de importar. Eso
+solo se ve mirando la pantalla: compila igual y el icono sale "casi" bien.
+
+**Un componente que se desmonta solo necesita `key`.** El aviso se cierra —por
+la equis o por temporizador—, termina su animación de salida y se pinta a sí
+mismo como nada. Si quien lo muestra vuelve a renderizar el mismo elemento, no
+pasa nada: React reutiliza la instancia cerrada y el segundo aviso no llega a
+verse. Con una identidad nueva —el `id` de una lista, un contador— se monta de
+verdad. Es la única aspereza de que el componente controle su propio ciclo, y
+compensa: la alternativa es que cada pantalla que quiera un aviso monte también
+el `useState` que lo esconde.
+
+**Pausar es guardar lo que queda, no reiniciar.** El temporizador del aviso se
+para con el puntero encima y sigue por donde iba al salir. Rearmarlo con los
+cinco segundos completos es una línea más corta y está mal: un aviso por el que
+se pasa dos veces no se iría nunca. El resto vive en una `ref` porque cambia en
+la limpieza del efecto y no lo pinta nadie —la barra la anima el CSS, que se
+congela con `data-paused` en el mismo momento—.
+
 **El primitivo importa tanto como el estilo.** `Modal` se monta sobre
 `Dialog` y `ConfirmDialog` sobre `AlertDialog`, que es el mismo diálogo con una
 diferencia: la alerta no se cierra al pulsar fuera. Un clic despistado no puede

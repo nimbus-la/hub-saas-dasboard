@@ -40,6 +40,10 @@ export type { ColumnAlign } from '../interfaces/data-table.types';
 // los importaba desde este barril.
 export type { DataTableProps } from '../interfaces/components/tables.interfaces';
 
+// ── Avisos ──────────────────────────────────────────────────────────────────
+export { default as Alert } from './alerts/Alert';
+export * from './alerts/alert.style';
+
 // ── Insignias ───────────────────────────────────────────────────────────────
 export { default as StatusBadge } from './badges/StatusBadge';
 export { statusBadgeVariants } from './badges/status-badge.style';
