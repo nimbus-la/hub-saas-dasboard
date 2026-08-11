@@ -4,6 +4,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import "@/style/style.css";
 import { HttpClientProvider, QueryProvider, SidebarLayoutProvider } from "@/context";
 import { DEFAULT_LOCALE, messages } from "@/messages";
+import AlertToaster from "@/components/alerts/AlertToaster";
 import AppShell from "@/components/layout/AppShell";
 import { cn } from "@/lib/utils";
 
@@ -31,14 +32,6 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body>
-        {/*
-          Orden de los proveedores, de fuera a dentro:
-
-          1. `HttpClientProvider` — no depende de nadie y todo depende de él.
-          2. `QueryProvider`      — sus hooks resuelven el cliente HTTP del
-                                    proveedor anterior.
-          3. `SidebarLayoutProvider` — estado de interfaz, ajeno a los datos.
-        */}
         <HttpClientProvider>
           <QueryProvider>
             <SidebarLayoutProvider>
@@ -46,6 +39,8 @@ export default function RootLayout({
                 {children}
               </AppShell>
             </SidebarLayoutProvider>
+
+            <AlertToaster />
           </QueryProvider>
         </HttpClientProvider>
       </body>

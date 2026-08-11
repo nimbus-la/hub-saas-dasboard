@@ -1,12 +1,8 @@
-"use client";
-
-import * as React from "react";
-
 import type { AlertProps } from "@/interfaces";
-import { DURATION, ICON_SIZE, ICON_STROKE, ICON_STROKE_BY_SIZE, ICON_TOKENS } from "@/tokens";
-import { ALERT_DURATION, ASSERTIVE_TONES, DEFAULT_ICON, MEDIA_SIZE } from "@/utils";
-import { cn } from "@/lib/utils";
+import { ICON_SIZE, ICON_STROKE, ICON_STROKE_BY_SIZE, ICON_TOKENS } from "@/tokens";
+import { ASSERTIVE_TONES, DEFAULT_ICON, MEDIA_SIZE } from "@/utils";
 import { messages } from "@/messages";
+import { cn } from "@/lib/utils";
 
 import {
     alertActionsVariants,
@@ -28,23 +24,33 @@ import {
  *
  * El aviso del panel: icono de tono, título, descripción, acciones y la equis
  * para cerrarlo. Sirve dentro de una pantalla —un formulario que no se pudo
- * guardar, un listado que se quedó sin conexión— y también flotando como
- * notificación, cambiando `variant` a `outline`.
+ * guardar— y también flotando como notificación, cambiando `variant` a
+ * `outline`.
  *
- * Se cierra solo a los cinco segundos (`ALERT_DURATION`). El temporizador se
- * para mientras el puntero o el foco están encima y sigue por donde iba al
- * salir: si alguien se detuvo a leerlo, el aviso no se le va de debajo del
- * cursor, y si el aviso trae acciones, dan tiempo a pulsarse. Para los avisos
- * de los que el usuario tiene que hacerse cargo —un error de verdad— va
- * `duration={null}`, y entonces solo lo cierra la equis.
+ * **No tiene ciclo de vida.** No cuenta el tiempo, no se pausa y no se
+ * desmonta: pinta lo que le dan y avisa por `onClose` cuando alguien pulsa la
+ * equis. Quien lo monta es quien lo retira.
  *
- * El componente se desmonta solo al cerrarse; `onClose` es para que quien lo
- * mostró se entere, no para que desaparezca. Si se muestra desde una lista,
- * hay que darle `key`: sin ella React reutiliza la instancia cerrada y el
- * segundo aviso no llega a verse.
+ * Ese reparto es deliberado. En un aviso flotante el tiempo lo lleva sonner
+ * —que además pausa al pasar el ratón, apila, deja descartar deslizando y lo
+ * anuncia al lector de pantalla—, y duplicar aquí ese temporizador significaba
+ * dos relojes compitiendo por cerrar la misma caja. Dentro de una pantalla,
+ * sencillamente no hace falta: el error de un formulario no debe caducar.
+ *
+ * Lo único que queda del tiempo es la barra de `countdownMs`, y es sólo un
+ * dibujo: le pone cara a la cuenta que lleva otro, porque un aviso que
+ * desaparece sin previo aviso deja a quien lo estaba leyendo sin saber si se
+ * fue solo o lo cerró sin querer.
+ *
+ * Al no tener estado tampoco es un componente de cliente: dentro de una
+ * pantalla servida desde el servidor se pinta ahí, sin mandar nada al
+ * navegador. La directiva `"use client"` la pone quien le da comportamiento
+ * —`AlertToaster`, o la pantalla que le pasa un `onClose`—.
  *
  * Uso mínimo:
  *   <Alert tone="success" title="Categoría creada" />
+ *
+ * Para un aviso flotante no se usa directamente: `notify.success(…)`.
  */
 export default function Alert({
     title,
@@ -55,92 +61,29 @@ export default function Alert({
     icon,
     showIcon = true,
     actions,
-    duration = ALERT_DURATION,
+    countdownMs = null,
     dismissible = true,
     closeLabel = messages.components.alert.close,
-    pauseOnHover = true,
-    showProgress = true,
+    announce = true,
     onClose,
     className,
 }: AlertProps) {
     const Icon = icon ?? DEFAULT_ICON[tone];
 
-    const [phase, setPhase] = React.useState<"open" | "closing" | "closed">("open");
-    const [paused, setPaused] = React.useState(false);
-
-    /**
-     * Lo que le queda al temporizador.
-     * 
-     * Va en una `ref` y no en estado porque cambia en la limpieza del efecto y
-     * nadie lo pinta: la barra de cuenta atrás la anima el CSS, que se congela
-     * con `data-paused` en el mismo momento. Guardar el resto es lo que hace
-     * que pausar sea pausar y no reiniciar — si al salir el puntero volviera a
-     * empezar por los cinco segundos, un aviso al que se pasa por encima dos
-     * veces no se iría nunca.
-     */
-    const remainingRef = React.useRef(duration ?? 0);
-
-    React.useEffect(() => {
-        remainingRef.current = duration ?? 0;
-    }, [duration]);
-
-    const close = React.useCallback(() => {
-        setPhase((current) => (current === "open" ? "closing" : current));
-    }, []);
-
-
-    /**
-     * Temporizador
-     * Se rearma en cada pausa con el tiempo que quedaba. La limpieza descuenta
-     * lo consumido, así que el efecto es reentrante por construcción.
-     */
-    React.useEffect(() => {
-        if (duration === null || phase !== "open" || paused) return;
-
-        const startedAt = Date.now();
-        const timer = window.setTimeout(close, remainingRef.current);
-
-        return () => {
-            window.clearTimeout(timer);
-            remainingRef.current = Math.max(
-                0,
-                remainingRef.current - (Date.now() - startedAt)
-            );
-        };
-    }, [close, duration, paused, phase]);
-
-    /**
-     * Salida
-     * El desmontaje espera a que termine la animación; `onClose` se avisa una
-     * vez el aviso ya no está en pantalla, que es cuando de verdad se fue.
-     */
-    React.useEffect(() => {
-        if (phase !== "closing") return;
-
-        const timer = window.setTimeout(() => {
-            setPhase("closed");
-            onClose?.();
-        }, DURATION.fast);
-
-        return () => window.clearTimeout(timer);
-    }, [onClose, phase]);
-
-    if (phase === "closed") return null;
-
-    const autoDismiss = duration !== null;
-    const showCountdown = autoDismiss && showProgress && phase === "open";
+    // La barra sólo tiene sentido con una cuenta atrás de verdad detrás: a cero
+    // o en negativo se pintaría vacía desde el primer fotograma, que es decir
+    // "esto ya se fue" de algo que sigue en pantalla.
+    const showCountdown = countdownMs !== null && countdownMs > 0;
 
     return (
         <div
-            role={ASSERTIVE_TONES.includes(tone) ? "alert" : "status"}
-            data-closing={phase === "closing" ? "" : undefined}
-            onMouseEnter={pauseOnHover ? () => setPaused(true) : undefined}
-            onMouseLeave={pauseOnHover ? () => setPaused(false) : undefined}
-            // El foco para el temporizador siempre: quien llegó hasta aquí con
-            // el tabulador está usando el aviso, y `onFocus`/`onBlur` en React
-            // burbujean desde las acciones y desde la equis.
-            onFocus={() => setPaused(true)}
-            onBlur={() => setPaused(false)}
+            role={
+                announce
+                    ? ASSERTIVE_TONES.includes(tone)
+                        ? "alert"
+                        : "status"
+                    : undefined
+            }
             className={cn(
                 alertVariants({
                     variant,
@@ -189,7 +132,7 @@ export default function Alert({
             {dismissible && (
                 <button
                     type="button"
-                    onClick={close}
+                    onClick={onClose}
                     aria-label={closeLabel}
                     className={alertCloseVariants({ tone })}
                 >
@@ -204,11 +147,10 @@ export default function Alert({
             {showCountdown && (
                 <span
                     aria-hidden="true"
-                    data-paused={paused ? "" : undefined}
                     // La duración es un número en tiempo de ejecución: no hay
                     // clase que la exprese. Es la excepción documentada en el
                     // `@theme` de `--animate-countdown`.
-                    style={{ animationDuration: `${duration}ms` }}
+                    style={{ animationDuration: `${countdownMs}ms` }}
                     className={alertProgressVariants({ tone })}
                 />
             )}
