@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import type { VariantProps } from "class-variance-authority";
 import type { LucideIcon } from "lucide-react";
+import type { ToasterProps } from "sonner";
 
 import type { alertVariants } from "@/components/alerts/alert.style";
 
@@ -52,7 +53,8 @@ export interface AlertProps {
      *
      * `soft` para un aviso dentro de la pantalla —el tinte lo separa del
      * contenido sin sombra—; `outline` para el que flota por encima de otra
-     * cosa, donde el fondo blanco evita que se confunda con lo que tapa.
+     * cosa, donde el fondo blanco y la sombra evitan que se confunda con lo
+     * que tapa. Es la que usa `notify`.
      */
     variant?: AlertVariant;
 
@@ -82,21 +84,27 @@ export interface AlertProps {
      * Acciones del aviso: "Reintentar", "Deshacer", "Ver detalle".
      *
      * Van por props y no dentro de la descripción porque tienen sitio propio
-     * —sangradas bajo el texto— y porque un aviso que se cierra solo necesita
-     * saber que las tiene: mientras el puntero o el foco están encima, el
-     * temporizador se para para que dé tiempo a pulsarlas.
+     * —sangradas bajo el texto— y porque cambian la alineación del medallón,
+     * que con dos botones debajo deja de estar centrado.
+     *
+     * En un aviso flotante dan tiempo a pulsarse: sonner para su temporizador
+     * mientras el puntero está sobre la pila.
      */
     actions?: ReactNode;
 
     /**
-     * Cuánto dura el aviso en pantalla, en milisegundos.
+     * Cuánto va a durar el aviso en pantalla, en milisegundos, **para pintar
+     * la barra**.
      *
-     * Por defecto `ALERT_DURATION` (5s). `null` lo deja hasta que alguien lo
-     * cierre: es lo que hay que usar cuando el aviso explica un error del que
-     * el usuario tiene que hacerse cargo, porque un mensaje que se va solo
-     * antes de leerse no ha avisado de nada.
+     * No es un temporizador: el aviso no se cierra al llegar a cero. Es el
+     * número que necesita la animación de la barra para vaciarse al mismo
+     * ritmo que la cuenta que lleva otro —sonner—, y por eso quien pasa la
+     * duración a `notify` es quien pasa este mismo valor aquí.
+     *
+     * `null` —lo normal dentro de una pantalla— no pinta barra: un aviso que
+     * no caduca no tiene nada que contar hacia atrás.
      */
-    duration?: number | null;
+    countdownMs?: number | null;
 
     /** ¿Mostrar la equis de cierre? */
     dismissible?: boolean;
@@ -110,26 +118,84 @@ export interface AlertProps {
     closeLabel?: string;
 
     /**
-     * ¿Parar el temporizador con el puntero encima?
+     * ¿Anunciarlo al lector de pantalla?
      *
-     * El foco lo para siempre, aunque esto sea `false`: si alguien llegó con
-     * el tabulador hasta una acción del aviso, el aviso no puede irse debajo
-     * de su dedo.
+     * Por defecto sí: el aviso se pinta con `role="alert"` o `role="status"`
+     * según el tono, que es lo que hace que se lea sin que nadie mueva el
+     * foco hasta él.
+     *
+     * Va a `false` cuando el aviso ya nace dentro de una región viva ajena
+     * —la pila de sonner es un `aria-live`—, porque una región dentro de otra
+     * hace que el mismo texto se anuncie dos veces.
      */
-    pauseOnHover?: boolean;
-
-    /** ¿Pintar la barra de cuenta atrás? Solo se ve si el aviso se cierra solo. */
-    showProgress?: boolean;
+    announce?: boolean;
 
     /**
-     * Se llama cuando el aviso termina de cerrarse —por la equis o por
-     * temporizador—, ya con la animación de salida hecha.
+     * Se llama cuando alguien pulsa la equis.
      *
-     * El aviso se desmonta solo, así que esta prop no hace falta para que
-     * desaparezca: es para que quien lo mostró lo saque de su lista o libere
-     * lo que estuviera reservando.
+     * El aviso no se desmonta solo: quien lo monta es quien lo retira. Dentro
+     * de una pantalla eso significa borrar el estado que lo pintaba; en un
+     * aviso flotante lo resuelve `notify`, que aquí cuelga el `dismiss` de
+     * sonner.
      */
     onClose?: () => void;
 
     className?: string;
 }
+
+
+/**
+ * Ajustes de un aviso flotante — lo que se le pasa a `notify.success(…)`.
+ *
+ * Es el `AlertProps` sin lo que decide el propio `notify`: el tono lo pone el
+ * método que se llama, la superficie es siempre `outline` y la barra de cuenta
+ * atrás sale de `duration`, para no poder escribir un aviso cuya barra dure
+ * menos que él.
+ */
+export interface NotifyOptions
+    extends Pick<
+        AlertProps,
+        | "description"
+        | "actions"
+        | "icon"
+        | "showIcon"
+        | "size"
+        | "dismissible"
+        | "closeLabel"
+        | "className"
+    > {
+    /**
+     * Cuánto dura en pantalla, en milisegundos.
+     *
+     * Por defecto `ALERT_DURATION` (5s). `null` lo deja hasta que alguien lo
+     * cierre: es lo que hay que usar cuando el aviso explica un error del que
+     * el usuario tiene que hacerse cargo, porque un mensaje que se va solo
+     * antes de leerse no ha avisado de nada.
+     */
+    duration?: number | null;
+
+    /**
+     * Identificador del aviso.
+     *
+     * Repetirlo actualiza el que ya está en pantalla en vez de apilar otro
+     * igual: es lo que evita seis "Sin conexión" seguidos cuando lo que falla
+     * es la red y no una acción del usuario.
+     */
+    id?: string | number;
+
+    /** Se llama cuando el aviso se va, lo cierre la equis o el temporizador. */
+    onClose?: () => void;
+}
+
+
+/**
+ * Ajustes del contenedor de avisos flotantes.
+ *
+ * Sólo lo que una aplicación cambia de verdad. Lo demás —el tiempo, el ancho,
+ * la forma de cada aviso— lo fija `AlertToaster`, que para eso es la decisión
+ * del design system y no de la pantalla que lo monta.
+ */
+export type AlertToasterProps = Pick<
+    ToasterProps,
+    "position" | "expand" | "visibleToasts" | "offset" | "className"
+>;

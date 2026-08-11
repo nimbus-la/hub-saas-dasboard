@@ -40,9 +40,15 @@ export type { ColumnAlign } from '../interfaces/data-table.types';
 // los importaba desde este barril.
 export type { DataTableProps } from '../interfaces/components/tables.interfaces';
 
+
 // ── Avisos ──────────────────────────────────────────────────────────────────
+// `Alert` es la caja —sirve dentro de una pantalla—; `AlertToaster` es la pila
+// flotante, que se monta una sola vez en el layout raíz, y `notify` la forma de
+// hablarle desde cualquier sitio.
 export { default as Alert } from './alerts/Alert';
+export { default as AlertToaster, notify } from './alerts/AlertToaster';
 export * from './alerts/alert.style';
+
 
 // ── Insignias ───────────────────────────────────────────────────────────────
 export { default as StatusBadge } from './badges/StatusBadge';

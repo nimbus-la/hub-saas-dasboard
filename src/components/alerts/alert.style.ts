@@ -1,7 +1,7 @@
 import { cva } from "class-variance-authority";
 
 import {
-    DURATION_CLASS,
+    ELEVATION,
     SPACING_CLASS,
     SURFACE_SIZE,
     TYPOGRAPHY,
@@ -45,25 +45,17 @@ import {
  * `overflow-hidden` recorta la barra de cuenta atrás contra el radio de las
  * esquinas; sin él la barra sobresale por las dos inferiores.
  *
- * La entrada es un desvanecido con 4px de caída y la salida un desvanecido con
- * encogimiento, más corta que la entrada (150ms frente a 200ms): un elemento
- * que se va debe quitarse de en medio antes de que lo eche de menos el ojo. El
- * `motion-reduce:animate-none` deja las dos en un cambio seco cuando el
- * sistema pide menos movimiento.
+ * **Aquí no hay animación de entrada ni de salida**, y es la consecuencia
+ * directa de que el aviso no tenga ciclo de vida. Dentro de una pantalla
+ * aparece con lo que lo pinta —un formulario que acaba de fallar no necesita
+ * presentarse—; flotando, quien lo mueve es sonner, que lo desliza al entrar,
+ * lo reordena cuando llega el siguiente y lo saca al descartarlo deslizando.
+ * Un desvanecido propio encima de eso son dos animaciones sobre la misma caja
+ * peleándose por la opacidad, y se nota: el aviso parpadea al montarse.
  */
 export const alertVariants = cva(
     [
         "group/alert relative isolate flex w-full overflow-hidden border",
-
-        DURATION_CLASS.normal,
-        "animate-in fade-in-0 slide-in-from-top-1",
-        "data-closing:animate-out data-closing:fade-out-0 data-closing:zoom-out-95",
-        // El escalón `fast` de la receta, escrito literal: una clase con
-        // variante delante no se puede componer desde el token —Tailwind
-        // escanea el código fuente y `data-closing:` + `duration-150` nunca
-        // aparecen juntos en él—, así que la utilidad no se generaría.
-        "data-closing:duration-150",
-        "motion-reduce:animate-none",
     ],
     {
         variants: {
@@ -76,10 +68,20 @@ export const alertVariants = cva(
              * fondo blanco y el borde neutro lo despegan de lo que tape —sobre
              * una tabla de colores, un tinte suave se confunde con la fila que
              * hay debajo—.
+             *
+             * La sombra va con `outline` y no como eje aparte porque es la
+             * misma decisión dicha entera: la regla del sistema es que se
+             * separa con borde lo que está en la página y con sombra lo que
+             * flota por encima, y `outline` es exactamente lo segundo. El
+             * escalón es el de los menús y popovers, que es la altura a la que
+             * de verdad está un aviso flotante.
              */
             variant: {
                 soft: "",
-                outline: "border-neutral-200 bg-white text-neutral-800",
+                outline: [
+                    "border-neutral-200 bg-white text-neutral-800",
+                    ELEVATION.lg.class,
+                ],
             },
 
             /**
@@ -356,9 +358,18 @@ export const alertCloseVariants = cva(
  * antes de que se acabe.
  *
  * La duración la pone el componente en `style` —es un número en tiempo de
- * ejecución— y `origin-left` fija el punto por el que se vacía. Con el puntero
- * encima, `data-paused` la congela en el fotograma actual a la vez que se para
- * el temporizador.
+ * ejecución— y `origin-left` fija el punto por el que se vacía.
+ *
+ * La pausa se lee del padre. Sonner para los temporizadores de toda la pila
+ * mientras el puntero está encima y lo publica marcando cada aviso con
+ * `data-expanded`; engancharse a ese atributo es lo que mantiene la barra y la
+ * cuenta contando lo mismo. Hacerlo con estado propio —un `onMouseEnter` en el
+ * aviso— volvería a separarlos: el puntero sobre el aviso de abajo para el
+ * reloj de los tres y sólo congelaría una de las tres barras.
+ *
+ * Fuera de sonner nadie pone ese atributo, así que la barra simplemente corre
+ * hasta el final. Es lo correcto: sin temporizador que pausar, no hay nada que
+ * sincronizar.
  *
  * `motion-reduce:hidden` en lugar de `animate-none`: una barra que no se mueve
  * es una barra llena, y eso dice justo lo contrario de lo que está pasando.
@@ -367,7 +378,8 @@ export const alertCloseVariants = cva(
 export const alertProgressVariants = cva(
     [
         "absolute inset-x-0 bottom-0 h-0.5 origin-left",
-        "animate-countdown data-paused:animation-paused",
+        "animate-countdown",
+        "[[data-expanded=true]_&]:animation-paused",
         "motion-reduce:hidden",
     ],
     {
