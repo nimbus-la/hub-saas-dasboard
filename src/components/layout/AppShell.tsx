@@ -5,10 +5,17 @@ import { cx } from "class-variance-authority";
 import { useSidebarLayout } from "@/context";
 import Sidebar from "../sidebar/Sidebar";
 import Navbar from "../navbar/Navbar";
+import { usePathname } from "next/navigation";
 
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
     const { isCollapsed } = useSidebarLayout();
+
+     // El login no utiliza el layout del dashboard.
+    const pathname = usePathname();
+    if (pathname === "/login") {
+        return <>{children}</>;
+    }
 
     return (
         <div className="flex min-h-screen">
