@@ -5,6 +5,7 @@ import { AlertDialog } from "@base-ui/react/alert-dialog";
 import GenericButton from "@/components/buttons/GenericButton";
 import type { ConfirmDialogProps, ConfirmDialogTone } from "@/interfaces";
 import { cn } from "@/lib/utils";
+import { messages } from "@/messages";
 import { CONTROL_SIZE, ICON_STROKE, ICON_TOKENS } from "@/tokens";
 
 import {
@@ -70,7 +71,7 @@ export default function ConfirmDialog({
     title,
     description,
     confirmLabel,
-    cancelLabel = "Cancelar",
+    cancelLabel = messages.components.confirmDialog.cancel,
     onConfirm,
     icon,
     tone = "danger",

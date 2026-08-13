@@ -509,6 +509,25 @@ TRANSITION.elevation  // sombra al elevar una tarjeta
 Todas incluyen `motion-reduce:transition-none`. **Todo lo que se mueva debe
 respetar `prefers-reduced-motion`.**
 
+### Animaciones con nombre
+
+Declaradas en `@theme` como `--animate-*`, con sus `@keyframes` dentro del
+mismo bloque:
+
+| Utilidad | Qué hace | Duración |
+|---|---|---|
+| `animate-countdown` | Barra que se vacía de izquierda a derecha | La pone quien la usa |
+
+`animation-paused` (utilidad propia) la congela en el fotograma actual;
+`data-paused:animation-paused` es como la usa el aviso cuando el puntero se
+posa encima.
+
+Es la única animación sin duración en el token, y a propósito: el tiempo que
+dura un aviso es una decisión de producto que llega como número en ejecución
+(`ALERT_DURATION`, 5 s). Cuánto tiempo se deja algo a la vista no es lo mismo
+que cuánto tarda en moverse, y por eso no está en esta tabla — el escalón más
+largo de aquí son 500ms.
+
 Este es el único bloque que vive en los dos lados a la vez, y con motivo:
 framer-motion necesita la duración como número y la curva como string de
 cubic-bezier, cosas que no se pueden sacar de una clase.

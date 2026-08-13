@@ -4,6 +4,7 @@ import * as React from "react"
 import { Eye, EyeOff, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { messages } from "@/messages"
 import { FOCUS_RING } from "@/tokens"
 import {
     InputGroup,
@@ -188,7 +189,7 @@ export function TextField({
                         {showClear && (
                             <FieldButton
                                 size={size}
-                                aria-label="Limpiar campo"
+                                aria-label={messages.components.textField.clear}
                                 // `onMouseDown` con preventDefault evita el
                                 // parpadeo de perder y recuperar el foco.
                                 onMouseDown={(event) => event.preventDefault()}
@@ -203,7 +204,9 @@ export function TextField({
                                 size={size}
                                 disabled={disabled}
                                 aria-label={
-                                    revealed ? "Ocultar contraseña" : "Mostrar contraseña"
+                                    revealed
+                                        ? messages.components.textField.hidePassword
+                                        : messages.components.textField.showPassword
                                 }
                                 aria-pressed={revealed}
                                 onMouseDown={(event) => event.preventDefault()}

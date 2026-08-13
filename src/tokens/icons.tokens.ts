@@ -1,9 +1,12 @@
 import {
     ArrowLeft,
     ArrowRight,
+    CircleCheck,
     Home,
     ImageUp,
+    Info,
     ListFilter,
+    OctagonX,
     Package,
     PackageSearch,
     ClipboardList,
@@ -65,6 +68,20 @@ export const ICON_TOKENS = {
     NO_RESULTS: PackageSearch,
     /** Aviso de una acción irreversible. */
     WARNING: TriangleAlert,
+    /** Algo terminó bien: se guardó, se envió, se publicó. */
+    SUCCESS: CircleCheck,
+    /**
+     * Algo falló y hay que hacer algo al respecto.
+     *
+     * Octógono y aspa: la señal de stop. Los cuatro glifos de estado se
+     * eligieron para que **la silueta sola** distinga uno de otro —círculo,
+     * triángulo, octógono—, porque en el aviso el icono se dibuja a tamaño de
+     * medallón y es lo único que separa un error de una confirmación cuando el
+     * rojo y el verde se leen igual.
+     */
+    ERROR: OctagonX,
+    /** Dato de contexto, sin urgencia ni consecuencia. */
+    INFO: Info,
 
     /* ── Chrome ───────────────────────────────────────────────────────────── */
     PANEL_RIGHT_OPEN: PanelRightOpen,

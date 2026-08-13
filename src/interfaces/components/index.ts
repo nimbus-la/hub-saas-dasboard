@@ -8,6 +8,8 @@
  * punto central para importar todas las interfaces.
  */
 
+export * from "./alerts.interfaces";
+
 export * from "./avatar.interfaces";
 
 export * from "./badge.interfaces";

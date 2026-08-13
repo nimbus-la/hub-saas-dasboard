@@ -6,12 +6,8 @@ import StatusBadge from "@/components/badges/StatusBadge";
 import GenericButton from "@/components/buttons/GenericButton";
 import DataTable from "@/components/tables/DataTable";
 import { cn } from "@/lib/utils";
-import {
-    EMPTY_DESCRIPTION,
-    formatCategoryStatus,
-    getCategoryStatusTone,
-    type Category,
-} from "@/lib/categories";
+import { formatMessage, messages } from "@/messages";
+
 import { ICON_TOKENS } from "@/tokens";
 
 import {
@@ -23,6 +19,12 @@ import {
     categoriesTablePanelVariants,
 } from "./categories-table.style";
 import { formatDate } from "@/lib/format";
+import { Category } from "../../interfaces";
+import { EMPTY_DESCRIPTION, formatCategoryStatus, getCategoryStatusTone } from "../../libs";
+
+
+/** Lo que dice esta tabla. Ver `@/messages`. */
+const COPY = messages.products.categories.table;
 
 
 /**
@@ -41,7 +43,7 @@ import { formatDate } from "@/lib/format";
 const categoryColumns: ColumnDef<Category>[] = [
     {
         accessorKey: "name",
-        header: "Nombre",
+        header: COPY.name,
         meta: { headerClassName: "w-56", cellClassName: "w-56" },
         cell: ({ row }) => (
             <span className={categoriesTableNameVariants()}>
@@ -51,7 +53,7 @@ const categoryColumns: ColumnDef<Category>[] = [
     },
     {
         accessorKey: "description",
-        header: "Descripción",
+        header: COPY.description,
         // Sin ordenamiento: ordenar alfabéticamente un texto libre no responde
         // a ninguna pregunta que alguien se haga delante de esta tabla.
         enableSorting: false,
@@ -62,7 +64,7 @@ const categoryColumns: ColumnDef<Category>[] = [
                 return (
                     <span
                         className={categoriesTableEmptyDescriptionVariants()}
-                        aria-label="Sin descripción"
+                        aria-label={COPY.noDescription}
                     >
                         {EMPTY_DESCRIPTION}
                     </span>
@@ -83,25 +85,44 @@ const categoryColumns: ColumnDef<Category>[] = [
         },
     },
     {
-        accessorKey: "active",
-        header: "Estado",
+        accessorKey: "isActive",
+        header: COPY.status,
         meta: { headerClassName: "w-32", cellClassName: "w-32" },
         cell: ({ row }) => (
             <StatusBadge
-                tone={getCategoryStatusTone(row.original.active)}
-                label={formatCategoryStatus(row.original.active)}
+                tone={getCategoryStatusTone(row.original.isActive)}
+                label={formatCategoryStatus(row.original.isActive)}
             />
         ),
     },
     {
         accessorKey: "placedAt",
-        header: "Fecha de actualización",
+        header: COPY.updatedAt,
         meta: { headerClassName: "w-32", cellClassName: "w-32" },
-        cell: ({ row }) => (
-            <time dateTime={row.original.placedAt} className="tabular-nums">
-                {formatDate(row.original.placedAt)}
-            </time>
-        ),
+        cell: ({ row }) => {
+            const { placedAt } = row.original;
+
+            // Sin guarda esto revienta la tabla entera: `formatDate("")` acaba
+            // en `Intl.DateTimeFormat.format(Invalid Date)`, que lanza
+            // `RangeError`. Mientras el backend no publique la fecha, la
+            // ausencia se pinta igual que la de la descripción.
+            if (!placedAt) {
+                return (
+                    <span
+                        className={categoriesTableEmptyDescriptionVariants()}
+                        aria-label={COPY.noUpdatedAt}
+                    >
+                        {EMPTY_DESCRIPTION}
+                    </span>
+                );
+            }
+
+            return (
+                <time dateTime={placedAt} className="tabular-nums">
+                    {formatDate(placedAt)}
+                </time>
+            );
+        },
     },
 ];
 
@@ -141,8 +162,10 @@ export default function CategoriesTable({
                             variant="ghost"
                             size="sm"
                             icon={ICON_TOKENS.EDIT}
-                            aria-label={`Editar ${category.name}`}
-                            title="Editar"
+                            aria-label={formatMessage(COPY.editCategory, {
+                                name: category.name,
+                            })}
+                            title={COPY.edit}
                             onClick={() => onEditCategory(category)}
                         />
 
@@ -151,8 +174,10 @@ export default function CategoriesTable({
                             variant="danger"
                             size="sm"
                             icon={ICON_TOKENS.DELETE}
-                            aria-label={`Eliminar ${category.name}`}
-                            title="Eliminar"
+                            aria-label={formatMessage(COPY.deleteCategory, {
+                                name: category.name,
+                            })}
+                            title={COPY.delete}
                             onClick={() => onDeleteCategory(category)}
                             className={categoriesTableDeleteVariants()}
                         />

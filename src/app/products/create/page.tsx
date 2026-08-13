@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 
+import { messages } from "@/messages";
+
 import CreateProduct from "@/features/products/page/CreateProduct";
 
-export const metadata: Metadata = {
-    title: "Nuevo producto · Vorea",
-    description: "Añade un producto a la carta de tus sucursales.",
-};
+export const metadata: Metadata = messages.products.metadata.create;
 
 export default function CreateProductPage() {
     // La ruta no resuelve datos: el alta parte de un borrador vacío y las

@@ -4,6 +4,7 @@ import { Controller, type Control } from "react-hook-form";
 
 import { InputSelector, TextAreaField, TextField } from "@/components";
 import { cn } from "@/lib/utils";
+import { messages } from "@/messages";
 import {
     PRODUCT_CATEGORY_OPTIONS,
     PRODUCT_DESCRIPTION_MAX,
@@ -31,6 +32,9 @@ import {
  * campo que falla.
  */
 
+/** Lo que dice este paso. Ver `@/messages`. */
+const COPY = messages.products.create.basics;
+
 interface ProductBasicsStepProps {
     control: Control<ProductFormValues>;
     className?: string;
@@ -45,7 +49,7 @@ export default function ProductBasicsStep({
         // al grupo para quien navega con lector de pantalla. No se ve porque en
         // pantalla ese nombre ya lo da el indicador de la cabecera.
         <fieldset className={cn(productBasicsStepVariants(), className)}>
-            <legend className="sr-only">Datos básicos del producto</legend>
+            <legend className="sr-only">{COPY.legend}</legend>
 
             <div className={productBasicsGridVariants()}>
                 <Controller
@@ -55,12 +59,12 @@ export default function ProductBasicsStep({
                     render={({ field, fieldState }) => (
                         <TextField
                             {...field}
-                            label="Nombre del producto"
+                            label={COPY.name.label}
                             required
                             size="md"
                             error={fieldState.error?.message ?? false}
-                            placeholder="Ej. Hamburguesa doble BBQ"
-                            helperText="Así aparecerá en la carta y en la comanda de cocina."
+                            placeholder={COPY.name.placeholder}
+                            helperText={COPY.name.helper}
                             maxLength={PRODUCT_NAME_LIMITS.max}
                             showCount
                             autoComplete="off"
@@ -75,14 +79,14 @@ export default function ProductBasicsStep({
                     render={({ field, fieldState }) => (
                         <InputSelector
                             {...field}
-                            label="Categoría"
+                            label={COPY.category.label}
                             required
                             size="md"
                             options={PRODUCT_CATEGORY_OPTIONS}
                             error={fieldState.error?.message ?? false}
-                            placeholder="Selecciona una categoría"
-                            helperText="Define la sección de la carta en la que se agrupa."
-                            emptyMessage="Ninguna categoría coincide"
+                            placeholder={COPY.category.placeholder}
+                            helperText={COPY.category.helper}
+                            emptyMessage={COPY.category.empty}
                             clearable
                         />
                     )}
@@ -95,9 +99,9 @@ export default function ProductBasicsStep({
                     render={({ field, fieldState }) => (
                         <TextAreaField
                             {...field}
-                            label="Descripción"
+                            label={COPY.description.label}
                             error={fieldState.error?.message ?? false}
-                            placeholder="Ej. Doble carne de res a la parrilla, queso cheddar, cebolla caramelizada y salsa BBQ de la casa."
+                            placeholder={COPY.description.placeholder}
                             maxLength={PRODUCT_DESCRIPTION_MAX}
                             showCount
                             rows={4}

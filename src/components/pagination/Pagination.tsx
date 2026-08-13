@@ -18,6 +18,7 @@ import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { formatMessage, formatPlural, messages } from "@/messages";
 import type { PaginationProps } from "@/interfaces";
 import { CONTROL_SIZE, ICON_STROKE_BY_SIZE } from "@/tokens";
 
@@ -39,7 +40,21 @@ import {
 
 const DEFAULT_PAGE_SIZE_OPTIONS = [8, 12, 24] as const;
 
-const DEFAULT_ITEM_LABEL = { singular: "resultado", plural: "resultados" };
+const DEFAULT_ITEM_LABEL = messages.components.pagination.items;
+
+/**
+ * Los dos huecos del resumen que van resaltados.
+ *
+ * El resumen llega del catálogo como una sola frase —`Mostrando {range} de
+ * {total} {items}`— y se parte por estos huecos en lugar de concatenar trozos
+ * traducidos por separado. La diferencia importa: el orden de las piezas es
+ * cosa del idioma, y partir por los huecos lo respeta sin que este componente
+ * tenga que saber cuál va primero.
+ *
+ * El grupo de captura hace que `split` conserve los delimitadores, que es
+ * justo lo que hay que sustituir.
+ */
+const SUMMARY_SLOTS = /(\{range\}|\{total\})/;
 
 /** Máximo de casillas visibles antes de recurrir a los puntos suspensivos. */
 const MAX_VISIBLE_PAGES = 7;
@@ -70,31 +85,57 @@ export default function Pagination({
     const firstItem = totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1;
     const lastItem = Math.min(currentPage * pageSize, totalItems);
 
-    const noun = totalItems === 1 ? itemLabel.singular : itemLabel.plural;
+    const noun = formatPlural(itemLabel, totalItems);
     const pageItems = buildPageItems(currentPage, totalPages);
 
+    // La raya del rango es una raya corta (–), no un guión de teclado: separa
+    // dos cifras, no une dos palabras.
+    const range = `${firstItem}–${lastItem}`;
+    const summaryParts = messages.components.pagination.summary.split(SUMMARY_SLOTS);
+
     return (
-        <nav aria-label="Paginación" className={cn(paginationVariants(), className)}>
+        <nav
+            aria-label={messages.components.pagination.label}
+            className={cn(paginationVariants(), className)}
+        >
             {/* ── Resumen ────────────────────────────────────────────────── */}
             {/* `aria-live` anuncia el nuevo rango al cambiar de página sin
                 robar el foco del botón que acaba de pulsarse. */}
             <p aria-live="polite" className={paginationSummaryVariants()}>
-                Mostrando{" "}
-                <span className={paginationSummaryValueVariants()}>
-                    {firstItem}–{lastItem}
-                </span>{" "}
-                de{" "}
-                <span className={paginationSummaryValueVariants()}>
-                    {formatNumber(totalItems)}
-                </span>{" "}
-                {noun}
+                {summaryParts.map((part, index) => {
+                    if (part === "{range}") {
+                        return (
+                            <span
+                                key={index}
+                                className={paginationSummaryValueVariants()}
+                            >
+                                {range}
+                            </span>
+                        );
+                    }
+
+                    if (part === "{total}") {
+                        return (
+                            <span
+                                key={index}
+                                className={paginationSummaryValueVariants()}
+                            >
+                                {formatNumber(totalItems)}
+                            </span>
+                        );
+                    }
+
+                    // Lo que queda es texto de la frase, con el nombre de lo
+                    // que se lista todavía por rellenar.
+                    return formatMessage(part, { items: noun });
+                })}
             </p>
 
             <div className={paginationControlsVariants()}>
                 {/* ── Tamaño de página ───────────────────────────────────── */}
                 <div className={paginationPageSizeVariants()}>
                     <label htmlFor={pageSizeId} className={paginationLabelVariants()}>
-                        Por página
+                        {messages.components.pagination.pageSize}
                     </label>
 
                     <div className={paginationSelectWrapperVariants()}>
@@ -127,7 +168,7 @@ export default function Pagination({
                     <li>
                         <button
                             type="button"
-                            aria-label="Página anterior"
+                            aria-label={messages.components.pagination.previousPage}
                             disabled={currentPage === 1}
                             onClick={() => onPageChange(currentPage - 1)}
                             className={paginationArrowVariants()}
@@ -145,7 +186,10 @@ export default function Pagination({
                             <li key={item}>
                                 <button
                                     type="button"
-                                    aria-label={`Página ${item}`}
+                                    aria-label={formatMessage(
+                                        messages.components.pagination.page,
+                                        { page: String(item) }
+                                    )}
                                     aria-current={item === currentPage ? "page" : undefined}
                                     onClick={() => onPageChange(item)}
                                     className={paginationPageVariants({
@@ -171,7 +215,7 @@ export default function Pagination({
                     <li>
                         <button
                             type="button"
-                            aria-label="Página siguiente"
+                            aria-label={messages.components.pagination.nextPage}
                             disabled={currentPage === totalPages}
                             onClick={() => onPageChange(currentPage + 1)}
                             className={paginationArrowVariants()}

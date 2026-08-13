@@ -85,6 +85,7 @@ manejador. Llamarla durante el render rompería la hidratación.
 | `--radius-*` | `rounded-*` | 6 |
 | `--shadow-*` | `shadow-*` | 6 |
 | `--ease-*` | `ease-*` | 1 (`emphasized`) |
+| `--animate-*` | `animate-*` | 1 (`countdown`) |
 | `--breakpoint-*` | variantes `xs:` … | 1 (`xs`) |
 | `--font-*` | `font-sans` | 1 |
 
@@ -125,6 +126,17 @@ propiedades a través de variables con fallback:
    tailwind-merge se deriva de `TYPOGRAPHY`.
 
 **Un color:** solo el paso 1 (`--color-*`). No hay tokens de color en TS.
+
+**Una animación:** declara `--animate-x` en `@theme` y sus `@keyframes` **dentro
+del mismo bloque** —v4 solo emite los fotogramas de las animaciones que se
+usan—. Si la duración no se sabe hasta ejecución, déjala fuera de la variable y
+que la ponga quien la use por `style`; es lo que hace `--animate-countdown` con
+los cinco segundos del aviso.
+
+**Una utilidad que Tailwind no trae:** `@utility nombre { … }` a nivel raíz de
+`style.css`. Admite variantes como cualquier otra
+(`data-paused:animation-paused`), y es lo que evita escribirla como propiedad
+arbitraria en cada componente.
 
 **Un tamaño de componente:** añade la fila a la receta correspondiente de
 `components.tokens.ts`. El tipo `SizeMap<T>` no compila si te dejas un escalón.
@@ -199,6 +211,21 @@ const controlSize = (token: ControlSizeToken) => [
     token.paddingXClass,    // y Tailwind lo escanea allí
 ];
 ```
+
+**Y una variante delante no se puede pegar**, aunque las dos mitades existan:
+
+```ts
+// ❌ "duration-150" está escrito en motion.tokens.ts, pero
+//    "data-closing:duration-150" no está escrito en ninguna parte
+`data-closing:${DURATION_CLASS.fast}`
+
+// ✅ literal, con el escalón de la receta anotado al lado
+"data-closing:duration-150"
+```
+
+El escaneo busca la clase **entera**, con su prefijo. Es el mismo motivo por el
+que las clases de dentro de un slot (`[&_[data-slot=…]]:px-4`) van a mano en
+lugar de salir del token.
 
 ### 3. Lo que llega de shadcn hay que traducirlo
 

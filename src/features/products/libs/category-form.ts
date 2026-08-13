@@ -9,65 +9,12 @@
 
 import type { RegisterOptions } from "react-hook-form";
 
-import type { Category } from "@/lib/categories";
+import { formatMessage, messages } from "@/messages";
 
-/* -------------------------------------------------------------------------- */
-/*  Valores del formulario                                                     */
-/* -------------------------------------------------------------------------- */
+import { CategoryFormValues } from "../interfaces";
 
-/**
- * Lo que el formulario tiene en la mano en cada momento.
- *
- * `active` viaja siempre, también al crear: una categoría nueva nace activa —
- * nadie da de alta algo que no piensa ofrecer— y el interruptor solo aparece
- * al editar, que es cuando retirarla de la carta es una decisión de verdad.
- */
-export interface CategoryFormValues {
-    name: string;
-    description: string;
-    active: boolean;
-}
-
-export const EMPTY_CATEGORY_FORM_VALUES: CategoryFormValues = {
-    name: "",
-    description: "",
-    active: true,
-};
-
-/** Convierte una categoría guardada en los valores que edita el formulario. */
-export const toCategoryFormValues = (category: Category): CategoryFormValues => ({
-    name: category.name,
-    description: category.description ?? "",
-    active: category.active,
-});
-
-
-/** Lo que el formulario escribe de una categoría. El id y la fecha los pone la pantalla. */
-export type CategoryFormFields = Omit<Category, "id" | "placedAt">;
-
-
-/**
- * El camino de vuelta: de lo que se escribió a lo que se guarda.
- *
- * Recorta los extremos —un nombre con espacios delante se ordena antes que
- * todos los demás en la tabla y nadie entiende por qué— y, si la descripción
- * queda vacía, **la propiedad desaparece** en lugar de viajar como `""`.
- *
- * Esa distinción importa dos veces. En el tipo, porque
- * `exactOptionalPropertyTypes` no acepta `description: undefined` donde la
- * propiedad es opcional. Y en pantalla, porque la tabla decide si pinta su
- * guion de "sin descripción" preguntando por la ausencia, no por el texto
- * vacío.
- */
-export const toCategoryFields = (values: CategoryFormValues): CategoryFormFields => {
-    const description = values.description.trim();
-
-    return {
-        name: values.name.trim(),
-        active: values.active,
-        ...(description ? { description } : {}),
-    };
-};
+/** Atajo al bloque del catálogo que da nombre a todo lo de este archivo. */
+const copy = messages.products.categories;
 
 /* -------------------------------------------------------------------------- */
 /*  Reglas de validación                                                       */
@@ -101,29 +48,35 @@ type FieldRules<K extends keyof CategoryFormValues> = RegisterOptions<
  */
 export const CATEGORY_FORM_RULES = {
     name: {
-        required: "Escribe el nombre con el que aparecerá en la carta.",
+        required: copy.validation.nameRequired,
         maxLength: {
             value: CATEGORY_NAME_LIMITS.max,
-            message: `El nombre no puede pasar de ${CATEGORY_NAME_LIMITS.max} caracteres.`,
+            message: formatMessage(copy.validation.nameMax, {
+                max: CATEGORY_NAME_LIMITS.max,
+            }),
         },
         // Se valida sobre el texto sin espacios de los extremos: tres espacios
         // seguidos cumplen cualquier `minLength` y no son un nombre.
         validate: (value: string) =>
             value.trim().length >= CATEGORY_NAME_LIMITS.min ||
-            `El nombre necesita al menos ${CATEGORY_NAME_LIMITS.min} caracteres.`,
+            formatMessage(copy.validation.nameMin, {
+                min: CATEGORY_NAME_LIMITS.min,
+            }),
     } satisfies FieldRules<"name">,
 
     description: {
         maxLength: {
             value: CATEGORY_DESCRIPTION_MAX,
-            message: `La descripción supera los ${CATEGORY_DESCRIPTION_MAX} caracteres.`,
+            message: formatMessage(copy.validation.descriptionMax, {
+                max: CATEGORY_DESCRIPTION_MAX,
+            }),
         },
     } satisfies FieldRules<"description">,
 } as const;
 
 /** Mensaje del nombre repetido. Se compone aquí para no redactarlo dos veces. */
 export const duplicateCategoryNameMessage = (name: string): string =>
-    `Ya existe una categoría llamada "${name.trim()}". Usa otro nombre.`;
+    formatMessage(copy.validation.nameTaken, { name: name.trim() });
 
 /* -------------------------------------------------------------------------- */
 /*  Textos                                                                     */
@@ -137,24 +90,11 @@ export const duplicateCategoryNameMessage = (name: string): string =>
  * repetido cinco veces dentro del JSX.
  */
 export const CATEGORY_MODAL_COPY = {
-    create: {
-        title: "Nueva categoría",
-        description:
-            "Agrupa productos de la carta bajo un nombre. Podrás asignarle productos después.",
-        submit: "Crear categoría",
-    },
-    edit: {
-        title: "Editar categoría",
-        description:
-            "Cambia el nombre, la descripción o retírala de la carta sin perder sus productos.",
-        submit: "Guardar cambios",
-    },
+    create: copy.form.create,
+    edit: copy.form.edit,
 } as const;
 
 export type CategoryModalMode = keyof typeof CATEGORY_MODAL_COPY;
 
 /** Aviso del interruptor. Explica qué pasa con los productos al desactivar. */
-export const CATEGORY_ACTIVE_HINT = {
-    on: "Se muestra en la carta y en el filtro del catálogo.",
-    off: "Se oculta de la carta. Sus productos no se borran.",
-} as const;
+export const CATEGORY_ACTIVE_HINT = copy.form.activeHint;

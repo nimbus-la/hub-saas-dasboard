@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 
 import "@/style/style.css";
-import { SidebarLayoutProvider } from "@/context";
+import { HttpClientProvider, QueryProvider, SidebarLayoutProvider } from "@/context";
+import { DEFAULT_LOCALE, messages } from "@/messages";
+import AlertToaster from "@/components/alerts/AlertToaster";
 import AppShell from "@/components/layout/AppShell";
 import { cn } from "@/lib/utils";
 
@@ -14,8 +16,8 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Vorea",
-  description: "Panel de control para la gestión de sucursales, ventas e inventario.",
+  title: messages.navigation.app.name,
+  description: messages.navigation.app.description,
 };
 
 export default function RootLayout({
@@ -25,16 +27,22 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang={DEFAULT_LOCALE}
       className={cn("h-full", jakarta.variable, "font-sans")}
       suppressHydrationWarning
     >
       <body>
-        <SidebarLayoutProvider>
-          <AppShell>
-            {children}
-          </AppShell>
-        </SidebarLayoutProvider>
+        <HttpClientProvider>
+          <QueryProvider>
+            <SidebarLayoutProvider>
+              <AppShell>
+                {children}
+              </AppShell>
+            </SidebarLayoutProvider>
+
+            <AlertToaster />
+          </QueryProvider>
+        </HttpClientProvider>
       </body>
     </html>
   );

@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import GenericButton from "@/components/buttons/GenericButton";
 import PageHeader from "@/components/layout/PageHeader";
+import { messages } from "@/messages";
 import { ICON_TOKENS } from "@/tokens";
 import { PRODUCT_FORM_STEPS } from "@/features/products/libs/product-form";
 
@@ -27,13 +28,8 @@ import {
 /** Destino de la flecha de regreso y del botón de cancelar. */
 const PRODUCTS_LIST_HREF = "/products";
 
-const COPY = {
-    title: "Nuevo producto",
-    subtitle: "Completa los 3 pasos para publicar el producto. Nada se publicará hasta el último paso.",
-    backLabel: "Volver a la lista de productos",
-    requiredFields: "Los campos marcados con * son obligatorios.",
-    cannotSaveYet: "Podrás guardar el producto cuando los tres pasos estén disponibles.",
-} as const;
+/** Todo lo que dice esta pantalla. Ver `@/messages`. */
+const COPY = messages.products.create;
 
 
 /**
@@ -80,7 +76,7 @@ export default function CreateProduct() {
     const footerNote = isLastStep
         ? COPY.cannotSaveYet
         : step.fields.length > 0
-            ? COPY.requiredFields
+            ? messages.common.forms.requiredFields
             : null;
 
     return (
@@ -131,13 +127,13 @@ export default function CreateProduct() {
                                 href={PRODUCTS_LIST_HREF}
                                 className={createProductCancelVariants()}
                             >
-                                Cancelar
+                                {messages.common.actions.cancel}
                             </Link>
                         ) : (
                             <GenericButton
                                 type="button"
                                 variant="ghost"
-                                label="Atrás"
+                                label={messages.common.actions.back}
                                 startIcon={ICON_TOKENS.BACK}
                                 onClick={goToPreviousStep}
                             />
@@ -149,7 +145,11 @@ export default function CreateProduct() {
                         <GenericButton
                             type="submit"
                             variant="primary"
-                            label={isLastStep ? "Guardar producto" : "Continuar"}
+                            label={
+                                isLastStep
+                                    ? COPY.submit
+                                    : messages.common.actions.continue
+                            }
                             disabled={isLastStep}
                             {...(!isLastStep && { endIcon: ICON_TOKENS.NEXT })}
                         />

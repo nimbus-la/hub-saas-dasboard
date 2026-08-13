@@ -9,11 +9,12 @@ import {
     CATEGORY_ACTIVE_HINT,
     CATEGORY_FORM_RULES,
     CATEGORY_MODAL_COPY,
-    type CategoryFormValues,
 } from "@/features/products/libs/category-form";
-import type { Category } from "@/lib/categories";
+import type { Category, CategoryFormValues } from "@/features/products/interfaces";
+import { messages } from "@/messages";
 
 import {
+    categoryFormModalErrorVariants,
     categoryFormModalToggleVariants,
     categoryFormModalVariants,
 } from "./category-form-modal.style";
@@ -38,17 +39,8 @@ import {
 /** Une el `<form>` del cuerpo con su botón de envío, que vive en el pie. */
 const FORM_ID = "category-form";
 
-const COPY = {
-    cancel: "Cancelar",
-    nameLabel: "Nombre",
-    namePlaceholder: "Ej. Bebidas calientes",
-    nameHelper: "Así aparecerá como sección de la carta.",
-    descriptionLabel: "Descripción",
-    descriptionPlaceholder: "Ej. Cafés, tés e infusiones preparados al momento.",
-    descriptionHelper: "Opcional. Una frase de apoyo bajo el nombre de la sección.",
-    activeLabel: "Categoría activa",
-    closeLabel: "Cerrar el formulario de categoría",
-} as const;
+/** Lo que dice este modal. Ver `@/messages`. */
+const COPY = messages.products.categories.form;
 
 
 interface CategoryFormModalProps {
@@ -69,8 +61,23 @@ interface CategoryFormModalProps {
      */
     isNameTaken: (name: string) => boolean;
 
-    /** Recibe los valores ya validados. Cerrar el modal es cosa de quien lo abre. */
-    onSubmit: (values: CategoryFormValues) => void;
+    /**
+     * Recibe los valores ya validados. Cerrar el modal es cosa de quien lo abre.
+     *
+     * Puede devolver una promesa: mientras esté pendiente, react-hook-form
+     * mantiene `isSubmitting` y el botón de envío se deshabilita solo. Es lo
+     * que impide que un segundo clic cree la categoría dos veces.
+     */
+    onSubmit: (values: CategoryFormValues) => void | Promise<void>;
+
+    /**
+     * Motivo por el que el guardado no salió.
+     *
+     * Lo pone quien envía, no el formulario: no es un problema del valor que se
+     * escribió —de eso ya avisan las reglas de cada campo— sino del intento de
+     * guardarlo. `null` cuando no hay nada que contar.
+     */
+    submitError?: string | null;
 
     className?: string;
 }
@@ -81,6 +88,7 @@ export default function CategoryFormModal({
     category,
     isNameTaken,
     onSubmit,
+    submitError = null,
     className,
 }: CategoryFormModalProps) {
     const mode = category ? "edit" : "create";
@@ -108,7 +116,7 @@ export default function CategoryFormModal({
             description={copy.description}
             size="lg"
             initialFocus={nameFieldRef}
-            closeLabel={COPY.closeLabel}
+            closeLabel={COPY.close}
             // Con cambios sin guardar, un clic fuera tira el trabajo. `Escape`,
             // la equis y "Cancelar" siguen cerrando: quitar también esas tres
             // dejaría el modal sin salida por teclado.
@@ -119,7 +127,7 @@ export default function CategoryFormModal({
                     <GenericButton
                         type="button"
                         variant="ghost"
-                        label={COPY.cancel}
+                        label={messages.common.actions.cancel}
                         onClick={() => onOpenChange(false)}
                         className="border border-neutral-300"
                     />
@@ -143,6 +151,15 @@ export default function CategoryFormModal({
                 onSubmit={handleSubmit(onSubmit)}
                 className={categoryFormModalVariants()}
             >
+                {/* `role="alert"` para que los lectores de pantalla lo anuncien
+                    al aparecer: quien no ve el modal necesita enterarse de que
+                    el envío falló sin tener que ir a buscarlo. */}
+                {submitError && (
+                    <p role="alert" className={categoryFormModalErrorVariants()}>
+                        {submitError}
+                    </p>
+                )}
+
                 <Controller
                     control={control}
                     name="name"
@@ -154,11 +171,11 @@ export default function CategoryFormModal({
                                 field.ref(node);
                                 nameFieldRef.current = node;
                             }}
-                            label={COPY.nameLabel}
+                            label={COPY.name.label}
                             required
                             error={fieldState.error?.message ?? false}
-                            placeholder={COPY.namePlaceholder}
-                            helperText={COPY.nameHelper}
+                            placeholder={COPY.name.placeholder}
+                            helperText={COPY.name.helper}
                             autoComplete="off"
                         />
                     )}
@@ -171,9 +188,9 @@ export default function CategoryFormModal({
                     render={({ field, fieldState }) => (
                         <TextAreaField
                             {...field}
-                            label={COPY.descriptionLabel}
+                            label={COPY.description.label}
                             error={fieldState.error?.message ?? false}
-                            placeholder={COPY.descriptionPlaceholder}
+                            placeholder={COPY.description.placeholder}
                             rows={3}
                         />
                     )}
@@ -185,7 +202,7 @@ export default function CategoryFormModal({
                 {mode === "edit" && (
                     <Controller
                         control={control}
-                        name="active"
+                        name="isActive"
                         render={({ field }) => (
                             <div className={categoryFormModalToggleVariants()}>
                                 <Switch

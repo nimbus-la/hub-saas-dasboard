@@ -7,6 +7,7 @@
 import { Hammer } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { formatMessage, messages } from "@/messages";
 import { formatStepPosition, type ProductFormStep } from "@/features/products/libs/product-form";
 import { ICON_SIZE, ICON_STROKE_BY_SIZE } from "@/tokens";
 
@@ -18,6 +19,9 @@ import {
     productStepPlaceholderVariants,
 } from "./product-step-placeholder.style";
 
+
+/** Lo que dice un paso todavía sin campos. Ver `@/messages`. */
+const COPY = messages.products.create.placeholder;
 
 interface ProductStepPlaceholderProps {
     step: ProductFormStep;
@@ -45,11 +49,16 @@ export default function ProductStepPlaceholder({
 
             <div className={productStepPlaceholderTextVariants()}>
                 <p className={productStepPlaceholderTitleVariants()}>
-                    {`${formatStepPosition(index)} · ${step.label}`}
+                    {formatMessage(COPY.title, {
+                        position: formatStepPosition(index),
+                        label: step.label,
+                    })}
                 </p>
 
                 <p className={productStepPlaceholderMessageVariants()}>
-                    {`Aquí se pedirá: ${step.hint.toLowerCase()}. Estamos construyendo este paso; mientras tanto, lo que escribiste en los anteriores se conserva.`}
+                    {formatMessage(COPY.message, {
+                        hint: step.hint.toLowerCase(),
+                    })}
                 </p>
             </div>
         </div>

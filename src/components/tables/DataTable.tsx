@@ -34,6 +34,7 @@ import { ChevronDown, ChevronsUpDown, ChevronUp } from "lucide-react";
 
 import type { DataTableProps } from "@/interfaces";
 import { cn } from "@/lib/utils";
+import { messages } from "@/messages";
 import { ICON_SIZE, ICON_STROKE_BY_SIZE } from "@/tokens";
 
 import DataTableCheckbox from "./DataTableCheckbox";
@@ -54,7 +55,7 @@ import {
 const SELECTION_COLUMN_ID = "row-selection";
 const ACTIONS_COLUMN_ID = "row-actions";
 
-const DEFAULT_EMPTY_MESSAGE = "Aún no hay registros para mostrar.";
+const DEFAULT_EMPTY_MESSAGE = messages.components.dataTable.empty;
 
 
 export default function DataTable<TData, TValue>({
@@ -226,7 +227,7 @@ function createSelectionColumn<TData, TValue>(): ColumnDef<TData, TValue> {
         },
         header: ({ table }) => (
             <DataTableCheckbox
-                label="Seleccionar todas las filas"
+                label={messages.components.dataTable.selectAllRows}
                 checked={table.getIsAllRowsSelected()}
                 indeterminate={table.getIsSomeRowsSelected()}
                 onChange={table.getToggleAllRowsSelectedHandler()}
@@ -234,7 +235,7 @@ function createSelectionColumn<TData, TValue>(): ColumnDef<TData, TValue> {
         ),
         cell: ({ row }) => (
             <DataTableCheckbox
-                label="Seleccionar fila"
+                label={messages.components.dataTable.selectRow}
                 checked={row.getIsSelected()}
                 disabled={!row.getCanSelect()}
                 onChange={row.getToggleSelectedHandler()}
