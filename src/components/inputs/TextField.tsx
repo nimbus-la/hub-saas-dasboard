@@ -212,10 +212,10 @@ export function TextField({
                                 onMouseDown={(event) => event.preventDefault()}
                                 onClick={() => setRevealed((prev) => !prev)}
                             >
-                                {revealed ? (
-                                    <EyeOff aria-hidden="true" />
-                                ) : (
+                               {revealed ? (
                                     <Eye aria-hidden="true" />
+                                ) : (
+                                    <EyeOff aria-hidden="true" />
                                 )}
                             </FieldButton>
                         )}
