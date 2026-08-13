@@ -13,7 +13,7 @@ export class HttpError extends Error {
     public readonly kind: HttpErrorKind;
     public readonly method: HttpMethod;
     public readonly url: string;
-    public readonly status: number | null; 
+    public readonly status: number | null;
     public readonly meta: ApiMeta | null;
     public readonly body: unknown;
 
@@ -96,6 +96,23 @@ export class HttpError extends Error {
             ...(this.status !== null ? { status: this.status } : {}),
             body: this.body,
             cause: this.cause
+        });
+    }
+
+
+    /** Envuelve cualquier excepción ajena para que nada escape del contrato. */
+    public static fromUnknown(
+        error: unknown,
+        context: { method: HttpMethod; url: string }
+    ): HttpError {
+        if (error instanceof HttpError) return error;
+
+        return new HttpError({
+            kind: "network",
+            message: error instanceof Error ? error.message : "Error de red desconocido",
+            method: context.method,
+            url: context.url,
+            cause: error
         });
     }
 }
