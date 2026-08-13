@@ -1,51 +1,61 @@
 /**
- * Sobre de respuesta del backend
- *
- * Este backend no devuelve el recurso pelado: lo envuelve junto a un estado, un
- * código y unos mensajes. Todas sus rutas responden con esta forma, así que es
- * una característica del **transporte** y no del dominio de categorías, de
- * productos ni de ventas.
- *
- * De ahí que el desenvuelto viva en `EnvelopeHttpClient` y no en cada servicio.
- * Si cada uno hiciera su `.data`, serían cuarenta sitios donde repetirlo y
- * cuarenta donde olvidarlo — y olvidarlo no da un error de compilación, da un
- * `undefined` que revienta tres capas más arriba.
+ * El sobre de respuesta del backend.
+ * 
+ * El backend nunca devuelve un objeto plano, lo envuelve junto 
+ * a un estado, código y mensaje. 
  */
 
 
 /**
- * Estado declarado por el backend.
- *
- * Es informativo. Quien decide si la operación salió bien es `code`: un
- * `WARNING` puede acompañar perfectamente a una respuesta correcta.
+ * Estado de la respuesta del backend.
+ * 
+ * El backend devuelve un estado de respuesta que puede ser:
+ * - `SUCCESS`: La operación fue exitosa.
+ * - `ERROR`: La operación falló.
+ * - `WARNING`: La operación fue exitosa pero con advertencias.
+ * - `INFO`: La operación fue exitosa pero con información adicional.
+ * 
+ * Sirve para que el frontend pueda manejar el tipo de respuesta y mostrar 
+ * mensajes adecuados al usuario. No decide si la operación fue exitosa o 
+ * no, eso lo decide el "code" de la respuesta.
  */
-export type ApiStatus = "SUCCESS" | "ERROR" | "INFO" | "WARNING";
+export type ApiEnvelopeStatus = 'SUCCESS' | 'ERROR' | 'WARNING' | 'INFO';
 
 
-export interface ApiEnvelope<TData> {
-    status: ApiStatus;
+
+/**
+ * Interfaz que define la estructura del sobre de respuesta del backend.
+ * El backend nunca devuelve un objeto plano, lo envuelve junto a un 
+ * estado, código y mensaje.
+ */
+export interface ApiEnvelope<TData = unknown> {
+    /** Ver `ApiEnvelopeStatus` es lo que elige el tono de la alerta. */
+    status: ApiEnvelopeStatus;
 
     /**
-     * Código de resultado. `"0000"` es éxito; cualquier otro es un fallo.
-     *
-     * Es una cadena y no un número a propósito del backend: los ceros a la
-     * izquierda son significativos y `0000` como número sería `0`.
+     * Código interno del sistema que indica el resultado de la operación. 
+     * "0000" es el código de éxito, cualquier otro código indica un error 
+     * o advertencia.
      */
     code: string;
 
-    /**
-     * Código HTTP que el backend considera equivalente.
-     *
-     * Puede no coincidir con el de la respuesta real: hay backends que
-     * responden `200 OK` con `httpStatus: 422` dentro. Cuando el sobre indica
-     * fallo, éste es el estado que se propaga en el `HttpError`, porque
-     * describe el problema mejor que el `200` del sobre.
-     */
+    /** Código HTTP que el backend considera adecuado para la respuesta. */
     httpStatus: number;
 
-    /** Mensajes para la interfaz. Puede venir como lista o como texto suelto. */
-    messages?: string[] | string;
+    /** Texto ya redactado que describe la respuesta. */
+    message: string;
 
-    /** El recurso de verdad: objeto, lista o `null`. */
+    /** Datos de la respuesta. */
     data: TData;
-}
+};
+
+
+
+/**
+ * El sobre sin su carga.
+ * 
+ * Todo lo que la interfaz necesita para decidir qué avisar, separado de lo que 
+ * necesita para pintar. Se deriva de `ApiEnvelope` con `Omit` en lugar de
+ * repetir los cuatro compos.
+ */
+export type ApiMeta = Omit<ApiEnvelope, "data">;

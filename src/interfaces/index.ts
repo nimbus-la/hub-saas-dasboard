@@ -21,10 +21,11 @@ export * from "./menu.types";
 
 
 /** Infraestructura */
-export * from "./http/http.interfaces";
 export * from "./http/http-error.interfaces";
 export * from "./http/api-envelope.interfaces";
 export * from "./http/fetch-http-client.interfaces";
+export * from "./http/http-core.interfaces";
+export * from "./http/http-client.interfaces";
 
 
 /** Tokens */
