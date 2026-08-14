@@ -35,5 +35,5 @@ export const errors = {
      * mensaje propio para él. Que haga falta suele significar que a esa
      * operación le falta su mensaje: es genérico a propósito, para que se note.
      */
-    unexpected: "Algo salió mal. Vuelve a intentarlo.",
+    unexpected: "Ocurrió un error inesperado, inténtelo más tarde.",
 } as const;

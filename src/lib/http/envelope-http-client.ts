@@ -1,8 +1,7 @@
-import { HttpClient, HttpRequest, HttpResponse } from "@/interfaces";
+import { ApiEnvelope, ApiErrorFields, HttpClient, HttpRequest, HttpResponse } from "@/interfaces";
 import { BaseHttpClient } from "./base-http-client";
-import { isApiEnvelope, isSuccessCode, toApiMeta } from "./api-envelope";
-import { isHttpError } from "./http-error.helpers";
-import { HttpError } from "./http-error";
+import { HttpError, isHttpError } from "./http-error";
+import { API_SUCCESS_CODE } from "@/utils";
 
 export class EnvelopeHttpClient extends BaseHttpClient {
     constructor(private readonly inner: HttpClient) {
@@ -17,7 +16,10 @@ export class EnvelopeHttpClient extends BaseHttpClient {
             response = await this.inner.request<unknown>(request);
 
         } catch (error: unknown) {
-            throw this.enrichWithEnvelope(error);
+            // Un 400 o un 500 de verdad también traen sobre. Se le adjuntan sus
+            // campos aquí, y no en el transporte, porque el transporte no sabe
+            // qué es un sobre y no debe aprenderlo.
+            throw this.enrichError(error);
         }
 
         if (!isApiEnvelope(response.data)) {
@@ -25,15 +27,14 @@ export class EnvelopeHttpClient extends BaseHttpClient {
         }
 
         const envelope = response.data;
-        const meta = toApiMeta(envelope, response.status)
 
-        if (!isSuccessCode(meta.code)) {
+        if (envelope.code !== API_SUCCESS_CODE) {
             throw new HttpError({
                 kind: "response",
-                status: meta.httpStatus,
-                meta,
+                status: response.status,
+                api: toApiErrorFields(envelope, response.status),
                 body: envelope,
-                message: `${request.method} ${request.url} respondió con el código ${meta.code}`,
+                message: `${request.method} ${request.url} respondió con el código ${envelope.code}`,
                 method: request.method,
                 url: request.url
             });
@@ -43,15 +44,62 @@ export class EnvelopeHttpClient extends BaseHttpClient {
             data: envelope.data as TData,
             status: response.status,
             headers: response.headers,
-            meta
         }
     }
 
 
-    private enrichWithEnvelope(error: unknown): unknown {
-        if (!isHttpError(error) || error.meta !== null) return error;
+    private enrichError(error: unknown): unknown {
+        if (!isHttpError(error) || error.api !== null) return error;
         if (!isApiEnvelope(error.body)) return error;
 
-        return error.withMeta(toApiMeta(error.body, error.status ?? 0));
+        return new HttpError({
+            kind: error.kind,
+            message: error.message,
+            method: error.method,
+            url: error.url,
+            api: toApiErrorFields(error.body, error.status ?? 0),
+            body: error.body,
+            cause: error.cause,
+            ...(error.status !== null ? { status: error.status } : {})
+        });
     }
+}
+
+
+
+/**
+ * ¿Esto es un sobre?
+ * 
+ * Se comprueban `code` y la presencia de `data`, que son los dos campos de los
+ * que dependen el desenvuelto. No exige `status` ni `message`, un sobre al que
+ * le falte uno de esos sigue siendo desenvolvible.
+ */
+function isApiEnvelope(value: unknown): value is ApiEnvelope {
+    if (typeof value !== "object" || value === null) return false;
+
+    const candidate = value as Record<string, unknown>;
+
+    return typeof candidate["code"] === "string" && "data" in candidate;
+}
+
+
+/**
+ * Saca del sobre lo que sobrevive a un fallo, normalizando lo que falte.
+ *
+ * Los valores por defecto existen para que `ApiErrorFields` sea un tipo **sin
+ * campos opcionales**: quien lo consume lee `api.apiMessage` sin un `?.` ni un
+ * `??` de por medio. Toda la incertidumbre sobre lo que manda el backend se
+ * resuelve aquí, una vez, en la frontera.
+ *
+ * `httpStatus` cae al real cuando el sobre no lo trae. Es el valor prudente:
+ * hace que `hasStatusMismatch` dé `false` y evita inventar un desajuste que
+ * nadie ha declarado.
+ */
+function toApiErrorFields(envelope: ApiEnvelope, realStatus: number): ApiErrorFields {
+    return {
+        code: envelope.code,
+        apiStatus: envelope.status ?? "ERROR",
+        apiMessage: typeof envelope.message === "string" ? envelope.message : "",
+        httpStatus: typeof envelope.httpStatus === "number" ? envelope.httpStatus : realStatus
+    };
 }
