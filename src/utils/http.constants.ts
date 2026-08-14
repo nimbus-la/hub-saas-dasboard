@@ -1,4 +1,13 @@
+/**
+ * Constantes de la capa de datos.
+ * 
+ * Los número y literales que gobiernan cómo la aplicación habla con el 
+ * backend, cuánto se espera, qué se reintenta y qué código significa
+ * éxito.
+ */
 
+
+// ---- Transporte -----------------------------------------------------------------------
 
 /**
  * Tiempo máximo por defecto de una petición, en milisegundos.
@@ -13,7 +22,6 @@
 export const HTTP_DEFAULT_TIMEOUT_MS = 20_000;
 
 
-
 /**
  * Códigos que por definición no traen cuerpo.
  * 
@@ -22,7 +30,6 @@ export const HTTP_DEFAULT_TIMEOUT_MS = 20_000;
  * error de parseo inventado.
  */
 export const HTTP_EMPTY_STATUSES: readonly number[] = [204, 205];
-
 
 
 /**
@@ -38,19 +45,15 @@ export const HTTP_EMPTY_STATUSES: readonly number[] = [204, 205];
 export const HTTP_RETRYABLE_STATUSES: readonly number[] = [408, 425, 429];
 
 
+// ---- Sobre del backend ---------------------------------------------------------------------
 
 /**
- * Claves donde otros backends suelen poner el mensaje legible.
+ * Código de resultado correcto.
  * 
- * Es la red de seguridad para cuando el fallo NO viene en sobre, un 502 
- * del balanceador, un servicio de terceros. Se prueban en orden hasta 
- * encontrar una cadena con contenido. No hay estándar para esto, así
- * que la lista es empírica y se amplía cuando aparezca un backend
- * que use otra.
+ * Cualquier otro valor es un fallo, aunque la respuesta HTTP haya sido `200`.
  */
-export const HTTP_ERROR_MESSAGE_KEYS: readonly string[] = [
-    "message",
-    "error",
-    "detail",
-    "title"
-];
+export const API_SUCCESS_CODE = "0000";
+
+
+/** El único `httpStatus` cuyo `message` se le enseña al usuario. */
+export const API_PRESENTABLE_STATUS = 200;

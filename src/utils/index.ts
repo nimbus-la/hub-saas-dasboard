@@ -7,5 +7,4 @@ export * from "./menu.utils";
 
 
 /** API CONSTANTS */
-export * from "./http/api-envelope.constants";
-export * from "./http/http.constants";
+export * from "./http.constants";
