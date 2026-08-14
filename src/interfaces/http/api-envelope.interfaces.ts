@@ -48,14 +48,3 @@ export interface ApiEnvelope<TData = unknown> {
     /** Datos de la respuesta. */
     data: TData;
 };
-
-
-
-/**
- * El sobre sin su carga.
- * 
- * Todo lo que la interfaz necesita para decidir qué avisar, separado de lo que 
- * necesita para pintar. Se deriva de `ApiEnvelope` con `Omit` en lugar de
- * repetir los cuatro compos.
- */
-export type ApiMeta = Omit<ApiEnvelope, "data">;
