@@ -1,13 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 
 import { isRetryableError } from "@/lib/http";
-import {
-    QUERY_DEFAULT_GC_TIME_MS,
-    QUERY_DEFAULT_STALE_TIME_MS,
-    QUERY_MAX_RETRIES,
-    QUERY_MAX_RETRY_DELAY_MS,
-    QUERY_RETRY_BASE_DELAY_MS,
-} from "@/utils";
+import { QUERY_DEFAULT_GC_TIME_MS, QUERY_DEFAULT_STALE_TIME_MS, QUERY_MAX_RETRIES, QUERY_MAX_RETRY_DELAY_MS, QUERY_RETRY_BASE_DELAY_MS } from "@/utils";
 
 
 /**
