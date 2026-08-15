@@ -41,9 +41,8 @@ export class EnvelopeHttpClient extends BaseHttpClient {
         }
 
         return {
+            ...response,
             data: envelope.data as TData,
-            status: response.status,
-            headers: response.headers,
         }
     }
 

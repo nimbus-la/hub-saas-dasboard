@@ -5,6 +5,8 @@
  * backend depende de `HttpClient` y nunca de una implementación concreta.
  */
 
+import { ApiEnvelope } from "./api-envelope.interfaces";
+
 
 /** Verbos que usa la aplicación. Si el backend expone otro, se añade aqui. */
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
@@ -120,28 +122,28 @@ export interface HttpClient {
     get<TData>(
         url: string,
         config?: HttpRequestConfig
-    ): Promise<TData>;
+    ): Promise<ApiEnvelope<TData> | null>;
 
     post<TData>(
         url: string,
         body?: unknown,
         config?: HttpRequestConfig
-    ): Promise<TData>;
+    ): Promise<ApiEnvelope<TData> | null>;
 
     put<TData>(
         url: string,
         body?: unknown,
         config?: HttpRequestConfig
-    ): Promise<TData>;
+    ): Promise<ApiEnvelope<TData> | null>;
 
     patch<TData>(
         url: string,
         body?: unknown,
         config?: HttpRequestConfig
-    ): Promise<TData>;
+    ): Promise<ApiEnvelope<TData> | null>;
 
     delete<TData>(
         url: string,
         config?: HttpRequestConfig
-    ): Promise<TData>;
+    ): Promise<ApiEnvelope<TData> | null>;
 };
