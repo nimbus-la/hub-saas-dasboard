@@ -1,7 +1,7 @@
 import type { HttpClient, HttpRequestConfig } from "@/interfaces";
+import { ENDPOINTS } from "@/utils";
 import type { Category, CategoryApiResponse, CreateCategoryPayload, UpdateCategoryPayload } from "../interfaces";
 import { toCategory, toCategoryList } from "../mappers";
-import { ENDPOINTS } from "@/utils";
 
 
 /**
@@ -34,7 +34,7 @@ import { ENDPOINTS } from "@/utils";
  * Mientras tanto, al menos hay un solo sitio que cambiar y un nombre que
  * buscar.
  */
-const TENANT_ID = "019fceb3-99f6-70eb-9dc6-04f24e1e7f67";
+const TENANT_ID = "019ff7ac-76bf-76ac-891e-ac1fc352d13e";
 
 
 /*
@@ -102,14 +102,23 @@ export const categoryKeys = {
 export interface CategoriesService {
     list(config?: HttpRequestConfig): Promise<Category[]>;
     detail(id: string, config?: HttpRequestConfig): Promise<Category>;
-    create(payload: CreateCategoryPayload, config?: HttpRequestConfig): Promise<Category>;
+
+    create(
+        payload: CreateCategoryPayload,
+        config?: HttpRequestConfig
+    ): Promise<{ data: Category; message: string }>;
+
     update(
         id: string,
         payload: UpdateCategoryPayload,
         config?: HttpRequestConfig
-    ): Promise<Category>;
-    remove(id: string, config?: HttpRequestConfig): Promise<void>;
+    ): Promise<{ data: Category; message: string }>;
+    remove(id: string, config?: HttpRequestConfig): Promise<unknown>;
 }
+
+
+const categoryPath = (id: string): string =>
+    `${ENDPOINTS.PRODUCTS_CATEGORY}/${encodeURIComponent(id)}`;
 
 
 export function createCategoriesService(http: HttpClient): CategoriesService {
@@ -126,21 +135,24 @@ export function createCategoriesService(http: HttpClient): CategoriesService {
          * datos sin normalizar y cualquier otro consumidor tendría que
          * acordarse de repetir la transformación.
          */
-        list: async (config) =>
-            toCategoryList(
-                await http.get<CategoryApiResponse[]>(
-                    ENDPOINTS.PRODUCTS_CATEGORY,
-                    withTenantParam(config)
-                )
-            ),
+        list: async (config: HttpRequestConfig | undefined): Promise<Category[]> => {
+            const response = await http.get<CategoryApiResponse[]>(
+                ENDPOINTS.PRODUCTS_CATEGORY,
+                withTenantParam(config)
+            );
 
-        detail: async (id, config) =>
-            toCategory(
-                await http.get<CategoryApiResponse>(
-                    `${ENDPOINTS.PRODUCTS_CATEGORY}/${encodeURIComponent(id)}`,
-                    withTenantParam(config)
-                )
-            ),
+            console.log('Respuesta completo del backend: ', response)
+            return toCategoryList([]);
+        },
+
+        detail: async (id: string, config: HttpRequestConfig | undefined): Promise<Category> => {
+            const { data } = await http.get<CategoryApiResponse>(
+                categoryPath(id),
+                withTenantParam(config)
+            );
+
+            return toCategory(data);
+        },
 
         // El alta y la edición también pasan por el mapper: devuelven la
         // categoría guardada, y esa acaba en la caché igual que las del
@@ -149,27 +161,33 @@ export function createCategoriesService(http: HttpClient): CategoriesService {
         // Aquí el inquilino va en el cuerpo y **no** en la query: mandarlo por
         // los dos sitios serían dos fuentes del mismo dato que pueden
         // discrepar, y el día que discrepen nadie sabría cuál gana.
-        create: async (payload, config) =>
-            toCategory(
-                await http.post<CategoryApiResponse>(
-                    ENDPOINTS.PRODUCTS_CATEGORY,
-                    withTenantBody(payload),
-                    config
-                )
-            ),
+        create: async (payload: CreateCategoryPayload, config: HttpRequestConfig | undefined): Promise<{ data: Category; message: string }> => {
+            const { data, message } = await http.post<CategoryApiResponse>(
+                ENDPOINTS.PRODUCTS_CATEGORY,
+                withTenantBody(payload),
+                config
+            );
 
-        update: async (id, payload, config) =>
-            toCategory(
-                await http.patch<CategoryApiResponse>(
-                    `${ENDPOINTS.PRODUCTS_CATEGORY}/${encodeURIComponent(id)}`,
-                    withTenantBody(payload),
-                    config
-                )
-            ),
+            return { data: toCategory(data), message };
+        },
+
+        update: async (
+            id: string,
+            payload: UpdateCategoryPayload,
+            config: HttpRequestConfig | undefined
+        ): Promise<{ data: Category; message: string }> => {
+            const { data, message } = await http.patch<CategoryApiResponse>(
+                categoryPath(id),
+                withTenantBody(payload),
+                config
+            );
+
+            return { data: toCategory(data), message };
+        },
 
         // Sin mapper: no devuelve cuerpo que traducir.
-        remove: (id, config) =>
-            http.delete<void>(
+        remove: (id: string, config: HttpRequestConfig | undefined): Promise<unknown> =>
+            http.delete<unknown>(
                 `${ENDPOINTS.PRODUCTS_CATEGORY}/${encodeURIComponent(id)}`,
                 withTenantParam(config)
             ),

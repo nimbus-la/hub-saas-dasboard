@@ -122,28 +122,28 @@ export interface HttpClient {
     get<TData>(
         url: string,
         config?: HttpRequestConfig
-    ): Promise<ApiEnvelope<TData> | null>;
+    ): Promise<ApiEnvelope<TData>>;
 
     post<TData>(
         url: string,
         body?: unknown,
         config?: HttpRequestConfig
-    ): Promise<ApiEnvelope<TData> | null>;
+    ): Promise<ApiEnvelope<TData>>;
 
     put<TData>(
         url: string,
         body?: unknown,
         config?: HttpRequestConfig
-    ): Promise<ApiEnvelope<TData> | null>;
+    ): Promise<ApiEnvelope<TData>>;
 
     patch<TData>(
         url: string,
         body?: unknown,
         config?: HttpRequestConfig
-    ): Promise<ApiEnvelope<TData> | null>;
+    ): Promise<ApiEnvelope<TData>>;
 
     delete<TData>(
         url: string,
         config?: HttpRequestConfig
-    ): Promise<ApiEnvelope<TData> | null>;
+    ): Promise<ApiEnvelope<TData>>;
 };

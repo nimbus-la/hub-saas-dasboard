@@ -1,7 +1,7 @@
 import { ApiEnvelope, ApiErrorFields, HttpClient, HttpRequest, HttpResponse } from "@/interfaces";
+import { API_SUCCESS_CODE } from "@/utils";
 import { BaseHttpClient } from "./base-http-client";
 import { HttpError, isHttpError } from "./http-error";
-import { API_SUCCESS_CODE } from "@/utils";
 
 export class EnvelopeHttpClient extends BaseHttpClient {
     constructor(private readonly inner: HttpClient) {
@@ -23,7 +23,14 @@ export class EnvelopeHttpClient extends BaseHttpClient {
         }
 
         if (!isApiEnvelope(response.data)) {
-            return { ...response, data: response.data as TData }
+            throw new HttpError({
+                kind: "parse",
+                status: response.status,
+                body: response.data,
+                message: `${request.method} ${request.url} respondió sin el sobre esperado`,
+                method: request.method,
+                url: request.url
+            });
         }
 
         const envelope = response.data;
@@ -40,10 +47,7 @@ export class EnvelopeHttpClient extends BaseHttpClient {
             });
         }
 
-        return {
-            ...response,
-            data: envelope.data as TData,
-        }
+        return { ...response, data: envelope as TData };
     }
 
 

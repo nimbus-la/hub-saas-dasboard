@@ -5,8 +5,8 @@ export abstract class BaseHttpClient implements HttpClient {
     public abstract request<TData>(request: HttpRequest): Promise<HttpResponse<TData>>;
 
 
-    public async get<TData>(url: string, config?: HttpRequestConfig): Promise<ApiEnvelope<TData> | null> {
-        const { data } = await this.request<ApiEnvelope<TData> | null>({
+    public async get<TData>(url: string, config?: HttpRequestConfig): Promise<ApiEnvelope<TData>> {
+        const { data } = await this.request<ApiEnvelope<TData>>({
             ...config,
             method: "GET",
             url
@@ -20,8 +20,8 @@ export abstract class BaseHttpClient implements HttpClient {
         url: string,
         body?: unknown,
         config?: HttpRequestConfig
-    ): Promise<ApiEnvelope<TData> | null> {
-        const { data } = await this.request<ApiEnvelope<TData> | null>({
+    ): Promise<ApiEnvelope<TData>> {
+        const { data } = await this.request<ApiEnvelope<TData>>({
             ...config,
             method: "POST",
             url,
@@ -36,8 +36,8 @@ export abstract class BaseHttpClient implements HttpClient {
         url: string,
         body?: unknown,
         config?: HttpRequestConfig
-    ): Promise<ApiEnvelope<TData> | null> {
-        const { data } = await this.request<ApiEnvelope<TData> | null>({
+    ): Promise<ApiEnvelope<TData>> {
+        const { data } = await this.request<ApiEnvelope<TData>>({
             ...config,
             method: "PUT",
             url,
@@ -52,8 +52,8 @@ export abstract class BaseHttpClient implements HttpClient {
         url: string,
         body?: unknown,
         config?: HttpRequestConfig
-    ): Promise<ApiEnvelope<TData> | null> {
-        const { data } = await this.request<ApiEnvelope<TData> | null>({
+    ): Promise<ApiEnvelope<TData>> {
+        const { data } = await this.request<ApiEnvelope<TData>>({
             ...config,
             method: "PATCH",
             url,
@@ -67,8 +67,8 @@ export abstract class BaseHttpClient implements HttpClient {
     public async delete<TData>(
         url: string,
         config?: HttpRequestConfig
-    ): Promise<ApiEnvelope<TData> | null> {
-        const { data } = await this.request<ApiEnvelope<TData> | null>({
+    ): Promise<ApiEnvelope<TData>> {
+        const { data } = await this.request<ApiEnvelope<TData>>({
             ...config,
             method: "PUT",
             url,
