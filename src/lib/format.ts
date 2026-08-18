@@ -99,7 +99,10 @@ const dateFormatter = new Intl.DateTimeFormat(LOCALE, {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
-    timeZone: "UTC",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "America/Bogota",
 });
 
 export const formatDate = (value: Date | string | number): string =>

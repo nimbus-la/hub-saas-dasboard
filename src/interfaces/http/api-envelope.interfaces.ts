@@ -48,3 +48,12 @@ export interface ApiEnvelope<TData = unknown> {
     /** Datos de la respuesta. */
     data: TData;
 };
+
+
+
+export interface ApiResponseWithPagination<TData> {
+    data: TData;
+    pageNumber: number;
+    pageSize: number;
+    total: number;
+};

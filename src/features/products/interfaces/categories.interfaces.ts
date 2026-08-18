@@ -1,4 +1,4 @@
-export interface CategoryApiResponse {
+export interface CategoryListApiResponse {
     /** Identificador que publica el backend. Se muestra tal cual. */
     id: string;
     name: string;
@@ -20,12 +20,13 @@ export interface CategoryApiResponse {
      * ejecución llegaría `undefined`, que es justo el caso que el mapper tiene
      * que resolver.
      */
-    placedAt?: string;
+    updatedAt: string;
+    createdAt: string;
 }
 
 
 // respuesta mapeada
-export interface Category {
+export interface CategoryList {
     /** Identificador que publica el backend. Se muestra tal cual. */
     id: string;
     name: string;
@@ -39,7 +40,7 @@ export interface Category {
     description: string;
     /** ¿Se ofrece hoy en la carta? */
     isActive: boolean;
-    placedAt: string; // ISO 8601
+    updatedAt: string; // ISO 8601
 }
 
 

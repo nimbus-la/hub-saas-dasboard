@@ -1,6 +1,6 @@
-import type { HttpClient, HttpRequestConfig } from "@/interfaces";
+import type { ApiResponseWithPagination, HttpClient, HttpRequestConfig } from "@/interfaces";
 import { ENDPOINTS } from "@/utils";
-import type { Category, CategoryApiResponse, CreateCategoryPayload, UpdateCategoryPayload } from "../interfaces";
+import type { CategoriesService, CategoryList, CategoryListApiResponse, CreateCategoryPayload, UpdateCategoryPayload } from "../interfaces";
 import { toCategory, toCategoryList } from "../mappers";
 
 
@@ -93,28 +93,10 @@ const withTenantBody = <TPayload extends object>(
  * cachee por separado.
  */
 export const categoryKeys = {
-    all: ["categories"] as const,
-    list: () => [...categoryKeys.all, "list"] as const,
-    detail: (id: string) => [...categoryKeys.all, "detail", id] as const,
+    all: ["products_categories"] as const,
+    list: () => [...categoryKeys.all, "products_categories_list"] as const,
+    detail: (id: string) => [...categoryKeys.all, "products_categories_detail", id] as const,
 };
-
-
-export interface CategoriesService {
-    list(config?: HttpRequestConfig): Promise<Category[]>;
-    detail(id: string, config?: HttpRequestConfig): Promise<Category>;
-
-    create(
-        payload: CreateCategoryPayload,
-        config?: HttpRequestConfig
-    ): Promise<{ data: Category; message: string }>;
-
-    update(
-        id: string,
-        payload: UpdateCategoryPayload,
-        config?: HttpRequestConfig
-    ): Promise<{ data: Category; message: string }>;
-    remove(id: string, config?: HttpRequestConfig): Promise<unknown>;
-}
 
 
 const categoryPath = (id: string): string =>
@@ -123,26 +105,13 @@ const categoryPath = (id: string): string =>
 
 export function createCategoriesService(http: HttpClient): CategoriesService {
     return {
-        /*
-         * El mapper se aplica aquí, en la frontera, y no en el hook ni en el
-         * JSX. A partir de este `return` no queda nadie en la aplicación que
-         * vea la forma cruda del backend: la caché de TanStack Query guarda
-         * `Category`, la precarga del Server Component serializa `Category` y
-         * la tabla recibe `Category`.
-         *
-         * Si el mapeo se hiciera en el `select` de `useQuery`, la caché
-         * seguiría guardando la forma cruda: el Server Component hidrataría
-         * datos sin normalizar y cualquier otro consumidor tendría que
-         * acordarse de repetir la transformación.
-         */
-        list: async (config: HttpRequestConfig | undefined): Promise<Category[]> => {
-            const response = await http.get<CategoryApiResponse[]>(
+        list: async (config: HttpRequestConfig | undefined): Promise<ApiResponseWithPagination<CategoryList[]>> => {
+            const { data } = await http.get<ApiResponseWithPagination<CategoryListApiResponse[]>>(
                 ENDPOINTS.PRODUCTS_CATEGORY,
                 withTenantParam(config)
             );
 
-            console.log('Respuesta completo del backend: ', response)
-            return toCategoryList([]);
+            return { ...data, data: toCategoryList(data.data) };
         },
 
         detail: async (id: string, config: HttpRequestConfig | undefined): Promise<Category> => {

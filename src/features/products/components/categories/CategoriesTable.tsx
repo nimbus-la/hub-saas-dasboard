@@ -10,6 +10,8 @@ import { formatMessage, messages } from "@/messages";
 
 import { ICON_TOKENS } from "@/tokens";
 
+import { CategoryList } from "../../interfaces";
+import { EMPTY_DESCRIPTION, formatCategoryStatus, getCategoryStatusTone } from "../../libs";
 import {
     categoriesTableActionsVariants,
     categoriesTableDeleteVariants,
@@ -18,13 +20,10 @@ import {
     categoriesTableNameVariants,
     categoriesTablePanelVariants,
 } from "./categories-table.style";
-import { formatDate } from "@/lib/format";
-import { Category } from "../../interfaces";
-import { EMPTY_DESCRIPTION, formatCategoryStatus, getCategoryStatusTone } from "../../libs";
 
 
 /** Lo que dice esta tabla. Ver `@/messages`. */
-const COPY = messages.products.categories.table;
+const message = messages.products.categories.table;
 
 
 /**
@@ -40,10 +39,10 @@ const COPY = messages.products.categories.table;
 // ── Columnas ────────────────────────────────────────────────────────────────
 // Constante de módulo: la referencia es estable entre renders, así el DataTable
 // no recalcula su modelo de columnas innecesariamente.
-const categoryColumns: ColumnDef<Category>[] = [
+const categoryColumns: ColumnDef<CategoryList>[] = [
     {
         accessorKey: "name",
-        header: COPY.name,
+        header: message.name,
         meta: { headerClassName: "w-56", cellClassName: "w-56" },
         cell: ({ row }) => (
             <span className={categoriesTableNameVariants()}>
@@ -53,7 +52,7 @@ const categoryColumns: ColumnDef<Category>[] = [
     },
     {
         accessorKey: "description",
-        header: COPY.description,
+        header: message.description,
         // Sin ordenamiento: ordenar alfabéticamente un texto libre no responde
         // a ninguna pregunta que alguien se haga delante de esta tabla.
         enableSorting: false,
@@ -64,7 +63,7 @@ const categoryColumns: ColumnDef<Category>[] = [
                 return (
                     <span
                         className={categoriesTableEmptyDescriptionVariants()}
-                        aria-label={COPY.noDescription}
+                        aria-label={message.noDescription}
                     >
                         {EMPTY_DESCRIPTION}
                     </span>
@@ -86,7 +85,7 @@ const categoryColumns: ColumnDef<Category>[] = [
     },
     {
         accessorKey: "isActive",
-        header: COPY.status,
+        header: message.status,
         meta: { headerClassName: "w-32", cellClassName: "w-32" },
         cell: ({ row }) => (
             <StatusBadge
@@ -97,29 +96,14 @@ const categoryColumns: ColumnDef<Category>[] = [
     },
     {
         accessorKey: "placedAt",
-        header: COPY.updatedAt,
+        header: message.updatedAt,
         meta: { headerClassName: "w-32", cellClassName: "w-32" },
         cell: ({ row }) => {
-            const { placedAt } = row.original;
-
-            // Sin guarda esto revienta la tabla entera: `formatDate("")` acaba
-            // en `Intl.DateTimeFormat.format(Invalid Date)`, que lanza
-            // `RangeError`. Mientras el backend no publique la fecha, la
-            // ausencia se pinta igual que la de la descripción.
-            if (!placedAt) {
-                return (
-                    <span
-                        className={categoriesTableEmptyDescriptionVariants()}
-                        aria-label={COPY.noUpdatedAt}
-                    >
-                        {EMPTY_DESCRIPTION}
-                    </span>
-                );
-            }
+            const { updatedAt } = row.original;
 
             return (
-                <time dateTime={placedAt} className="tabular-nums">
-                    {formatDate(placedAt)}
+                <time dateTime={updatedAt} className="tabular-nums">
+                    {updatedAt}
                 </time>
             );
         },
@@ -128,9 +112,9 @@ const categoryColumns: ColumnDef<Category>[] = [
 
 
 interface CategoriesTableProps {
-    categories: Category[];
-    onEditCategory: (category: Category) => void;
-    onDeleteCategory: (category: Category) => void;
+    categories: CategoryList[];
+    onEditCategory: (category: CategoryList) => void;
+    onDeleteCategory: (category: CategoryList) => void;
     /** Qué decir cuando no hay filas. Cambia según haya filtros puestos. */
     emptyMessage: string;
     className?: string;
@@ -162,10 +146,10 @@ export default function CategoriesTable({
                             variant="ghost"
                             size="sm"
                             icon={ICON_TOKENS.EDIT}
-                            aria-label={formatMessage(COPY.editCategory, {
+                            aria-label={formatMessage(message.editCategory, {
                                 name: category.name,
                             })}
-                            title={COPY.edit}
+                            title={message.edit}
                             onClick={() => onEditCategory(category)}
                         />
 
@@ -174,10 +158,10 @@ export default function CategoriesTable({
                             variant="danger"
                             size="sm"
                             icon={ICON_TOKENS.DELETE}
-                            aria-label={formatMessage(COPY.deleteCategory, {
+                            aria-label={formatMessage(message.deleteCategory, {
                                 name: category.name,
                             })}
-                            title={COPY.delete}
+                            title={message.delete}
                             onClick={() => onDeleteCategory(category)}
                             className={categoriesTableDeleteVariants()}
                         />

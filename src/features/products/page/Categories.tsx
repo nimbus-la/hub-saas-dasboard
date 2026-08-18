@@ -25,25 +25,26 @@ import {
     CategoriesToolbar,
     CategoryFormModal,
 } from "../components/categories";
-import {
-    useCategories,
-    useCreateCategory,
-    useDeleteCategory,
-    useUpdateCategory,
-} from "../queries/categories.queries";
-import {
-    categoriesPageBodyVariants,
-    categoriesPageVariants,
-} from "./categories.style";
+import { useProductsCategories } from "../hooks";
 import type { Category, CategoryFormValues } from "../interfaces";
 import {
     DEFAULT_CATEGORY_STATUS_FILTER,
     filterCategories,
     formatCategoryCount,
+    getEmptyMessage,
     isDuplicateCategoryName,
     type CategoryStatusFilter,
 } from "../libs";
 import { toCreateCategoryPayload, toUpdateCategoryPayload } from "../mappers";
+import {
+    useCreateCategory,
+    useDeleteCategory,
+    useUpdateCategory
+} from "../queries/categories.queries";
+import {
+    categoriesPageBodyVariants,
+    categoriesPageVariants,
+} from "./categories.style";
 
 /** Destino de la flecha de regreso. La misma ruta que declara el menú lateral. */
 const PRODUCTS_LIST_HREF = "/products";
@@ -53,12 +54,14 @@ const COPY = messages.products.categories;
 
 
 export default function Categories() {
-    const {
+    const categories = useProductsCategories();
+
+    /* const {
         data: categories = [],
         isPending,
         isError,
         error,
-    } = useCategories();
+    } = useCategories(); */
 
     const createCategory = useCreateCategory();
     const updateCategory = useUpdateCategory();
@@ -68,11 +71,8 @@ export default function Categories() {
     const [status, setStatus] = React.useState<CategoryStatusFilter>(DEFAULT_CATEGORY_STATUS_FILTER);
 
 
-    // ── Filtrado ────────────────────────────────────────────────────────────
-    // Sigue en memoria: son unas decenas de registros y traerlos todos una vez
-    // es más rápido que ir al servidor en cada tecla del buscador.
     const visibleCategories = React.useMemo(
-        () => filterCategories(categories, { query, status }),
+        () => filterCategories(categories.data?.data ?? [], { query, status }),
         [categories, query, status]
     );
 
@@ -82,23 +82,6 @@ export default function Categories() {
         setQuery("");
         setStatus(DEFAULT_CATEGORY_STATUS_FILTER);
     }, []);
-
-    /**
-     * Qué dice la tabla cuando no pinta filas.
-     *
-     * Son cuatro situaciones distintas y la diferencia importa: una tabla vacía
-     * porque está cargando, porque la API falló, porque no hay catálogo o
-     * porque el filtro no encontró nada piden reacciones opuestas de quien
-     * mira. Un único "sin resultados" para las cuatro es el camino corto a que
-     * alguien dé por perdidas sus categorías durante un corte de red.
-     */
-    const emptyMessage = isPending
-        ? COPY.loading
-        : isError
-            ? getApiErrorMessage(error, COPY.loadError)
-            : hasFilters
-                ? COPY.emptyFiltered
-                : COPY.emptyCatalog;
 
 
     // ── Formulario ──────────────────────────────────────────────────────────
@@ -130,15 +113,13 @@ export default function Categories() {
         setIsFormOpen(true);
     }, []);
 
-    /*
-     * La unicidad del nombre la comprueba la pantalla porque es la única que
-     * tiene la lista entera, y así el aviso sale al escribir en lugar de al
-     * enviar. No sustituye a la validación del backend —entre que se cargó la
-     * lista y se pulsa Guardar, otra persona pudo crear la misma categoría—:
-     * ese choque llega como error de la mutación y se muestra en el modal.
+
+    /**
+     * La unicidad del nombre la comprueba la patanlla por que es la única que
+     * tiene la lista entera, y así el aviso sale al escribir en lugar de enviar.
      */
     const isNameTaken = React.useCallback(
-        (name: string) => isDuplicateCategoryName(categories, name, formTarget?.id),
+        (name: string) => isDuplicateCategoryName(categories.data?.data ?? [], name, formTarget?.id),
         [categories, formTarget]
     );
 
@@ -173,7 +154,7 @@ export default function Categories() {
 
                 setIsFormOpen(false);
             } catch (mutationError) {
-                setSubmitError(getApiErrorMessage(mutationError, COPY.saveError));
+                setSubmitError(getApiErrorMessage(mutationError));
             }
         },
         [formTarget, createCategory, updateCategory]
@@ -223,7 +204,7 @@ export default function Categories() {
                     <StatusBadge
                         size="xs"
                         tone="neutral"
-                        label={formatCategoryCount(categories.length)}
+                        label={formatCategoryCount(categories.data?.data.length ?? 0)}
                         className="tabular-nums"
                     />
                 }
@@ -237,7 +218,7 @@ export default function Categories() {
                     onStatusChange={setStatus}
                     onCreateCategory={handleCreateCategory}
                     visibleCount={visibleCategories.length}
-                    totalCount={categories.length}
+                    totalCount={categories.data?.data.length ?? 0}
                     onClearFilters={handleClearFilters}
                 />
 
@@ -245,7 +226,7 @@ export default function Categories() {
                     categories={visibleCategories}
                     onEditCategory={handleEditCategory}
                     onDeleteCategory={handleDeleteRequest}
-                    emptyMessage={emptyMessage}
+                    emptyMessage={getEmptyMessage(categories.isLoading, categories.isError, hasFilters)}
                 />
             </section>
 

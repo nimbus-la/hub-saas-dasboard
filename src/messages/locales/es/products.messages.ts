@@ -275,7 +275,7 @@ export const products = {
          * perdidas sus categorías durante un corte de red.
          */
         loading: "Cargando categorías…",
-        loadError: "No se pudieron cargar las categorías.",
+        loadError: "Ocurrió un error inesperado al cargar las categorías.",
         emptyCatalog:
             "Todavía no hay categorías. Crea la primera para empezar a agrupar la carta.",
         emptyFiltered:

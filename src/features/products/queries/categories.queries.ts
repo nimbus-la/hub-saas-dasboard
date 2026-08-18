@@ -1,21 +1,20 @@
 "use client";
 
-import React from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import React from "react";
 
 import { useHttpClient } from "@/context";
 
+import type {
+    CreateCategoryPayload,
+    UpdateCategoryPayload,
+} from "../interfaces";
 import {
     categoriesQueryOptions,
     categoryKeys,
     createCategoriesService,
     type CategoriesService,
 } from "../services/categories.service";
-import type {
-    Category,
-    CreateCategoryPayload,
-    UpdateCategoryPayload,
-} from "../interfaces";
 
 
 /**
