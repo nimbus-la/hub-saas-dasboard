@@ -39,9 +39,26 @@ import { DEFAULT_PAGE_SIZE, FIRST_PAGE, getTotalPages } from "@/lib/pagination";
 
 export function usePagination({
     initialPageSize = DEFAULT_PAGE_SIZE,
+    resetKey,
 }: UsePaginationOptions = {}): PaginationState {
     const [pageNumber, setPageNumber] = React.useState<number>(FIRST_PAGE);
     const [pageSize, setPageSize] = React.useState<number>(initialPageSize);
+
+    // ── Vuelta a la primera página al cambiar lo que se lista ───────────────
+    // Se ajusta **durante el render** y no en un efecto. Es el patrón que
+    // documenta React para corregir estado cuando cambia una entrada, y aquí
+    // además es lo que evita una petición de más: al llamar a `setPageNumber`
+    // mientras se renderiza, React descarta este render y vuelve a empezar
+    // antes de pintar nada y antes de que corra ningún efecto —el de TanStack
+    // Query incluido—. Con un `useEffect` el orden sería el contrario: primero
+    // saldría la petición de la página 4 con el filtro nuevo y sólo después se
+    // corregiría a la 1, pidiendo dos veces para enseñar una.
+    const [lastResetKey, setLastResetKey] = React.useState<string | undefined>(resetKey);
+
+    if (resetKey !== lastResetKey) {
+        setLastResetKey(resetKey);
+        setPageNumber(FIRST_PAGE);
+    }
 
 
     /**

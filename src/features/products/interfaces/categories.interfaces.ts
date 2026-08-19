@@ -1,3 +1,6 @@
+import type { PaginationParams } from "@/interfaces";
+
+
 export interface CategoryListApiResponse {
     /** Identificador que publica el backend. Se muestra tal cual. */
     id: string;
@@ -73,3 +76,37 @@ export interface CreateCategoryParams {
 export type UpdateCategoryParams = CreateCategoryParams & {
     isActive?: boolean;
 };
+
+/* -------------------------------------------------------------------------- */
+/*  Consulta del listado                                                       */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Filtros que entiende el backend.
+ *
+ * Los nombres son los suyos: `text` para el texto libre —que él busca en el
+ * nombre **y** en la descripción, por eso es uno y no dos— e `isActive` para el
+ * estado.
+ *
+ * Los dos son opcionales y se construyen **por omisión**: un filtro sin elegir
+ * no se manda vacío. `?text=` o `?isActive=` no significan "sin filtro" para el
+ * backend, significan "filtra por cadena vacía", y devolverían cero resultados.
+ * De traducir la pantalla a esta forma se encarga `toCategoryFilters`.
+ */
+export interface CategoryFilters {
+    /** Texto libre. Ya recortado; si no hay nada que buscar, no está la clave. */
+    text?: string;
+
+    /** `true` sólo activas, `false` sólo inactivas, ausente ambas. */
+    isActive?: boolean;
+}
+
+
+/**
+ * Todo lo que define una página del listado: qué trozo y de qué resultados.
+ *
+ * Van juntos en un solo objeto porque juntos son la identidad de la respuesta,
+ * y es exactamente lo que tiene que entrar en la clave de caché: la página 2 de
+ * "café" no tiene nada que ver con la página 2 sin filtros.
+ */
+export type CategoryListParams = PaginationParams & CategoryFilters;

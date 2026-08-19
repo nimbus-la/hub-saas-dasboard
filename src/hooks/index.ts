@@ -6,4 +6,5 @@
  * cualquier pantalla puede necesitar.
  */
 
+export * from "./use-debounced-value";
 export * from "./use-pagination";

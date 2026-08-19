@@ -29,7 +29,14 @@ export const CATEGORY_STATUS_FILTERS = ["all", "active", "inactive"] as const;
 
 export type CategoryStatusFilter = (typeof CATEGORY_STATUS_FILTERS)[number];
 
-export const DEFAULT_CATEGORY_STATUS_FILTER: CategoryStatusFilter = "all";
+/*
+ * Se declara con `satisfies` y no con una anotación de tipo para que conserve
+ * su tipo literal (`"all"`, no `CategoryStatusFilter`). `satisfies` sigue
+ * comprobando que sea una opción válida, pero al mantener el literal, comparar
+ * contra esta constante **descarta** `"all"` del resto de ramas — que es lo que
+ * permite indexar los rótulos de estado sin un `as` de por medio.
+ */
+export const DEFAULT_CATEGORY_STATUS_FILTER = "all" satisfies CategoryStatusFilter;
 
 
 /**
@@ -66,6 +73,9 @@ export const CATEGORY_STATUS_TO_IS_ACTIVE: Record<
 // obligaría a leer el tipo para saber qué significa.
 
 export const CATEGORY_STATUS_LABELS = copy.status;
+
+/** Los mismos estados en plural y minúscula, para meterlos dentro de una frase. */
+export const CATEGORY_STATUS_PLURAL_LABELS = copy.statusPlural;
 
 export const CATEGORY_STATUS_TONES: Record<
     keyof typeof CATEGORY_STATUS_LABELS,

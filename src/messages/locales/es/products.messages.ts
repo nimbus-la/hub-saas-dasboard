@@ -287,11 +287,30 @@ export const products = {
          * perdidas sus categorías durante un corte de red.
          */
         loading: "Cargando categorías…",
-        loadError: "Ocurrió un error inesperado al cargar las categorías.",
+        loadError: "No pudimos cargar las categorías. Revisa tu conexión y vuelve a intentarlo.",
         emptyCatalog:
             "Todavía no hay categorías. Crea la primera para empezar a agrupar la carta.",
-        emptyFiltered:
-            "Ninguna categoría coincide con la búsqueda. Prueba con otro texto o cambia el filtro de estado.",
+
+        /**
+         * Cuando el filtro no encuentra nada.
+         *
+         * Son tres frases y no una porque el motivo del vacío es distinto en
+         * cada caso, y la salida también: con un término escrito lo probable es
+         * una errata, con un estado elegido lo probable es que ese estado esté
+         * vacío, y con los dos hay que decir cuál aflojar primero.
+         *
+         * Ninguna dice "sin resultados" a secas. Repiten el término tal y como
+         * se escribió —para que la errata se vea— y terminan en lo que se puede
+         * hacer, que es la diferencia entre un aviso y un callejón sin salida.
+         */
+        emptyFiltered: {
+            withQuery:
+                "Ninguna categoría coincide con «{query}». Revisa la escritura o prueba con una palabra más corta.",
+            withStatus:
+                "No hay categorías {status} en este momento. Cambia el filtro de estado para ver el resto de la carta.",
+            withBoth:
+                "Ninguna categoría {status} coincide con «{query}». Prueba con otro término o quita el filtro de estado.",
+        },
 
         saveError: "No se pudo guardar la categoría.",
 
@@ -302,6 +321,20 @@ export const products = {
         status: {
             active: "Activa",
             inactive: "Inactiva",
+        },
+
+        /**
+         * El mismo estado, en plural y en minúscula.
+         *
+         * Existe porque estos rótulos van **dentro** de una frase —"No hay
+         * categorías inactivas"— y los de arriba van solos, dentro de una
+         * insignia. Componer uno a partir del otro pidiendo un `toLowerCase()`
+         * y una `s` funciona en español y se rompe en el primer idioma que no
+         * forme el plural añadiendo una letra.
+         */
+        statusPlural: {
+            active: "activas",
+            inactive: "inactivas",
         },
 
         /* ── Barra de filtros ───────────────────────────────────────────── */
