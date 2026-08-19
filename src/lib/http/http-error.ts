@@ -1,6 +1,5 @@
 import { ApiEnvelopeStatus, ApiErrorFields, HttpErrorKind, HttpErrorOptions, HttpMethod } from "@/interfaces";
-import { messages } from "@/messages";
-import { API_PRESENTABLE_STATUS, HTTP_RETRYABLE_STATUSES } from "@/utils";
+import { HTTP_RETRYABLE_STATUSES } from "@/utils";
 
 
 /**
@@ -108,55 +107,4 @@ export function isRetryableError(error: unknown): boolean {
     if (error.kind !== "response") return false;
 
     return error.isServerError || HTTP_RETRYABLE_STATUSES.includes(error.status ?? 0);
-}
-
-
-/**
- * El mensaje que se le enseña al usuario.
- *
- * El `message` del backend se muestra **sólo si los dos estados dicen 200**: el
- * real y el que declara el sobre. Con esa combinación, el backend está hablando
- * de una regla de negocio ("Ya existe una categoría con ese nombre") y redactó
- * el texto para que lo lea una persona.
- *
- * Cualquier otra cosa cae al genérico:
- *
- * · Un `400`/`422` es una **validación del servidor** —falta un campo, un tipo
- *   no cuadra—, lo que significa que el front mandó mal la petición. El usuario
- *   no puede arreglarlo y enseñárselo sólo le confunde.
- * · Un `500` es una excepción interna: su texto suele ser técnico y además
- *   filtraría detalles del backend a cualquiera que mire la pantalla.
- * · Sin respuesta no hay `message` que leer, así que lo pone la aplicación.
- *
- * ¿Por qué se exigen los dos y no sólo el del sobre?
- *
- * Porque se ha visto al backend declarar un `httpStatus` distinto del que
- * termina recibiendo el navegador. Exigir que coincidan no bloquea ningún caso
- * legítimo —cuando es 200 siempre coinciden— y cierra el escenario feo: un 500
- * real cuyo sobre dice `200` acabaría enseñando el texto de una excepción
- * interna. Con la doble condición cae al genérico solo, y `hasStatusMismatch`
- * deja el desajuste marcado para los registros.
- *
- * **Nunca** devuelve `error.message`, que lleva método y URL dentro y no se le
- * enseña a nadie.
- */
-export function getApiErrorMessage(error: unknown): string {
-    if (!isHttpError(error)) return messages.errors.unexpected;
-
-
-    // Sin respuesta no hubo sobre, el texto lo pone la aplicación
-    if (error.kind === "network") return messages.errors.http.network;
-    if (error.kind === "timeout") return messages.errors.http.timeout;
-
-    const { api } = error;
-
-    if (api === null) return messages.errors.unexpected;
-
-    const isPresentable =
-        api.httpStatus === API_PRESENTABLE_STATUS &&
-        error.status === API_PRESENTABLE_STATUS;
-
-    if (isPresentable && api.apiMessage.trim().length > 0) return api.apiMessage;
-
-    return messages.errors.unexpected;
 }

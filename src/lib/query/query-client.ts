@@ -1,7 +1,11 @@
-import { QueryClient } from "@tanstack/react-query";
+import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
 
+import { ApiAlertSink } from "@/interfaces";
 import { isRetryableError } from "@/lib/http";
 import { QUERY_DEFAULT_GC_TIME_MS, QUERY_DEFAULT_STALE_TIME_MS, QUERY_MAX_RETRIES, QUERY_MAX_RETRY_DELAY_MS, QUERY_RETRY_BASE_DELAY_MS } from "@/utils";
+
+
+const silent: ApiAlertSink = () => { };
 
 
 /**
@@ -13,9 +17,30 @@ import { QUERY_DEFAULT_GC_TIME_MS, QUERY_DEFAULT_STALE_TIME_MS, QUERY_MAX_RETRIE
  * se comporta como la de al lado.
  */
 
-
-export function makeQueryClient(): QueryClient {
+export function makeQueryClient(onAlert: ApiAlertSink = silent): QueryClient {
     return new QueryClient({
+        queryCache: new QueryCache({
+            onError: (error, query) => {
+                if (query.meta?.alertOnError === false) return;
+
+                onAlert(error, { id: query.queryHash, ...query.meta?.alertOptions });
+            }
+        }),
+
+        mutationCache: new MutationCache({
+            onError: (error, _variables, _context, query) => {
+                if (query.meta?.alertOnError === false) return;
+
+                onAlert(error, query.meta?.alertOptions ?? {});
+            },
+
+            onSuccess: (data, _variables, _context, mutation) => {
+                if (mutation.meta?.alertOnSuccess !== true) return;
+
+                onAlert(data, mutation.meta?.alertOptions ?? {});
+            }
+        }),
+
         defaultOptions: {
             queries: {
                 staleTime: QUERY_DEFAULT_STALE_TIME_MS,
@@ -64,13 +89,13 @@ export function makeQueryClient(): QueryClient {
  */
 let browserQueryClient: QueryClient | undefined;
 
-export function getQueryClient(): QueryClient {
+export function getQueryClient(onAlert?: ApiAlertSink): QueryClient {
     if (typeof window === "undefined") return makeQueryClient();
 
     // En el navegador se reutiliza para que la caché sobreviva a las
     // navegaciones. El `??=` evita recrearla si React vuelve a montar el
     // proveedor (algo que en desarrollo, con Strict Mode, ocurre siempre).
-    browserQueryClient ??= makeQueryClient();
+    browserQueryClient ??= makeQueryClient(onAlert);
 
     return browserQueryClient;
 }

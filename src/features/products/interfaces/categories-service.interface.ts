@@ -1,4 +1,4 @@
-import { ApiResponseWithPagination, HttpRequestConfig } from "@/interfaces";
+import { ApiEnvelope, ApiResponseWithPagination, HttpRequestConfig } from "@/interfaces";
 import { CategoryList, CreateCategoryParams, UpdateCategoryParams } from "../interfaces";
 
 export interface CategoriesService {
@@ -14,13 +14,13 @@ export interface CategoriesService {
     create(
         payload: CreateCategoryParams,
         config?: HttpRequestConfig
-    ): Promise<void>;
+    ): Promise<ApiEnvelope<null>>;
 
     update(
         id: string,
         payload: UpdateCategoryParams,
         config?: HttpRequestConfig
-    ): Promise<void>;
+    ): Promise<ApiEnvelope<null>>;
 
     remove(id: string, config?: HttpRequestConfig): Promise<unknown>;
 }

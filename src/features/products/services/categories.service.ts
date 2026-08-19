@@ -1,4 +1,4 @@
-import type { ApiResponseWithPagination, HttpClient, HttpRequestConfig } from "@/interfaces";
+import type { ApiEnvelope, ApiResponseWithPagination, HttpClient, HttpRequestConfig } from "@/interfaces";
 import { ENDPOINTS } from "@/utils";
 import type { CategoriesService, CategoryList, CategoryListApiResponse, CreateCategoryParams, UpdateCategoryParams } from "../interfaces";
 import { toCategory, toCategoryList } from "../mappers";
@@ -123,25 +123,23 @@ export function createCategoriesService(http: HttpClient): CategoriesService {
             return { ...data, data: toCategory(data.data) };
         },
 
-        create: async (payload: CreateCategoryParams, config: HttpRequestConfig | undefined): Promise<void> => {
-            await http.post<unknown>(
+        create: async (payload: CreateCategoryParams, config: HttpRequestConfig | undefined): Promise<ApiEnvelope<null>> =>
+            http.post<null>(
                 ENDPOINTS.PRODUCTS_CATEGORY,
                 withTenantBody(payload),
                 config
-            );
-        },
+            ),
 
         update: async (
             id: string,
             payload: UpdateCategoryParams,
             config: HttpRequestConfig | undefined
-        ): Promise<void> => {
-            await http.patch<unknown>(
+        ): Promise<ApiEnvelope<null>> =>
+            http.patch<null>(
                 categoryPath(id),
                 withTenantBody(payload),
                 config
-            );
-        },
+            ),
 
         // Sin mapper: no devuelve cuerpo que traducir.
         remove: (id: string, config: HttpRequestConfig | undefined): Promise<unknown> =>

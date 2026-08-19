@@ -6,36 +6,36 @@ export * from './navbar/navbar.style';
 
 // ── Menú lateral ────────────────────────────────────────────────────────────
 export { default as Sidebar } from './sidebar/Sidebar';
-export { default as SidebarButton } from './sidebar/SidebarButton';
-export { default as SidebarGroup } from './sidebar/SidebarGroup';
-export { default as SidebarNavItem } from './sidebar/SidebarNavItem';
-export * from './sidebar/sidebar.style';
 export * from './sidebar/sidebar-button.style';
 export * from './sidebar/sidebar-group.style';
 export * from './sidebar/sidebar-nav-item.style';
+export * from './sidebar/sidebar.style';
+export { default as SidebarButton } from './sidebar/SidebarButton';
+export { default as SidebarGroup } from './sidebar/SidebarGroup';
+export { default as SidebarNavItem } from './sidebar/SidebarNavItem';
 
 // ── Tarjetas ────────────────────────────────────────────────────────────────
-export { default as ProductCard } from './cards/ProductCard';
-export { default as ProductThumbnail } from './cards/ProductThumbnail';
+export * from './cards/metric-card.style';
 export { default as MetricCard } from './cards/MetricCard';
 export * from './cards/product-card.style';
 export * from './cards/product-thumbnail.style';
-export * from './cards/metric-card.style';
+export { default as ProductCard } from './cards/ProductCard';
+export { default as ProductThumbnail } from './cards/ProductThumbnail';
 
 // ── Botones ─────────────────────────────────────────────────────────────────
-export { default as LinkButton } from './buttons/LinkButton';
+export { genericButtonVariants } from './buttons/generic-button.style';
 export { default as GenericButton } from './buttons/GenericButton';
 export { linkButtonVariants } from './buttons/link-button.style';
-export { genericButtonVariants } from './buttons/generic-button.style';
+export { default as LinkButton } from './buttons/LinkButton';
 
 // ── Tablas ──────────────────────────────────────────────────────────────────
+export type { ColumnAlign } from '../interfaces/data-table.types';
+export * from './tables/data-table-checkbox.style';
+export * from './tables/data-table.style';
 export { default as DataTable } from './tables/DataTable';
 export { default as DataTableCheckbox } from './tables/DataTableCheckbox';
-export { default as TitleSubtitleCell } from './tables/TitleSubtitleCell';
-export * from './tables/data-table.style';
-export * from './tables/data-table-checkbox.style';
 export * from './tables/title-subtitle-cell.style';
-export type { ColumnAlign } from '../interfaces/data-table.types';
+export { default as TitleSubtitleCell } from './tables/TitleSubtitleCell';
 // Los props viven en `@/interfaces`; se reexportan para no romper a quien ya
 // los importaba desde este barril.
 export type { DataTableProps } from '../interfaces/components/tables.interfaces';
@@ -46,13 +46,14 @@ export type { DataTableProps } from '../interfaces/components/tables.interfaces'
 // flotante, que se monta una sola vez en el layout raíz, y `notify` la forma de
 // hablarle desde cualquier sitio.
 export { default as Alert } from './alerts/Alert';
-export { default as AlertToaster, notify } from './alerts/AlertToaster';
 export * from './alerts/alert.style';
+export { default as AlertToaster, notify } from './alerts/AlertToaster';
+export * from "./alerts/notify-api";
 
 
 // ── Insignias ───────────────────────────────────────────────────────────────
-export { default as StatusBadge } from './badges/StatusBadge';
 export { statusBadgeVariants } from './badges/status-badge.style';
+export { default as StatusBadge } from './badges/StatusBadge';
 
 // ── Avatares ────────────────────────────────────────────────────────────────
 export {
@@ -61,14 +62,14 @@ export {
     AvatarFallback,
     AvatarGroup,
     AvatarGroupCount,
-    AvatarImage,
+    AvatarImage
 } from './avatars/Avatar';
 
 // ── Navegación y listados ───────────────────────────────────────────────────
-export { FilterTabs } from './tabs/FilterTabs';
-export * from './tabs/filter-tabs.style';
 export { default as Pagination } from './pagination/Pagination';
 export * from './pagination/pagination.style';
+export * from './tabs/filter-tabs.style';
+export { FilterTabs } from './tabs/FilterTabs';
 
 // ── Formularios ─────────────────────────────────────────────────────────────
 export { InputSelector } from './inputs/InputSelector';
@@ -82,13 +83,14 @@ export * from './toggles/switch.style';
 
 
 // ── Diálogos ────────────────────────────────────────────────────────────────
-export { default as Modal } from './modals/Modal';
-export { default as ConfirmDialog } from './modals/ConfirmDialog';
-export * from './modals/modal.style';
 export * from './modals/confirm-dialog.style';
+export { default as ConfirmDialog } from './modals/ConfirmDialog';
+export { default as Modal } from './modals/Modal';
+export * from './modals/modal.style';
 
 
 
 // ── Armazón ─────────────────────────────────────────────────────────────────
-export { default as PageHeader } from './layout/PageHeader';
 export * from './layout/page-header.style';
+export { default as PageHeader } from './layout/PageHeader';
+

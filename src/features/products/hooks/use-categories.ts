@@ -2,9 +2,7 @@ import React from "react";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { notify } from "@/components";
 import { useHttpClient } from "@/context";
-import { getApiErrorMessage } from "@/lib/http";
 import { CategoriesService, CreateCategoryParams, UpdateCategoryParams } from "../interfaces";
 import { createCategoriesService } from "../services";
 
@@ -33,9 +31,13 @@ export function useProductsCategories() {
     });
 
 
+    const invalidate = () => queryClient.invalidateQueries({ queryKey: categoryKeys.list() })
+
+
     const createCategory = useMutation({
         mutationFn: (params: CreateCategoryParams) => service.create(params),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: categoryKeys.list() })
+        onSuccess: invalidate,
+        meta: { alertOnSuccess: true }
     });
 
 
@@ -43,19 +45,9 @@ export function useProductsCategories() {
         mutationFn: ({ id, params }: { id: string, params: UpdateCategoryParams }) =>
             service.update(id, params),
 
-        onSuccess: () => {
-            // TODO: Implementar alerta de exito.
-            return queryClient.invalidateQueries({ queryKey: categoryKeys.list() });
-        }
+        onSuccess: invalidate,
+        meta: { alertOnSuccess: true }
     })
-
-
-    React.useEffect(() => {
-        if (query.isError) {
-            const errorMessage = getApiErrorMessage(query.error);
-            notify.error(errorMessage)
-        }
-    }, [query.isError])
 
 
     return {
