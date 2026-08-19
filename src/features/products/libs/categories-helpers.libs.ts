@@ -31,7 +31,7 @@ export const getCategoryStatusTone = (isActive: boolean): BadgeTone =>
  * estado — y dos versiones del mismo criterio acaban discrepando.
  */
 export const matchesCategoryStatus = (
-    category: Category,
+    category: CategoryList,
     status: CategoryStatusFilter
 ): boolean => {
     const required = CATEGORY_STATUS_TO_IS_ACTIVE[status];
@@ -55,9 +55,9 @@ export const formatCategoryCount = (count: number): string =>
  * navideño aunque la palabra no esté en su nombre.
  */
 export function filterCategories(
-    categories: Category[],
+    categories: CategoryList[],
     { query, status }: { query: string; status: CategoryStatusFilter }
-): Category[] {
+): CategoryList[] {
     const term = normalizeText(query.trim());
 
     return categories.filter((category) => {

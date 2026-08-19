@@ -1,6 +1,6 @@
 import type { ApiResponseWithPagination, HttpClient, HttpRequestConfig } from "@/interfaces";
 import { ENDPOINTS } from "@/utils";
-import type { CategoriesService, CategoryList, CategoryListApiResponse, CreateCategoryPayload, UpdateCategoryPayload } from "../interfaces";
+import type { CategoriesService, CategoryList, CategoryListApiResponse, CreateCategoryParams, UpdateCategoryPayload } from "../interfaces";
 import { toCategory, toCategoryList } from "../mappers";
 
 
@@ -123,21 +123,14 @@ export function createCategoriesService(http: HttpClient): CategoriesService {
             return toCategory(data);
         },
 
-        // El alta y la edición también pasan por el mapper: devuelven la
-        // categoría guardada, y esa acaba en la caché igual que las del
-        // listado. Sin esto sería la única con la forma del backend.
-        //
-        // Aquí el inquilino va en el cuerpo y **no** en la query: mandarlo por
-        // los dos sitios serían dos fuentes del mismo dato que pueden
-        // discrepar, y el día que discrepen nadie sabría cuál gana.
-        create: async (payload: CreateCategoryPayload, config: HttpRequestConfig | undefined): Promise<{ data: Category; message: string }> => {
-            const { data, message } = await http.post<CategoryApiResponse>(
+        create: async (payload: CreateCategoryParams, config: HttpRequestConfig | undefined): Promise<ApiResponseWithPagination<null>> => {
+            const { data } = await http.post<ApiResponseWithPagination<null>>(
                 ENDPOINTS.PRODUCTS_CATEGORY,
                 withTenantBody(payload),
                 config
             );
 
-            return { data: toCategory(data), message };
+            return data;
         },
 
         update: async (

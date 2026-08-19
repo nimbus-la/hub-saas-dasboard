@@ -1,11 +1,11 @@
 import React from "react";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { notify } from "@/components";
 import { useHttpClient } from "@/context";
 import { getApiErrorMessage } from "@/lib/http";
-import { CategoriesService } from "../interfaces";
+import { CategoriesService, CreateCategoryParams } from "../interfaces";
 import { createCategoriesService } from "../services";
 
 
@@ -33,6 +33,12 @@ export function useProductsCategories() {
     });
 
 
+    const createCategory = useMutation({
+        mutationFn: (params: CreateCategoryParams) => service.create(params),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: categoryKeys.list() })
+    });
+
+
     React.useEffect(() => {
         if (query.isError) {
             const errorMessage = getApiErrorMessage(query.error);
@@ -47,5 +53,7 @@ export function useProductsCategories() {
         isLoading: query.isLoading,
         isPending: query.isPending,
         isError: query.isError,
+
+        create: createCategory
     }
 };

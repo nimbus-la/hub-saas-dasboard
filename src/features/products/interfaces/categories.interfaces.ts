@@ -45,7 +45,7 @@ export interface CategoryList {
 
 
 /**
- * Lo que se manda al **crear**.
+ * Lo que se manda al crear una categoría.
  *
  * Sin `isActive`: el backend da de alta toda categoría como activa, y mandarlo
  * desde aquí sería duplicar esa regla en dos sitios que pueden discrepar. Que
@@ -54,7 +54,7 @@ export interface CategoryList {
  *
  * `id` y `placedAt` tampoco están: los pone el servidor.
  */
-export interface CreateCategoryPayload {
+export interface CreateCategoryParams {
     name: string;
     /** Se omite cuando está vacía: `""` significaría "guarda una vacía". */
     description?: string;
@@ -70,6 +70,6 @@ export interface CreateCategoryPayload {
  * compartido, olvidarlo en la llamada compilaría sin protestar y la categoría
  * se guardaría perdiendo su estado.
  */
-export type UpdateCategoryPayload = CreateCategoryPayload & {
+export type UpdateCategoryPayload = CreateCategoryParams & {
     estado: boolean;
 };

@@ -1,5 +1,5 @@
 import { formatDate } from "@/lib/format";
-import type { CategoryFormValues, CategoryList, CategoryListApiResponse, CreateCategoryPayload, UpdateCategoryPayload } from "../interfaces";
+import type { CategoryFormValues, CategoryList, CategoryListApiResponse, CreateCategoryParams, UpdateCategoryPayload } from "../interfaces";
 
 
 /**
@@ -71,9 +71,9 @@ export const toCategoryFormValues = (category: CategoryList): CategoryFormValues
  *
  * `isActive` no se incluye: al crear lo decide el servidor.
  */
-export const toCreateCategoryPayload = (
+export const toCreateCategoryParams = (
     values: CategoryFormValues
-): CreateCategoryPayload => {
+): CreateCategoryParams => {
     const description = values.description.trim();
 
     return {
@@ -93,6 +93,6 @@ export const toCreateCategoryPayload = (
 export const toUpdateCategoryPayload = (
     values: CategoryFormValues
 ): UpdateCategoryPayload => ({
-    ...toCreateCategoryPayload(values),
+    ...toCreateCategoryParams(values),
     estado: values.isActive,
 });

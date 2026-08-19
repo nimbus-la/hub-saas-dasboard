@@ -1,5 +1,5 @@
 import { ApiResponseWithPagination, HttpRequestConfig } from "@/interfaces";
-import { CategoryList, CreateCategoryPayload, UpdateCategoryPayload } from "../interfaces";
+import { CategoryList, CreateCategoryParams, UpdateCategoryPayload } from "../interfaces";
 
 export interface CategoriesService {
     list(
@@ -12,9 +12,9 @@ export interface CategoriesService {
     ): Promise<CategoryList>;
 
     create(
-        payload: CreateCategoryPayload,
+        payload: CreateCategoryParams,
         config?: HttpRequestConfig
-    ): Promise<{ data: CategoryList; message: string }>;
+    ): Promise<ApiResponseWithPagination<null>>;
 
     update(
         id: string,
