@@ -1,3 +1,5 @@
+import type { Plural } from "@/messages";
+
 export interface PaginationProps {
     /** Página actual, empezando en 1. */
     page: number;
@@ -10,8 +12,12 @@ export interface PaginationProps {
     pageSizeOptions?: readonly number[];
     /**
      * Nombre del elemento listado para el resumen ("Mostrando 1–12 de 22
-     * productos"). En singular y plural porque el español no lo deduce.
+     * productos").
+     *
+     * Es un `Plural` del catálogo de textos y no una cadena suelta: qué forma
+     * le toca a cada cantidad lo decide `formatPlural` con las reglas del
+     * idioma, no un `=== 1` dentro de este componente.
      */
-    itemLabel?: { singular: string; plural: string };
+    itemLabel?: Plural;
     className?: string;
 }

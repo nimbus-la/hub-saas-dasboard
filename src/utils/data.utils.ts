@@ -1,15 +1,26 @@
 import { MenuStructurePrimary } from "@/interfaces";
+import { messages } from "@/messages";
+
+/**
+ * Estructura del menú lateral.
+ *
+ * Aquí se decide qué cuelga de qué, con qué icono y hacia qué ruta. Los
+ * rótulos no se escriben: salen de `@/messages`, porque la estructura no se
+ * traduce y el texto sí — mantener las dos cosas juntas obligaría a duplicar
+ * el árbol entero por idioma para cambiar seis palabras.
+ */
+const { sections, items } = messages.navigation.menu;
 
 export const DATA_MENU: MenuStructurePrimary[] = [
     {
-        title: 'GENERAL',
+        title: sections.general,
         orden: 1,
         type: 'primary',
         active: true,
         items: [
             {
                 orden: 1,
-                title: 'Inicio',
+                title: items.home,
                 type: 'secondary',
                 icon: 'DASHBOARD',
                 url: '/',
@@ -18,14 +29,14 @@ export const DATA_MENU: MenuStructurePrimary[] = [
         ]
     },
     {
-        title: 'GESTIÓN',
+        title: sections.management,
         orden: 2,
         type: 'primary',
         active: true,
         items: [
             {
                 orden: 1,
-                title: 'Productos',
+                title: items.products,
                 type: 'secondary',
                 icon: 'PRODUCTS',
                 // Sin `url`: actúa como acordeón, sus hijos son las páginas reales.
@@ -33,21 +44,21 @@ export const DATA_MENU: MenuStructurePrimary[] = [
                 items: [
                     {
                         orden: 1,
-                        title: 'Categorías',
+                        title: items.categories,
                         type: 'tertiary',
                         url: '/products/categories',
                         active: true,
                     },
                     {
                         orden: 2,
-                        title: 'Lista de productos',
+                        title: items.productsList,
                         type: 'tertiary',
                         url: '/products',
                         active: true,
                     },
                     {
                         orden: 3,
-                        title: 'Crear producto',
+                        title: items.createProduct,
                         type: 'tertiary',
                         url: '/products/create',
                         active: true,
@@ -56,7 +67,7 @@ export const DATA_MENU: MenuStructurePrimary[] = [
             },
             {
                 orden: 2,
-                title: 'Inventario',
+                title: items.inventory,
                 type: 'secondary',
                 icon: 'INVENTORY',
                 url: '/invetory',
@@ -64,7 +75,7 @@ export const DATA_MENU: MenuStructurePrimary[] = [
             },
             {
                 orden: 3,
-                title: 'Ordenes',
+                title: items.orders,
                 type: 'secondary',
                 icon: 'ORDERS',
                 url: '/orders',
@@ -72,7 +83,7 @@ export const DATA_MENU: MenuStructurePrimary[] = [
             },
             {
                 orden: 4,
-                title: 'Empleados',
+                title: items.employees,
                 type: 'secondary',
                 icon: 'EMPLEOYES',
                 url: '/empleoyes',

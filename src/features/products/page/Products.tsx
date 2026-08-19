@@ -11,12 +11,13 @@
 // El catálogo llega por props desde el Server Component de la ruta: cuando
 // `getProducts` hable con la API, esta pantalla no cambia.
 
+import { useRouter } from "next/navigation";
 import * as React from "react";
 
+import { TextField } from "@/components/inputs/TextField";
 import Pagination from "@/components/pagination/Pagination";
 import { FilterTabs } from "@/components/tabs/FilterTabs";
-import { TextField } from "@/components/inputs/TextField";
-import { ICON_TOKENS } from "@/tokens";
+import type { FilterTabItem } from "@/interfaces";
 import {
     ALL_CATEGORIES,
     DEFAULT_PRODUCT_PAGE_SIZE,
@@ -26,27 +27,35 @@ import {
     filterProducts,
     type Product,
 } from "@/lib/products";
-import type { FilterTabItem } from "@/interfaces";
+import { formatMessage, messages } from "@/messages";
+import { ICON_TOKENS } from "@/tokens";
 
 import {
     ProductsEmptyState,
     ProductsGrid,
     ProductsHeader,
-} from "../components";
+} from "../components/list";
 import {
     productsPageBodyVariants,
     productsPagePaginationVariants,
     productsPageSearchVariants,
     productsPageVariants,
-} from "./products.style";
+} from "../style";
 
 const GRID_PANEL_ID = "products-grid";
+
+/** Todo lo que dice esta pantalla. Ver `@/messages`. */
+const COPY = messages.products.list;
+
+/** Formulario de alta. La misma ruta que declara el menú lateral. */
+const CREATE_PRODUCT_HREF = "/products/create";
 
 interface ProductsProps {
     products: Product[];
 }
 
 export default function Products({ products }: ProductsProps) {
+    const router = useRouter();
     const [query, setQuery] = React.useState("");
     const [category, setCategory] = React.useState<string>(ALL_CATEGORIES);
     const [page, setPage] = React.useState(1);
@@ -75,7 +84,7 @@ export default function Products({ products }: ProductsProps) {
         return [
             {
                 value: ALL_CATEGORIES,
-                label: "Todas",
+                label: COPY.allCategories,
                 count: searchResults.length,
             },
             ...PRODUCT_CATEGORIES.map((name) => ({
@@ -123,8 +132,8 @@ export default function Products({ products }: ProductsProps) {
     }, []);
 
     const handleCreateProduct = React.useCallback(() => {
-        // Enlazar con el formulario de alta cuando exista su ruta.
-    }, []);
+        router.push(CREATE_PRODUCT_HREF);
+    }, [router]);
 
     const handleEditProduct = React.useCallback((product: Product) => {
         // Enlazar con el formulario de edición cuando exista su ruta.
@@ -137,7 +146,8 @@ export default function Products({ products }: ProductsProps) {
         void product;
     }, []);
 
-    const categoryLabel = category === ALL_CATEGORIES ? "todas las categorías" : category;
+    const categoryLabel =
+        category === ALL_CATEGORIES ? COPY.allCategoriesLabel : category;
 
     return (
         <div className={productsPageVariants()}>
@@ -154,8 +164,8 @@ export default function Products({ products }: ProductsProps) {
                     onChange={handleQueryChange}
                     clearable
                     leftIcon={<ICON_TOKENS.SEARCH aria-hidden="true" />}
-                    placeholder="Buscar por nombre o categoría"
-                    aria-label="Buscar productos"
+                    placeholder={COPY.searchPlaceholder}
+                    aria-label={COPY.searchLabel}
                     className={productsPageSearchVariants()}
                 />
 
@@ -163,7 +173,7 @@ export default function Products({ products }: ProductsProps) {
                     items={categoryTabs}
                     value={category}
                     onChange={handleCategoryChange}
-                    label="Categorías de productos"
+                    label={COPY.tabsLabel}
                     panelId={GRID_PANEL_ID}
                 />
 
@@ -172,7 +182,9 @@ export default function Products({ products }: ProductsProps) {
                     onEditProduct={handleEditProduct}
                     onDeleteProduct={handleDeleteProduct}
                     panelId={GRID_PANEL_ID}
-                    panelLabel={`Productos de ${categoryLabel}`}
+                    panelLabel={formatMessage(COPY.panelLabel, {
+                        category: categoryLabel,
+                    })}
                     emptyState={
                         <ProductsEmptyState
                             query={query}
@@ -189,7 +201,7 @@ export default function Products({ products }: ProductsProps) {
                         onPageChange={setPage}
                         onPageSizeChange={handlePageSizeChange}
                         pageSizeOptions={PRODUCT_PAGE_SIZES}
-                        itemLabel={{ singular: "producto", plural: "productos" }}
+                        itemLabel={COPY.itemLabel}
                         className={productsPagePaginationVariants()}
                     />
                 )}

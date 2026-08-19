@@ -78,6 +78,27 @@ export const genericButtonVariants = cva(
                     "hover:bg-error-lighter hover:text-error-dark",
                     "disabled:bg-white disabled:text-neutral-300",
                 ],
+
+                // Destructivo sólido: el mismo papel que `primary` pero en la
+                // familia de error. Es para cuando borrar ES la acción
+                // principal de la pantalla — el botón que confirma un diálogo
+                // de eliminación—, donde el `danger` discreto quedaría por
+                // debajo del "Cancelar" que tiene al lado y el ojo elegiría
+                // mal. Fuera de ese caso se usa `danger`: dos rojos sólidos en
+                // una misma vista dejan de avisar de nada.
+                //
+                // El fondo arranca en `error-dark` y no en `error-main`, que es
+                // lo que pediría la simetría con `primary`. `error-main`
+                // (#FF5630) es un rojo anaranjado muy luminoso: con texto
+                // blanco encima da 3,1:1 y la etiqueta del botón necesita 4,5.
+                // `error-dark` (#B71D18) llega a 6,5:1 y además se lee más
+                // grave, que es justo lo que tiene que transmitir el botón que
+                // borra algo.
+                destructive: [
+                    "bg-error-dark text-white",
+                    "hover:bg-error-darker",
+                    "disabled:bg-neutral-400 disabled:text-white",
+                ],
             },
 
             // ── Tamaño — alto, relleno, separación, radio y texto ────────────

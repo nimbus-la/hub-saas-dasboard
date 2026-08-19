@@ -1,9 +1,20 @@
 import {
+    ArrowLeft,
+    ArrowRight,
+    CircleCheck,
     Home,
+    ImageUp,
+    Info,
+    ListFilter,
+    OctagonX,
     Package,
     PackageSearch,
     ClipboardList,
     ShoppingBasket,
+    SquarePen,
+    Tags,
+    Trash2,
+    TriangleAlert,
     Users,
     PanelRightClose,
     PanelRightOpen,
@@ -28,6 +39,8 @@ export const ICON_TOKENS = {
     /* ── Secciones ────────────────────────────────────────────────────────── */
     DASHBOARD: Home,
     PRODUCTS: Package,
+    /** Categorías de la carta — la agrupación, no el producto. */
+    CATEGORIES: Tags,
     INVENTORY: ClipboardList,
     ORDERS: ShoppingBasket,
     EMPLEOYES: Users,
@@ -35,12 +48,40 @@ export const ICON_TOKENS = {
     /* ── Acciones ─────────────────────────────────────────────────────────── */
     /** Crear un registro nuevo. */
     CREATE: Plus,
+    /** Editar un registro existente. */
+    EDIT: SquarePen,
+    /** Eliminar un registro. Siempre detrás de una confirmación. */
+    DELETE: Trash2,
     /** Buscar dentro de una colección. */
     SEARCH: Search,
+    /** Acotar una colección por un criterio cerrado. */
+    FILTER: ListFilter,
+    /** Volver a la pantalla anterior — el par de `NEXT`. */
+    BACK: ArrowLeft,
+    /** Avanzar al siguiente paso de un flujo. */
+    NEXT: ArrowRight,
+    /** Subir una imagen desde el equipo. */
+    UPLOAD_IMAGE: ImageUp,
 
     /* ── Estados ──────────────────────────────────────────────────────────── */
     /** Una búsqueda o un filtro que no devolvió nada. */
     NO_RESULTS: PackageSearch,
+    /** Aviso de una acción irreversible. */
+    WARNING: TriangleAlert,
+    /** Algo terminó bien: se guardó, se envió, se publicó. */
+    SUCCESS: CircleCheck,
+    /**
+     * Algo falló y hay que hacer algo al respecto.
+     *
+     * Octógono y aspa: la señal de stop. Los cuatro glifos de estado se
+     * eligieron para que **la silueta sola** distinga uno de otro —círculo,
+     * triángulo, octógono—, porque en el aviso el icono se dibuja a tamaño de
+     * medallón y es lo único que separa un error de una confirmación cuando el
+     * rojo y el verde se leen igual.
+     */
+    ERROR: OctagonX,
+    /** Dato de contexto, sin urgencia ni consecuencia. */
+    INFO: Info,
 
     /* ── Chrome ───────────────────────────────────────────────────────────── */
     PANEL_RIGHT_OPEN: PanelRightOpen,

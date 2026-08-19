@@ -8,6 +8,8 @@
  * punto central para importar todas las interfaces.
  */
 
+export * from "./alerts.interfaces";
+
 export * from "./avatar.interfaces";
 
 export * from "./badge.interfaces";
@@ -17,6 +19,10 @@ export * from "./buttons.interfaces";
 export * from "./cards.interfaces";
 
 export * from "./inputs.interfaces";
+
+export * from "./layout.interfaces";
+
+export * from "./modals.interfaces";
 
 export * from "./navbar.interfaces";
 

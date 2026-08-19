@@ -242,6 +242,26 @@
        necesita como número. Aquí solo la curva que Tailwind no trae.    */
     --ease-emphasized: cubic-bezier(0.2, 0, 0, 1.2);
 
+    /* Cuenta atrás de un aviso que se cierra solo: una barra que se vacía
+       de izquierda a derecha. Es la única animación del sistema cuya
+       duración NO se declara aquí — la pone quien la usa (`style`), porque
+       el tiempo que dura un aviso es una decisión de producto y llega como
+       número en tiempo de ejecución. Sin esa duración no se ve nada.
+
+       Se anima `transform` y no `width`: el ancho recalcula el layout en
+       cada fotograma; la escala la resuelve el compositor.               */
+    --animate-countdown: countdown linear forwards;
+
+    @keyframes countdown {
+        from {
+            transform: scaleX(1);
+        }
+
+        to {
+            transform: scaleX(0);
+        }
+    }
+
     /* ─── Puntos de corte ─────────────────────────────── */
     /* Los demás son los de Tailwind. Este añade la variante `xs:`, y su
        gemelo en JS está en `tokens/layout.tokens.ts` (BREAKPOINT).      */
@@ -288,8 +308,9 @@
        manda sobre la variable, no al revés. Los valores son los mismos que
        producía el `calc()`, así que nada cambia de aspecto.
 
-       `--radius` se conserva: los componentes de shadcn (`src/components/
-       ui`) la leen directamente en valores arbitrarios.                 */
+       `--radius` se conserva junto al resto del bloque heredado de shadcn:
+       ya no la lee ningún componente —`src/components/ui` desapareció al
+       migrar el `alert`—, y se poda con las demás. Ver `docs/tailwind.md`. */
     --radius-xs: 4px;
     --radius-sm: 6px;
     --radius-md: 8px;
@@ -367,6 +388,18 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.556 0 0);
+}
+
+/* ─── Utilidades del sistema ────────────────────────────────────────────────
+   Lo que Tailwind no trae y el design system necesita como clase, para no
+   escribirlo como valor arbitrario en cada componente.                      */
+
+/* Congela una animación en el fotograma actual sin reiniciarla al reanudar.
+   La usa la cuenta atrás de las alertas cuando el puntero se posa encima:
+   pausar la barra y pausar el temporizador son la misma decisión —quien está
+   leyendo el aviso no puede quedarse a medias— y así las dos se ven iguales. */
+@utility animation-paused {
+    animation-play-state: paused;
 }
 
 @layer base {

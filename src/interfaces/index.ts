@@ -18,8 +18,21 @@ export * from "./components";
 
 /** Dominio */
 export * from "./menu.types";
+export * from "./pagination.interface";
+
+
+/** Infraestructura */
+export * from "./http/api-alert.interface";
+export * from "./http/api-envelope.interfaces";
+export * from "./http/fetch-http-client.interfaces";
+export * from "./http/http-error.interfaces";
+export * from "./http/http.interfaces";
 
 
 /** Tokens */
-export * from "./tokens/sizes-token.interface";
 export * from "./tokens/elevation-token.interface";
+export * from "./tokens/sizes-token.interface";
+
+
+export * from "./query-types.interface";
+

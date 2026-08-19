@@ -3,6 +3,7 @@ import { TrendingDown, TrendingUp } from "lucide-react";
 import type { MetricCardProps } from "@/interfaces";
 import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { messages } from "@/messages";
 import { ICON_SIZE, ICON_STROKE_BY_SIZE } from "@/tokens";
 
 import {
@@ -34,7 +35,7 @@ export default function MetricCard({
     label,
     value,
     delta,
-    deltaLabel = "vs. mes anterior",
+    deltaLabel = messages.components.metricCard.deltaLabel,
     color,
     className,
 }: MetricCardProps) {
