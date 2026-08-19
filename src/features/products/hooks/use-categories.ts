@@ -137,13 +137,6 @@ export function useProductsCategories() {
         isPending: query.isPending,
         isError: query.isError,
 
-        /**
-         * Hay una petición en curso, incluida la que se dispara al dejar de
-         * escribir. Sirve para atenuar la tabla mientras llega lo nuevo: con
-         * `keepPreviousData` lo que se ve son los resultados del texto anterior.
-         */
-        isFetching: query.isFetching,
-
         create: createCategory,
         update: updateCategory
     }

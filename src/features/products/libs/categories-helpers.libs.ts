@@ -1,7 +1,7 @@
 import type { BadgeTone } from "@/interfaces";
 import { formatMessage, formatPlural, messages } from "@/messages";
 
-import { CategoryFilters, CategoryList } from "../interfaces";
+import { CategoryFilters } from "../interfaces";
 import {
     CATEGORY_STATUS_LABELS,
     CATEGORY_STATUS_PLURAL_LABELS,
@@ -73,45 +73,6 @@ export const getCategoryFiltersKey = (
 /** `1 categoría` · `8 categorías` */
 export const formatCategoryCount = (count: number): string =>
     formatPlural(messages.products.categories.count, count);
-
-
-
-/**
- * Minúsculas y sin diacríticos: "Café" → "cafe".
- *
- * Queda para comparar nombres entre sí. Buscar ya no pasa por aquí: lo hace el
- * backend, que es el único que ve el catálogo entero — con la búsqueda en
- * memoria, teclear "café" sólo encontraba lo que hubiera en la página cargada.
- */
-function normalizeText(value: string): string {
-    return value
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/\p{Diacritic}/gu, "");
-};
-
-
-
-/**
- * ¿Hay ya otra categoría con este nombre?
- *
- * Se compara normalizado porque "Bebidas" y "bebidas " son la misma categoría
- * para quien lee la carta, y dos entradas iguales en el filtro del catálogo no
- * hay forma de distinguirlas. `ignoreId` deja fuera la que se está editando:
- * sin él, guardar sin tocar el nombre chocaría consigo misma.
- */
-export function isDuplicateCategoryName(
-    categories: CategoryList[],
-    name: string,
-    ignoreId?: string
-): boolean {
-    const target = normalizeText(name.trim());
-
-    return categories.some(
-        (category) =>
-            category.id !== ignoreId && normalizeText(category.name) === target
-    );
-}
 
 
 

@@ -150,10 +150,6 @@ export function hasCategoryChanges(
     );
 }
 
-/** Mensaje del nombre repetido. Se compone aquí para no redactarlo dos veces. */
-export const duplicateCategoryNameMessage = (name: string): string =>
-    formatMessage(copy.validation.nameTaken, { name: name.trim() });
-
 /* -------------------------------------------------------------------------- */
 /*  Textos                                                                     */
 /* -------------------------------------------------------------------------- */

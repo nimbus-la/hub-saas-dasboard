@@ -43,9 +43,6 @@ export interface CategoryFiltersState {
     /** Deja la barra como estaba. */
     clear: () => void;
 
-    /** ¿Hay algo puesto? Decide qué dice la tabla cuando no devuelve filas. */
-    hasFilters: boolean;
-
     /**
      * Lo que viaja al backend, ya con el texto reposado.
      *
@@ -104,7 +101,6 @@ export function useCategoryFilters(): CategoryFiltersState {
         status,
         setStatus,
         clear,
-        hasFilters: query.trim().length > 0 || status !== DEFAULT_CATEGORY_STATUS_FILTER,
         params,
         key,
     };
