@@ -7,28 +7,13 @@ import { ConfirmDialog, notify, PageHeader, StatusBadge } from "@/components";
 import { getApiErrorMessage } from "@/lib/http";
 import { formatMessage, messages } from "@/messages";
 
-
 import { CategoriesTable, CategoriesToolbar, CategoryFormModal } from "../components/categories";
 import { useProductsCategories } from "../hooks";
 import type { CategoryFormValues, CategoryList } from "../interfaces";
-import {
-    DEFAULT_CATEGORY_STATUS_FILTER,
-    EMPTY_CATEGORY_FORM_VALUES,
-    filterCategories,
-    formatCategoryCount,
-    getEmptyMessage,
-    isDuplicateCategoryName,
-    type CategoryStatusFilter,
-} from "../libs";
-import { toCreateCategoryParams, toUpdateCategoryPayload } from "../mappers";
-import {
-    useDeleteCategory,
-    useUpdateCategory
-} from "../queries/categories.queries";
-import {
-    categoriesPageBodyVariants,
-    categoriesPageVariants,
-} from "./categories.style";
+import { DEFAULT_CATEGORY_STATUS_FILTER, EMPTY_CATEGORY_FORM_VALUES, filterCategories, formatCategoryCount, getEmptyMessage, isDuplicateCategoryName, type CategoryStatusFilter } from "../libs";
+import { toCreateCategoryParams, toUpdateCategoryParams } from "../mappers";
+import { categoriesPageBodyVariants, categoriesPageVariants } from "./categories.style";
+
 
 /** Destino de la flecha de regreso. La misma ruta que declara el menú lateral. */
 const PRODUCTS_LIST_HREF = "/products";
@@ -48,16 +33,6 @@ export default function Categories() {
     const message = messages.products.categories;
     console.log("form data: ", form.watch())
 
-
-    /* const {
-        data: categories = [],
-        isPending,
-        isError,
-        error,
-    } = useCategories(); */
-
-    const updateCategory = useUpdateCategory();
-    const deleteCategory = useDeleteCategory();
 
     const [query, setQuery] = React.useState<string>("");
     const [status, setStatus] = React.useState<CategoryStatusFilter>(DEFAULT_CATEGORY_STATUS_FILTER);
@@ -144,9 +119,9 @@ export default function Categories() {
                 // edición sí, que es el único momento en que alguien decide
                 // sobre el interruptor.
                 if (formTarget) {
-                    await updateCategory.mutateAsync({
+                    await categories.update.mutateAsync({
                         id: formTarget.id,
-                        payload: toUpdateCategoryPayload(values),
+                        params: toUpdateCategoryParams(values, formTarget),
                     });
                 } else {
                     await categories.create.mutateAsync(toCreateCategoryParams(values));
@@ -159,7 +134,7 @@ export default function Categories() {
                 notify.error(errorMessage);
             }
         },
-        [formTarget, categories.create, updateCategory]
+        [formTarget, categories.create, categories.update]
     );
 
 
@@ -178,14 +153,15 @@ export default function Categories() {
         if (!deleteTarget) return;
 
         try {
-            await deleteCategory.mutateAsync(deleteTarget.id);
+            // TODO: Integrar servicio para eliminar categoria.
+            // await deleteCategory.mutateAsync(deleteTarget.id);
             setIsDeleteOpen(false);
         } catch {
             // El diálogo se queda abierto para poder reintentar. El detalle del
             // fallo no cabe aquí; queda en `deleteCategory.error` para cuando
             // la pantalla tenga dónde mostrar avisos.
         }
-    }, [deleteTarget, deleteCategory]);
+    }, [deleteTarget, /* deleteCategory */]);
 
 
     return (
@@ -226,9 +202,6 @@ export default function Categories() {
                     />
                 </section>
 
-                {/* El modal se monta siempre: `useCategoryForm` recarga el borrador
-                al abrir, así que la misma instancia sirve para el alta y para
-                cualquier fila sin arrastrar lo que se escribió en la anterior. */}
                 <CategoryFormModal
                     open={isFormOpen}
                     onOpenChange={setIsFormOpen}
@@ -251,7 +224,7 @@ export default function Categories() {
                         confirmLabel={message.delete.confirm}
                         cancelLabel={message.delete.cancel}
                         onConfirm={handleDeleteConfirm}
-                        loading={deleteCategory.isPending}
+                        loading={/* deleteCategory.isPending */ false}
                     />
                 )}
             </div>

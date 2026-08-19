@@ -1,5 +1,5 @@
 import { ApiResponseWithPagination, HttpRequestConfig } from "@/interfaces";
-import { CategoryList, CreateCategoryParams, UpdateCategoryPayload } from "../interfaces";
+import { CategoryList, CreateCategoryParams, UpdateCategoryParams } from "../interfaces";
 
 export interface CategoriesService {
     list(
@@ -9,17 +9,18 @@ export interface CategoriesService {
     detail(
         id: string,
         config?: HttpRequestConfig
-    ): Promise<CategoryList>;
+    ): Promise<ApiResponseWithPagination<CategoryList>>;
 
     create(
         payload: CreateCategoryParams,
         config?: HttpRequestConfig
-    ): Promise<ApiResponseWithPagination<null>>;
+    ): Promise<void>;
 
     update(
         id: string,
-        payload: UpdateCategoryPayload,
+        payload: UpdateCategoryParams,
         config?: HttpRequestConfig
-    ): Promise<{ data: CategoryList; message: string }>;
+    ): Promise<void>;
+
     remove(id: string, config?: HttpRequestConfig): Promise<unknown>;
 }

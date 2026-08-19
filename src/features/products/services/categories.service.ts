@@ -1,6 +1,6 @@
 import type { ApiResponseWithPagination, HttpClient, HttpRequestConfig } from "@/interfaces";
 import { ENDPOINTS } from "@/utils";
-import type { CategoriesService, CategoryList, CategoryListApiResponse, CreateCategoryParams, UpdateCategoryPayload } from "../interfaces";
+import type { CategoriesService, CategoryList, CategoryListApiResponse, CreateCategoryParams, UpdateCategoryParams } from "../interfaces";
 import { toCategory, toCategoryList } from "../mappers";
 
 
@@ -114,37 +114,33 @@ export function createCategoriesService(http: HttpClient): CategoriesService {
             return { ...data, data: toCategoryList(data.data) };
         },
 
-        detail: async (id: string, config: HttpRequestConfig | undefined): Promise<Category> => {
-            const { data } = await http.get<CategoryApiResponse>(
+        detail: async (id: string, config: HttpRequestConfig | undefined): Promise<ApiResponseWithPagination<CategoryList>> => {
+            const { data } = await http.get<ApiResponseWithPagination<CategoryListApiResponse>>(
                 categoryPath(id),
                 withTenantParam(config)
             );
 
-            return toCategory(data);
+            return { ...data, data: toCategory(data.data) };
         },
 
-        create: async (payload: CreateCategoryParams, config: HttpRequestConfig | undefined): Promise<ApiResponseWithPagination<null>> => {
-            const { data } = await http.post<ApiResponseWithPagination<null>>(
+        create: async (payload: CreateCategoryParams, config: HttpRequestConfig | undefined): Promise<void> => {
+            await http.post<unknown>(
                 ENDPOINTS.PRODUCTS_CATEGORY,
                 withTenantBody(payload),
                 config
             );
-
-            return data;
         },
 
         update: async (
             id: string,
-            payload: UpdateCategoryPayload,
+            payload: UpdateCategoryParams,
             config: HttpRequestConfig | undefined
-        ): Promise<{ data: Category; message: string }> => {
-            const { data, message } = await http.patch<CategoryApiResponse>(
+        ): Promise<void> => {
+            await http.patch<unknown>(
                 categoryPath(id),
                 withTenantBody(payload),
                 config
             );
-
-            return { data: toCategory(data), message };
         },
 
         // Sin mapper: no devuelve cuerpo que traducir.

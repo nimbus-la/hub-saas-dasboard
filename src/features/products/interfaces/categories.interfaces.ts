@@ -70,6 +70,6 @@ export interface CreateCategoryParams {
  * compartido, olvidarlo en la llamada compilaría sin protestar y la categoría
  * se guardaría perdiendo su estado.
  */
-export type UpdateCategoryPayload = CreateCategoryParams & {
-    estado: boolean;
+export type UpdateCategoryParams = CreateCategoryParams & {
+    isActive?: boolean;
 };

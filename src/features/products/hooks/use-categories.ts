@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { notify } from "@/components";
 import { useHttpClient } from "@/context";
 import { getApiErrorMessage } from "@/lib/http";
-import { CategoriesService, CreateCategoryParams } from "../interfaces";
+import { CategoriesService, CreateCategoryParams, UpdateCategoryParams } from "../interfaces";
 import { createCategoriesService } from "../services";
 
 
@@ -39,6 +39,17 @@ export function useProductsCategories() {
     });
 
 
+    const updateCategory = useMutation({
+        mutationFn: ({ id, params }: { id: string, params: UpdateCategoryParams }) =>
+            service.update(id, params),
+
+        onSuccess: () => {
+            // TODO: Implementar alerta de exito.
+            return queryClient.invalidateQueries({ queryKey: categoryKeys.list() });
+        }
+    })
+
+
     React.useEffect(() => {
         if (query.isError) {
             const errorMessage = getApiErrorMessage(query.error);
@@ -54,6 +65,7 @@ export function useProductsCategories() {
         isPending: query.isPending,
         isError: query.isError,
 
-        create: createCategory
+        create: createCategory,
+        update: updateCategory
     }
 };

@@ -1,5 +1,5 @@
 import { formatDate } from "@/lib/format";
-import type { CategoryFormValues, CategoryList, CategoryListApiResponse, CreateCategoryParams, UpdateCategoryPayload } from "../interfaces";
+import type { CategoryFormValues, CategoryList, CategoryListApiResponse, CreateCategoryParams, UpdateCategoryParams } from "../interfaces";
 
 
 /**
@@ -90,9 +90,12 @@ export const toCreateCategoryParams = (
  * omisión de la descripción. Así la diferencia entre los dos queda en una sola
  * línea, que es exactamente lo que se diferencian.
  */
-export const toUpdateCategoryPayload = (
-    values: CategoryFormValues
-): UpdateCategoryPayload => ({
+export const toUpdateCategoryParams = (
+    values: CategoryFormValues,
+    current: CategoryList
+): UpdateCategoryParams => ({
     ...toCreateCategoryParams(values),
-    estado: values.isActive,
+
+    // Ausente cuando no cambio.
+    ...(values.isActive !== current.isActive ? { isActive: values.isActive } : {}),
 });

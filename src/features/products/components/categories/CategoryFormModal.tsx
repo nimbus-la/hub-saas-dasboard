@@ -4,7 +4,6 @@ import * as React from "react";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { GenericButton, Modal, Switch, TextAreaField, TextField } from "@/components";
-import { useCategoryForm } from "@/features/products/hooks/use-category-form";
 import {
     CATEGORY_ACTIVE_HINT,
     CATEGORY_FORM_RULES,
@@ -17,21 +16,6 @@ import { CategoryFormValues, CategoryList } from "../../interfaces";
 import { categoryFormModalToggleVariants, categoryFormModalVariants } from "./category-form-modal.style";
 
 
-/**
- * Modal de alta y edición de una categoría.
- *
- * Un solo componente para los dos modos: comparten campos, reglas y mensajes
- * de error, y se diferencian en lo que dicen —`CATEGORY_MODAL_COPY`— y en si
- * enseñan el interruptor de estado. Dos componentes casi iguales habrían
- * significado corregir cada validación dos veces.
- *
- * El estado lo lleva `useCategoryForm`; aquí solo se decide la estructura.
- *
- * Cada campo va envuelto en un `Controller` porque los controles del design
- * system exponen `onChange(valor)` en lugar del evento nativo del DOM, que es
- * lo que esperaría `register` —el mismo motivo que en el formulario de
- * producto—.
- */
 
 /** Une el `<form>` del cuerpo con su botón de envío, que vive en el pie. */
 const FORM_ID = "category-form";
@@ -81,8 +65,6 @@ export default function CategoryFormModal({
 
     const mode = category ? "edit" : "create";
     const generalMessage = CATEGORY_MODAL_COPY[mode];
-
-    const { } = useCategoryForm({ open, category, isNameTaken });
 
 
     const nameRules = React.useMemo(
