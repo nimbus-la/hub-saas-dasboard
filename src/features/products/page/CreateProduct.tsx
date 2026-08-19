@@ -1,13 +1,13 @@
 "use client";
 
-import * as React from "react";
 import Link from "next/link";
+import * as React from "react";
 
 import GenericButton from "@/components/buttons/GenericButton";
 import PageHeader from "@/components/layout/PageHeader";
+import { PRODUCT_FORM_STEPS } from "@/features/products/libs/product-form";
 import { messages } from "@/messages";
 import { ICON_TOKENS } from "@/tokens";
-import { PRODUCT_FORM_STEPS } from "@/features/products/libs/product-form";
 
 import {
     ProductBasicsStep,
@@ -23,7 +23,7 @@ import {
     createProductFooterVariants,
     createProductPageVariants,
     createProductPanelVariants,
-} from "./create-product.style";
+} from "../style";
 
 /** Destino de la flecha de regreso y del botón de cancelar. */
 const PRODUCTS_LIST_HREF = "/products";

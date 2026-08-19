@@ -1,47 +1,11 @@
-import type {
-    ErrorInterceptor,
-    FetchHttpClientOptions,
-    HttpClient,
-    HttpMethod,
-    HttpRequest,
-    HttpRequestConfig,
-    HttpResponse,
-    QueryParams,
-    RequestInterceptor,
-    ResponseFormat,
-} from "@/interfaces";
+import { ErrorInterceptor, FetchHttpClientOptions, HttpMethod, HttpRequest, HttpResponse, QueryParams, RequestInterceptor, ResponseFormat } from "@/interfaces";
 import { HTTP_DEFAULT_TIMEOUT_MS, HTTP_EMPTY_STATUSES } from "@/utils";
 
+import { BaseHttpClient } from "./base-http-client";
 import { HttpError } from "./http-error";
 
 
-/**
- * Cliente HTTP basado en `fetch`.
- * 
- * Cumple `HttpClient` usando el `fetch` de la plataforma. Es la única pieza de
- * la aplicación que conoce detalles de transporte: cabeceras, serialización,
- * códigos de estado y cancelación.
- * 
- * Por qué `fetch` y no axios: Next extiende `fetch` con su sistema de caché y
- * revalidación (`next: { tags }` + `revalidateTag`). Una petición hecha con
- * axios desde un Server Component queda fuera de eso. Si algún día hace falta
- * axios —por ejemplo para progreso de subida, que `fetch` no expone— se crea
- * un `AxiosHttpClient` que cumpla la misma interfaz y se registra en
- * `index.ts`; nada más cambia.
- * 
- * Lo que este cliente NO hace, a propósito:
- * 
- *   - Reintentar. La política de reintentos vive en React Query, que además
- *     sabe si la consulta sigue interesando. Reintentar en las dos capas
- *     multiplica los intentos (3 × 3 = 9) y nadie entiende de dónde salen.
- *   - Refrescar el token. Hacerlo bien exige encolar las peticiones que fallan
- *     en paralelo con 401 para no disparar N refrescos a la vez. Cuando exista
- *     autenticación, ese código va en `onRequest`/`onError` desde el módulo de
- *     sesión, no incrustado aquí.
- */
-
-
-export class FetchHttpClient implements HttpClient {
+export class FetchHttpClient extends BaseHttpClient {
     private readonly baseUrl: string;
     private readonly defaultHeaders: Record<string, string>;
     private readonly timeoutMs: number;
@@ -49,10 +13,11 @@ export class FetchHttpClient implements HttpClient {
     private readonly onRequest: RequestInterceptor | undefined;
     private readonly onError: ErrorInterceptor | undefined;
 
-    constructor(options: FetchHttpClientOptions = {}) {
-        // La barra final se quita aquí para que `${baseUrl}${path}` nunca
-        // produzca `//categories`, que algunos backends tratan como otra ruta.
-        this.baseUrl = options.baseUrl?.replace(/\/+$/, "") ?? "";
+
+    constructor(options: FetchHttpClientOptions) {
+        super();
+
+        this.baseUrl = this.normalizeUrl(options.baseUrl);
         this.defaultHeaders = options.headers ?? {};
         this.timeoutMs = options.timeoutMs ?? HTTP_DEFAULT_TIMEOUT_MS;
         this.credentials = options.credentials;
@@ -60,10 +25,9 @@ export class FetchHttpClient implements HttpClient {
         this.onError = options.onError;
     }
 
-    // ── API pública ─────────────────────────────────────────────────────────
 
-    public async request<TData>(input: HttpRequest): Promise<HttpResponse<TData>> {
-        const resolved = this.onRequest ? await this.onRequest(input) : input;
+    override async request<TData>(request: HttpRequest): Promise<HttpResponse<TData>> {
+        const resolved = this.onRequest ? await this.onRequest(request) : request;
 
         try {
             return await this.execute<TData>(resolved);
@@ -71,17 +35,14 @@ export class FetchHttpClient implements HttpClient {
         } catch (error: unknown) {
             const httpError = HttpError.fromUnknown(error, {
                 method: resolved.method,
-                url: resolved.url,
+                url: resolved.url
             });
 
-            // El interceptor observa, pero no puede impedir que el error llegue
-            // a quien lo pidió: si él mismo falla, ese fallo no debe tapar el
-            // error original.
             if (this.onError) {
                 try {
                     await this.onError(httpError, resolved);
-                } catch {
-                    // Silencio deliberado: se propaga `httpError`, no éste.
+                } catch (error) {
+                    // Se propaga 'httpError'
                 }
             }
 
@@ -90,135 +51,58 @@ export class FetchHttpClient implements HttpClient {
     }
 
 
-    public async get<TData>(url: string, config?: HttpRequestConfig): Promise<TData> {
-        const response = await this.request<TData>({ ...config, method: "GET", url });
+    private async execute<TData>(request: HttpRequest): Promise<HttpResponse<TData>> {
+        const target = this.buildUrl(request.url, request.params);
+        const headers = this.buildHeaders(request.headers);
+        const payload = this.serializeBody(request.body, headers);
 
-        return response.data;
-    }
+        const effectiveTimeout = request.timeoutMs ?? this.timeoutMs;
+        const timeoutSignal = effectiveTimeout > 0 ? AbortSignal.timeout(effectiveTimeout) : null;
 
-
-    public async post<TData>(
-        url: string,
-        body?: unknown,
-        config?: HttpRequestConfig
-    ): Promise<TData> {
-        const response = await this.request<TData>({
-            ...config,
-            method: "POST",
-            url,
-            body,
-        });
-
-        return response.data;
-    }
-
-
-    public async put<TData>(
-        url: string,
-        body?: unknown,
-        config?: HttpRequestConfig
-    ): Promise<TData> {
-        const response = await this.request<TData>({
-            ...config,
-            method: "PUT",
-            url,
-            body,
-        });
-
-        return response.data;
-    }
-
-
-    public async patch<TData>(
-        url: string,
-        body?: unknown,
-        config?: HttpRequestConfig
-    ): Promise<TData> {
-        const response = await this.request<TData>({
-            ...config,
-            method: "PATCH",
-            url,
-            body,
-        });
-
-        return response.data;
-    }
-
-
-    public async delete<TData>(url: string, config?: HttpRequestConfig): Promise<TData> {
-        const response = await this.request<TData>({ ...config, method: "DELETE", url });
-
-        return response.data;
-    }
-
-
-    // ── Interior ────────────────────────────────────────────────────────────
-
-    private async execute<TData>(input: HttpRequest): Promise<HttpResponse<TData>> {
-        const {
-            method,
-            url,
-            body,
-            params,
-            headers,
-            signal,
-            timeoutMs,
-            responseAs,
-            ...init
-        } = input;
-
-        const target = this.buildUrl(url, params);
-        const requestHeaders = this.buildHeaders(headers);
-        const payload = resolveBody(body, requestHeaders);
-
-        // El timeout y la cancelación del llamante se combinan: gana el que
-        // dispare primero. Se guarda la referencia al de timeout para poder
-        // distinguir después "tardó demasiado" de "el usuario se fue".
-        const effectiveTimeout = timeoutMs ?? this.timeoutMs;
-        const timeoutSignal =
-            effectiveTimeout > 0 ? AbortSignal.timeout(effectiveTimeout) : null;
-        const signals = [signal, timeoutSignal].filter(
+        const signal = [request.signal, timeoutSignal].filter(
             (candidate): candidate is AbortSignal => Boolean(candidate)
         );
+
+        const credentials = request.credentials ?? this.credentials;
 
         let response: Response;
 
         try {
             response = await fetch(target, {
-                method,
-                headers: requestHeaders,
+                method: request.method,
+                headers,
                 ...(payload !== undefined ? { body: payload } : {}),
-                ...(signals.length > 0 ? { signal: AbortSignal.any(signals) } : {}),
-                ...(this.credentials ? { credentials: this.credentials } : {}),
-                // `cache`, `next` y un `credentials` propio de la llamada. Va al
-                // final para que lo puntual gane sobre lo general.
-                ...init,
+                ...(signal.length > 0 ? { signal: AbortSignal.any(signal) } : {}),
+                ...(credentials ? { credentials } : {}),
+                ...(request.cache ? { cache: request.cache } : {}),
+                ...(request.next ? { next: request.next } : {}),
             });
-        } catch (error) {
+        } catch (error: unknown) {
             throw this.describeTransportFailure(error, {
-                method,
+                method: request.method,
                 url: target,
                 timeoutSignal,
-                callerSignal: signal,
-                effectiveTimeout,
+                callerSignal: request.signal,
+                effectiveTimeout
             });
         }
 
         if (!response.ok) {
-            // El cuerpo se lee igual, porque el detalle útil del fallo suele
-            // venir ahí: qué campo del formulario rechazó y por qué.
             throw new HttpError({
                 kind: "response",
                 status: response.status,
-                body: await readErrorBody(response),
-                message: `${method} ${target} respondió ${response.status} ${response.statusText}`,
-                method,
-                url: target,
+                body: await this.readErrorBody(response),
+                message: `${request.method} ${target} respondió ${response.status} ${response.statusText}`,
+                method: request.method,
+                url: target
             });
         }
 
         return {
-            data: await parseBody<TData>(response, responseAs, method, target),
+            data: await this.parseBody<TData>(response, request.responseAs ?? "json", {
+                method: request.method,
+                url: target
+            }),
             status: response.status,
             headers: response.headers,
         };
@@ -228,18 +112,17 @@ export class FetchHttpClient implements HttpClient {
     /**
      * Traduce el fallo de `fetch` a un `kind` concreto.
      *
-     * `fetch` lanza el mismo `AbortError` tanto si venció el timeout como si
-     * canceló el llamante, así que se pregunta a las señales cuál se disparó
-     * en vez de intentar adivinarlo por el mensaje.
+     * Se pregunta a las señales cuál se disparó en vez de adivinarlo por el
+     * mensaje de la excepción, que además cambia entre navegadores.
      */
     private describeTransportFailure(
         error: unknown,
         context: {
-            method: HttpMethod;
-            url: string;
-            timeoutSignal: AbortSignal | null;
-            callerSignal: AbortSignal | undefined;
-            effectiveTimeout: number;
+            method: HttpMethod,
+            url: string,
+            timeoutSignal: AbortSignal | null,
+            callerSignal: AbortSignal | undefined,
+            effectiveTimeout: number
         }
     ): HttpError {
         const { method, url } = context;
@@ -250,7 +133,7 @@ export class FetchHttpClient implements HttpClient {
                 message: `${method} ${url} superó los ${context.effectiveTimeout} ms`,
                 method,
                 url,
-                cause: error,
+                cause: error
             });
         }
 
@@ -260,7 +143,7 @@ export class FetchHttpClient implements HttpClient {
                 message: `${method} ${url} fue cancelada`,
                 method,
                 url,
-                cause: error,
+                cause: error
             });
         }
 
@@ -269,23 +152,66 @@ export class FetchHttpClient implements HttpClient {
             message: `${method} ${url} no obtuvo respuesta del servidor`,
             method,
             url,
-            cause: error,
+            cause: error
         });
     }
+
+
+    /**
+     * Quita las barras finales del origen.
+     * 
+     * Se hace una vez al construir el cliente, no en cada peticion.
+     * `${baseUrl}${path}` nunca debe producir `//categories`, algunos
+     * backends tratan como otra ruta.
+     */
+    private normalizeUrl(baseUrl: string | undefined): string {
+        return baseUrl?.replace(/\/+$/, "") ?? "";
+    };
 
 
     /** Une `baseUrl`, ruta y query string. Las URL absolutas pasan intactas. */
     private buildUrl(url: string, params?: QueryParams): string {
         const isAbsolute = /^[a-z][a-z\d+\-.]*:\/\//i.test(url);
+
         const path = isAbsolute
             ? url
             : `${this.baseUrl}${url.startsWith("/") ? url : `/${url}`}`;
 
-        const search = serializeParams(params);
+        const search = this.serializeParams(params);
 
         if (search.length === 0) return path;
 
         return `${path}${path.includes("?") ? "&" : "?"}${search}`;
+    };
+
+
+    /**
+     * Serializa los parámetros a query string.
+     * 
+     * Dos decisiones que no son evidentes:
+     * - `null` y `undefined` se omiten, no se mandan vacios. Un filtro sin
+     *   elegir no debe llegar como `?status=`, que para el backend es un valor.
+     * 
+     * - Una array produce la clave repetida (`tag=a&tag=b`), que es la convención
+     *   mas extendida.
+     */
+    private serializeParams(params?: QueryParams): string {
+        if (!params) return "";
+
+        const search = new URLSearchParams();
+
+        for (const [key, value] of Object.entries(params)) {
+            if (value === undefined || value === null) continue;
+
+            if (Array.isArray(value)) {
+                for (const item of value) search.append(key, String(item));
+                continue;
+            };
+
+            search.append(key, String(value));
+        };
+
+        return search.toString();
     }
 
 
@@ -311,116 +237,82 @@ export class FetchHttpClient implements HttpClient {
 
         return merged;
     }
-}
 
 
-// ── Auxiliares de serialización ─────────────────────────────────────────────
+    /** Decide que se manda como cuerpo y si hay que declarar el `Content-Type`. */
+    private serializeBody(body: unknown, headers: Headers): BodyInit | undefined {
+        if (body === undefined) return undefined;
 
-function serializeParams(params?: QueryParams): string {
-    if (!params) return "";
+        const isNativeBody =
+            typeof body === "string" ||
+            body instanceof FormData ||
+            body instanceof URLSearchParams ||
+            body instanceof Blob ||
+            body instanceof ArrayBuffer;
 
-    const search = new URLSearchParams();
+        if (isNativeBody) return body as BodyInit;
 
-    for (const [key, value] of Object.entries(params)) {
-        if (value === undefined || value === null) continue;
+        if (!headers.has("Content-Type")) {
+            headers.set("Content-Type", "application/json");
+        };
 
-        if (Array.isArray(value)) {
-            for (const item of value) search.append(key, String(item));
-            continue;
-        }
-
-        search.append(key, String(value));
-    }
-
-    return search.toString();
-}
-
-
-/**
- * Decide qué se manda como cuerpo y si hay que declarar el `Content-Type`.
- *
- * El caso que importa es `FormData`: la cabecera se deja **sin tocar** a
- * propósito, porque el navegador tiene que añadirle el `boundary` que separa
- * las partes. Ponerle `multipart/form-data` a mano produce un cuerpo que el
- * backend no sabe leer, y es el error clásico al subir una imagen de producto.
- */
-function resolveBody(body: unknown, headers: Headers): BodyInit | undefined {
-    if (body === undefined || body === null) return undefined;
-
-    const isNativeBody =
-        typeof body === "string" ||
-        body instanceof FormData ||
-        body instanceof URLSearchParams ||
-        body instanceof Blob ||
-        body instanceof ArrayBuffer;
-
-    if (isNativeBody) return body as BodyInit;
-
-    if (!headers.has("Content-Type")) {
-        headers.set("Content-Type", "application/json");
-    }
-
-    return JSON.stringify(body);
-}
+        return JSON.stringify(body);
+    };
 
 
-/**
- * Lee el cuerpo de una respuesta correcta.
- *
- * Un `204` o un cuerpo vacío devuelven `null`: un `DELETE` que responde sin
- * contenido es un éxito, no un error de parseo.
- */
-async function parseBody<TData>(
-    response: Response,
-    responseAs: ResponseFormat | undefined,
-    method: HttpMethod,
-    url: string
-): Promise<TData> {
-    const format = responseAs ?? "json";
+    /**
+     * Lee el cuerpo de una respuesta correcta.
+     * 
+     * Se lee como texto y luego se parsea, en vez de llamar a `response.json()`
+     * directamente, asi el cuerpo crudo sigue disponible para meterlo en el error
+     * cuando el parseo falla. Con `.json()` la excepción llega sin el texto que lo
+     * provocóy no hay forma de saber qué mandó el servidor.
+     */
+    private async parseBody<TData>(
+        response: Response,
+        format: ResponseFormat,
+        context: { method: HttpMethod; url: string }
+    ): Promise<TData> {
+        if (format === "blob") return (await response.blob()) as TData;
+        if (format === "text") return (await response.text()) as TData;
 
-    if (format === "blob") return (await response.blob()) as TData;
-    if (format === "text") return (await response.text()) as TData;
+        if (HTTP_EMPTY_STATUSES.includes(response.status)) return null as TData;
 
-    if (HTTP_EMPTY_STATUSES.includes(response.status)) return null as TData;
-
-    const raw = await response.text();
-
-    if (raw.trim().length === 0) return null as TData;
-
-    try {
-        return JSON.parse(raw) as TData;
-    } catch (error) {
-        throw new HttpError({
-            kind: "parse",
-            status: response.status,
-            body: raw,
-            message: `${method} ${url} devolvió un cuerpo que no es JSON válido`,
-            method,
-            url,
-            cause: error,
-        });
-    }
-}
-
-
-/**
- * Lee el cuerpo de una respuesta de error sin lanzar nunca.
- *
- * Si el backend contesta un 500 con una página HTML de error, eso no debe
- * convertirse en un fallo de parseo que oculte el 500 de verdad.
- */
-async function readErrorBody(response: Response): Promise<unknown> {
-    try {
         const raw = await response.text();
 
-        if (raw.trim().length === 0) return null;
+        if (raw.trim().length === 0) return null as TData;
 
         try {
-            return JSON.parse(raw) as unknown;
+            return JSON.parse(raw) as TData;
+
+        } catch (error: unknown) {
+            throw new HttpError({
+                kind: "parse",
+                status: response.status,
+                body: raw,
+                message: `${context.method} ${context.url} devolvió un cuerpo que no es JSON váliido`,
+                method: context.method,
+                url: context.url,
+                cause: error
+            });
+        };
+    };
+
+
+    /** Lee el texto de una respuesta de error. */
+    private async readErrorBody(response: Response): Promise<unknown> {
+        try {
+            const raw = await response.text();
+
+            if (raw.trim().length === 0) return null;
+
+            try {
+                return JSON.parse(raw) as unknown;
+            } catch {
+                return raw;
+            };
         } catch {
-            return raw;
-        }
-    } catch {
-        return null;
-    }
+            return null;
+        };
+    };
 }

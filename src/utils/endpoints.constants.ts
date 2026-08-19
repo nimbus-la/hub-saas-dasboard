@@ -41,6 +41,6 @@ export const ENDPOINTS = {
      * El inquilino no aparece en la ruta aunque el backend lo exija: viaja en
      * la query o en el cuerpo según el verbo, y de eso se encarga el servicio.
      */
-    PRODUCTS_CATEGORY: "/categories",
+    PRODUCTS_CATEGORY: "products/categories",
 
 } as const;

@@ -1,4 +1,4 @@
-export interface CategoryApiResponse {
+export interface CategoryListApiResponse {
     /** Identificador que publica el backend. Se muestra tal cual. */
     id: string;
     name: string;
@@ -20,12 +20,13 @@ export interface CategoryApiResponse {
      * ejecución llegaría `undefined`, que es justo el caso que el mapper tiene
      * que resolver.
      */
-    placedAt?: string;
+    updatedAt: string;
+    createdAt: string;
 }
 
 
 // respuesta mapeada
-export interface Category {
+export interface CategoryList {
     /** Identificador que publica el backend. Se muestra tal cual. */
     id: string;
     name: string;
@@ -39,12 +40,12 @@ export interface Category {
     description: string;
     /** ¿Se ofrece hoy en la carta? */
     isActive: boolean;
-    placedAt: string; // ISO 8601
+    updatedAt: string; // ISO 8601
 }
 
 
 /**
- * Lo que se manda al **crear**.
+ * Lo que se manda al crear una categoría.
  *
  * Sin `isActive`: el backend da de alta toda categoría como activa, y mandarlo
  * desde aquí sería duplicar esa regla en dos sitios que pueden discrepar. Que
@@ -53,7 +54,7 @@ export interface Category {
  *
  * `id` y `placedAt` tampoco están: los pone el servidor.
  */
-export interface CreateCategoryPayload {
+export interface CreateCategoryParams {
     name: string;
     /** Se omite cuando está vacía: `""` significaría "guarda una vacía". */
     description?: string;
@@ -69,6 +70,6 @@ export interface CreateCategoryPayload {
  * compartido, olvidarlo en la llamada compilaría sin protestar y la categoría
  * se guardaría perdiendo su estado.
  */
-export type UpdateCategoryPayload = CreateCategoryPayload & {
-    estado: boolean;
+export type UpdateCategoryParams = CreateCategoryParams & {
+    isActive?: boolean;
 };

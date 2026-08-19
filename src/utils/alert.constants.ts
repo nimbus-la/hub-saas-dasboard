@@ -1,6 +1,6 @@
 import { LucideIcon } from "lucide-react";
 
-import { AlertSize, AlertTone } from "@/interfaces";
+import { AlertSize, AlertTone, ApiEnvelopeStatus } from "@/interfaces";
 import { CONTROL_SIZE, ICON_TOKENS } from "@/tokens";
 
 
@@ -55,3 +55,13 @@ export const MEDIA_SIZE = {
  * notificaciones.
  */
 export const ASSERTIVE_TONES: readonly AlertTone[] = ["error", "warning"];
+
+
+
+// El status del sobre traducido a tono de aviso.
+export const ALERT_TONE_BY_API_STATUS = {
+    SUCCESS: "success",
+    ERROR: "error",
+    WARNING: "warning",
+    INFO: "info"
+} as const satisfies Record<ApiEnvelopeStatus, AlertTone>;

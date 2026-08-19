@@ -1,9 +1,7 @@
-import { formatPlural, messages } from "@/messages";
 import type { BadgeTone } from "@/interfaces";
+import { formatPlural, messages } from "@/messages";
 
-import type {
-    Category,
-} from "../interfaces";
+import { CategoryList } from "../interfaces";
 import {
     CATEGORY_STATUS_LABELS,
     CATEGORY_STATUS_TONES,
@@ -33,7 +31,7 @@ export const getCategoryStatusTone = (isActive: boolean): BadgeTone =>
  * estado — y dos versiones del mismo criterio acaban discrepando.
  */
 export const matchesCategoryStatus = (
-    category: Category,
+    category: CategoryList,
     status: CategoryStatusFilter
 ): boolean => {
     const required = CATEGORY_STATUS_TO_IS_ACTIVE[status];
@@ -57,9 +55,9 @@ export const formatCategoryCount = (count: number): string =>
  * navideño aunque la palabra no esté en su nombre.
  */
 export function filterCategories(
-    categories: Category[],
+    categories: CategoryList[],
     { query, status }: { query: string; status: CategoryStatusFilter }
-): Category[] {
+): CategoryList[] {
     const term = normalizeText(query.trim());
 
     return categories.filter((category) => {
@@ -95,7 +93,7 @@ function normalizeText(value: string): string {
  * sin él, guardar sin tocar el nombre chocaría consigo misma.
  */
 export function isDuplicateCategoryName(
-    categories: Category[],
+    categories: CategoryList[],
     name: string,
     ignoreId?: string
 ): boolean {
@@ -105,4 +103,24 @@ export function isDuplicateCategoryName(
         (category) =>
             category.id !== ignoreId && normalizeText(category.name) === target
     );
+}
+
+
+
+export function getEmptyMessage(
+    isPending: boolean,
+    isError: boolean,
+    hasFilters: boolean
+): string {
+    const message = messages.products.categories;
+
+    const emptyMessage = isPending
+        ? message.loading
+        : isError
+            ? message.loadError
+            : hasFilters
+                ? message.emptyFiltered
+                : message.emptyCatalog;
+
+    return emptyMessage;
 }

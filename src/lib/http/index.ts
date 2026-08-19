@@ -1,7 +1,10 @@
+import type { HttpClient, RequestInterceptor } from "@/interfaces";
 import { EnvelopeHttpClient } from "./envelope-http-client";
 import { FetchHttpClient } from "./fetch-http-client";
-import type { HttpClient } from "@/interfaces";
 
+export * from "./api-alert";
+export * from "./base-http-client";
+export * from "./envelope";
 export * from "./envelope-http-client";
 export * from "./fetch-http-client";
 export * from "./http-error";
@@ -35,46 +38,65 @@ export * from "./http-error";
  * Si ninguna está definida, queda vacío y las rutas se resuelven contra el
  * mismo origen: sirve para pegarle a los Route Handlers del propio Next.
  */
-const BASE_URL =
+const DEFAULT_BASE_URL =
     (typeof window === "undefined" ? process.env["API_INTERNAL_URL"] : undefined) ??
     process.env["NEXT_PUBLIC_API_URL"] ??
     "";
 
+
+
+export interface CreateHttpClientOptions {
+    /** Sustituye el origen por defecto. Lo usa el banco de pruebas. */
+    baseUrl?: string;
+
+    /**
+     * Ver `RequestInterceptor`. Se ejecuta antes de cada petición.
+     *
+     * Para cabeceras que cambian durante la sesión: un id de correlación para
+     * trazas, la sucursal activa. No sirven las de `headers`, que se evalúan una
+     * sola vez al construir el cliente.
+     */
+    onRequest?: RequestInterceptor;
+}
+
+
+
+/**
+ * Fábrica del cliente.
+ *
+ * Apila los decoradores de dentro hacia fuera:
+ *
+ *   1. `FetchHttpClient`    — red. Sólo sabe de HTTP.
+ *   2. `EnvelopeHttpClient` — quita el sobre y convierte un `code` de fallo en
+ *                             un error lanzado.
+ *
+ * Existe como función y no sólo como constante para que el banco de pruebas
+ * pueda apuntar a otro origen sin tocar variables de entorno.
+ *
+ * Aquí es donde entran las capas que faltan, sin tocar nada más:
+ *
+ *   · `LoggingHttpClient` — **por fuera de todo**, porque es el único punto que
+ *     ve tanto los fallos de red como los que lanza el decorador del sobre.
+ *   · `AuthHttpClient` — por fuera del sobre, porque este backend puede anunciar
+ *     un 401 dentro de un `200 OK` y una capa colocada por dentro no lo vería.
+ */
+export function createHttpClient(options: CreateHttpClientOptions = {}): HttpClient {
+    const transport = new FetchHttpClient({
+        baseUrl: options.baseUrl ?? DEFAULT_BASE_URL,
+        headers: { Accept: "application/json" },
+        ...(options.onRequest ? { onRequest: options.onRequest } : {}),
+    });
+
+    return new EnvelopeHttpClient(transport);
+}
+
+
+
 /**
  * Cliente compartido de la aplicación.
  *
- * Se tipa como `HttpClient` y no como `FetchHttpClient` a propósito: así el
- * autocompletado sólo ofrece lo que está en el contrato, y es imposible que
- * una pantalla acabe dependiendo sin querer de un detalle de `fetch`.
- *
- * Se compone en dos capas, de dentro hacia fuera:
- *
- * 1. `FetchHttpClient` — habla por la red. Sólo sabe de HTTP.
- * 2. `EnvelopeHttpClient` — saca `data` del sobre de este backend y convierte
- *    un `code` de fallo en un error lanzado.
- *
- * Cada una tiene un motivo distinto para cambiar. Para migrar a otra librería
- * de red se sustituye la de dentro y la de fuera no se entera:
- *
- *     new EnvelopeHttpClient(new AxiosHttpClient({ ... }))
- *
- * Y el día que el backend deje de envolver sus respuestas, se quita la de
- * fuera y ni un servicio se toca.
+ * Se tipa como `HttpClient` y no como la clase concreta a propósito: así el
+ * autocompletado sólo ofrece lo que está en el contrato, y es imposible que una
+ * pantalla acabe dependiendo sin querer de un detalle de `fetch`.
  */
-export const httpClient: HttpClient = new EnvelopeHttpClient(
-    new FetchHttpClient({
-        baseUrl: BASE_URL,
-        headers: {
-            Accept: "application/json",
-        },
-
-        // Aquí entra el token cuando exista sesión. Se hace en el interceptor y
-        // no en `headers` porque `headers` se evalúa una sola vez al arrancar
-        // el módulo, y el token cambia durante la vida de la aplicación.
-        //
-        // onRequest: async (request) => ({
-        //     ...request,
-        //     headers: { ...request.headers, Authorization: `Bearer ${await getToken()}` },
-        // }),
-    })
-);
+export const httpClient: HttpClient = createHttpClient();

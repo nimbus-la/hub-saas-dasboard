@@ -1,46 +1,24 @@
 "use client";
 
 import * as React from "react";
-import { Controller } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 
 import { GenericButton, Modal, Switch, TextAreaField, TextField } from "@/components";
-import { useCategoryForm } from "@/features/products/hooks/use-category-form";
 import {
     CATEGORY_ACTIVE_HINT,
     CATEGORY_FORM_RULES,
     CATEGORY_MODAL_COPY,
+    duplicateCategoryNameMessage,
 } from "@/features/products/libs/category-form";
-import type { Category, CategoryFormValues } from "@/features/products/interfaces";
 import { messages } from "@/messages";
 
-import {
-    categoryFormModalErrorVariants,
-    categoryFormModalToggleVariants,
-    categoryFormModalVariants,
-} from "./category-form-modal.style";
+import { CategoryFormValues, CategoryList } from "../../interfaces";
+import { categoryFormModalToggleVariants, categoryFormModalVariants } from "./category-form-modal.style";
 
 
-/**
- * Modal de alta y edición de una categoría.
- *
- * Un solo componente para los dos modos: comparten campos, reglas y mensajes
- * de error, y se diferencian en lo que dicen —`CATEGORY_MODAL_COPY`— y en si
- * enseñan el interruptor de estado. Dos componentes casi iguales habrían
- * significado corregir cada validación dos veces.
- *
- * El estado lo lleva `useCategoryForm`; aquí solo se decide la estructura.
- *
- * Cada campo va envuelto en un `Controller` porque los controles del design
- * system exponen `onChange(valor)` en lugar del evento nativo del DOM, que es
- * lo que esperaría `register` —el mismo motivo que en el formulario de
- * producto—.
- */
 
 /** Une el `<form>` del cuerpo con su botón de envío, que vive en el pie. */
 const FORM_ID = "category-form";
-
-/** Lo que dice este modal. Ver `@/messages`. */
-const COPY = messages.products.categories.form;
 
 
 interface CategoryFormModalProps {
@@ -53,7 +31,7 @@ interface CategoryFormModalProps {
      * Su ausencia es la que pone el modal en modo alta: no hace falta un
      * `mode` aparte porque no existe la combinación "editar sin categoría".
      */
-    category?: Category | undefined;
+    category?: CategoryList | undefined;
 
     /**
      * ¿Ya hay otra categoría con este nombre? La respuesta la tiene la
@@ -70,15 +48,6 @@ interface CategoryFormModalProps {
      */
     onSubmit: (values: CategoryFormValues) => void | Promise<void>;
 
-    /**
-     * Motivo por el que el guardado no salió.
-     *
-     * Lo pone quien envía, no el formulario: no es un problema del valor que se
-     * escribió —de eso ya avisan las reglas de cada campo— sino del intento de
-     * guardarlo. `null` cuando no hay nada que contar.
-     */
-    submitError?: string | null;
-
     className?: string;
 }
 
@@ -88,14 +57,28 @@ export default function CategoryFormModal({
     category,
     isNameTaken,
     onSubmit,
-    submitError = null,
     className,
 }: CategoryFormModalProps) {
-    const mode = category ? "edit" : "create";
-    const copy = CATEGORY_MODAL_COPY[mode];
+    const message = messages.products.categories.form;
+    const { control, formState, handleSubmit } = useFormContext<CategoryFormValues>();
 
-    const { form, nameRules } = useCategoryForm({ open, category, isNameTaken });
-    const { control, handleSubmit, formState } = form;
+
+    const mode = category ? "edit" : "create";
+    const generalMessage = CATEGORY_MODAL_COPY[mode];
+
+
+    const nameRules = React.useMemo(
+        () => ({
+            ...CATEGORY_FORM_RULES.name,
+            validate: {
+                length: CATEGORY_FORM_RULES.name.validate,
+                unique: (value: string) =>
+                    !isNameTaken(value) || duplicateCategoryNameMessage(value),
+            },
+        }),
+        [isNameTaken]
+    );
+
 
     /*
      * El foco entra por el nombre.
@@ -108,15 +91,16 @@ export default function CategoryFormModal({
      */
     const nameFieldRef = React.useRef<HTMLInputElement>(null);
 
+
     return (
         <Modal
             open={open}
             onOpenChange={onOpenChange}
-            title={copy.title}
-            description={copy.description}
+            title={generalMessage.title}
+            description={generalMessage.description}
             size="lg"
             initialFocus={nameFieldRef}
-            closeLabel={COPY.close}
+            closeLabel={message.close}
             // Con cambios sin guardar, un clic fuera tira el trabajo. `Escape`,
             // la equis y "Cancelar" siguen cerrando: quitar también esas tres
             // dejaría el modal sin salida por teclado.
@@ -139,7 +123,7 @@ export default function CategoryFormModal({
                     <GenericButton
                         type="submit"
                         form={FORM_ID}
-                        label={copy.submit}
+                        label={generalMessage.submit}
                         disabled={formState.isSubmitting}
                     />
                 </>
@@ -151,15 +135,6 @@ export default function CategoryFormModal({
                 onSubmit={handleSubmit(onSubmit)}
                 className={categoryFormModalVariants()}
             >
-                {/* `role="alert"` para que los lectores de pantalla lo anuncien
-                    al aparecer: quien no ve el modal necesita enterarse de que
-                    el envío falló sin tener que ir a buscarlo. */}
-                {submitError && (
-                    <p role="alert" className={categoryFormModalErrorVariants()}>
-                        {submitError}
-                    </p>
-                )}
-
                 <Controller
                     control={control}
                     name="name"
@@ -171,11 +146,11 @@ export default function CategoryFormModal({
                                 field.ref(node);
                                 nameFieldRef.current = node;
                             }}
-                            label={COPY.name.label}
+                            label={message.name.label}
                             required
                             error={fieldState.error?.message ?? false}
-                            placeholder={COPY.name.placeholder}
-                            helperText={COPY.name.helper}
+                            placeholder={message.name.placeholder}
+                            helperText={message.name.helper}
                             autoComplete="off"
                         />
                     )}
@@ -188,9 +163,9 @@ export default function CategoryFormModal({
                     render={({ field, fieldState }) => (
                         <TextAreaField
                             {...field}
-                            label={COPY.description.label}
+                            label={message.description.label}
                             error={fieldState.error?.message ?? false}
-                            placeholder={COPY.description.placeholder}
+                            placeholder={message.description.placeholder}
                             rows={3}
                         />
                     )}
@@ -209,7 +184,7 @@ export default function CategoryFormModal({
                                     checked={field.value}
                                     onCheckedChange={field.onChange}
                                     name={field.name}
-                                    label={COPY.activeLabel}
+                                    label={message.activeLabel}
                                     description={
                                         field.value
                                             ? CATEGORY_ACTIVE_HINT.on

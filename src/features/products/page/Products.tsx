@@ -11,14 +11,13 @@
 // El catálogo llega por props desde el Server Component de la ruta: cuando
 // `getProducts` hable con la API, esta pantalla no cambia.
 
-import * as React from "react";
 import { useRouter } from "next/navigation";
+import * as React from "react";
 
+import { TextField } from "@/components/inputs/TextField";
 import Pagination from "@/components/pagination/Pagination";
 import { FilterTabs } from "@/components/tabs/FilterTabs";
-import { TextField } from "@/components/inputs/TextField";
-import { formatMessage, messages } from "@/messages";
-import { ICON_TOKENS } from "@/tokens";
+import type { FilterTabItem } from "@/interfaces";
 import {
     ALL_CATEGORIES,
     DEFAULT_PRODUCT_PAGE_SIZE,
@@ -28,7 +27,8 @@ import {
     filterProducts,
     type Product,
 } from "@/lib/products";
-import type { FilterTabItem } from "@/interfaces";
+import { formatMessage, messages } from "@/messages";
+import { ICON_TOKENS } from "@/tokens";
 
 import {
     ProductsEmptyState,
@@ -40,7 +40,7 @@ import {
     productsPagePaginationVariants,
     productsPageSearchVariants,
     productsPageVariants,
-} from "./products.style";
+} from "../style";
 
 const GRID_PANEL_ID = "products-grid";
 

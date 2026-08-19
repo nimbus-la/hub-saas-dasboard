@@ -1,4 +1,5 @@
-import type { Category, CategoryApiResponse, CategoryFormValues, CreateCategoryPayload, UpdateCategoryPayload } from "../interfaces";
+import { formatDate } from "@/lib/format";
+import type { CategoryFormValues, CategoryList, CategoryListApiResponse, CreateCategoryParams, UpdateCategoryParams } from "../interfaces";
 
 
 /**
@@ -28,7 +29,7 @@ import type { Category, CategoryApiResponse, CategoryFormValues, CreateCategoryP
  * listado, la categoría recién creada entraría en la caché con la forma cruda
  * y sería la única fila de la tabla que no cumple el contrato.
  */
-export const toCategory = (category: CategoryApiResponse): Category => ({
+export const toCategory = (category: CategoryListApiResponse): CategoryList => ({
     id: category.id,
     name: category.name,
 
@@ -38,25 +39,21 @@ export const toCategory = (category: CategoryApiResponse): Category => ({
     // dentro que se guardaría como descripción de verdad.
     description: category.description ?? "",
 
-    // Se conserva vacío si el backend todavía no lo manda. La tabla ya sabe
-    // qué hacer con eso; inventar una fecha aquí sería peor que no tenerla,
-    // porque una fecha falsa no se distingue de una real.
-    placedAt: category.placedAt ?? "",
-
+    updatedAt: formatDate(category.updatedAt),
     isActive: category.isActive,
 });
 
 
 
 /** El listado completo. */
-export const toCategoryList = (categories: CategoryApiResponse[]): Category[] =>
+export const toCategoryList = (categories: CategoryListApiResponse[]): CategoryList[] =>
     categories.map(toCategory);
 
 
 
 
 /** Convierte una categoría guardada en los valores que edita el formulario. */
-export const toCategoryFormValues = (category: Category): CategoryFormValues => ({
+export const toCategoryFormValues = (category: CategoryList): CategoryFormValues => ({
     name: category.name,
     description: category.description,
     isActive: category.isActive,
@@ -74,9 +71,9 @@ export const toCategoryFormValues = (category: Category): CategoryFormValues => 
  *
  * `isActive` no se incluye: al crear lo decide el servidor.
  */
-export const toCreateCategoryPayload = (
+export const toCreateCategoryParams = (
     values: CategoryFormValues
-): CreateCategoryPayload => {
+): CreateCategoryParams => {
     const description = values.description.trim();
 
     return {
@@ -93,9 +90,12 @@ export const toCreateCategoryPayload = (
  * omisión de la descripción. Así la diferencia entre los dos queda en una sola
  * línea, que es exactamente lo que se diferencian.
  */
-export const toUpdateCategoryPayload = (
-    values: CategoryFormValues
-): UpdateCategoryPayload => ({
-    ...toCreateCategoryPayload(values),
-    estado: values.isActive,
+export const toUpdateCategoryParams = (
+    values: CategoryFormValues,
+    current: CategoryList
+): UpdateCategoryParams => ({
+    ...toCreateCategoryParams(values),
+
+    // Ausente cuando no cambio.
+    ...(values.isActive !== current.isActive ? { isActive: values.isActive } : {}),
 });
