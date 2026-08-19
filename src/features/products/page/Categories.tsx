@@ -12,7 +12,7 @@ import { useProductsCategories } from "../hooks";
 import type { CategoryFormValues, CategoryList } from "../interfaces";
 import { DEFAULT_CATEGORY_STATUS_FILTER, EMPTY_CATEGORY_FORM_VALUES, filterCategories, formatCategoryCount, getEmptyMessage, isDuplicateCategoryName, type CategoryStatusFilter } from "../libs";
 import { toCreateCategoryParams, toUpdateCategoryParams } from "../mappers";
-import { categoriesPageBodyVariants, categoriesPageVariants } from "./categories.style";
+import { categoriesPageBodyVariants, categoriesPageVariants } from "../style";
 
 
 /** Destino de la flecha de regreso. La misma ruta que declara el menú lateral. */

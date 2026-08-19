@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 import { messages } from "@/messages";
-import { connection } from "next/server";
 import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
+import { connection } from "next/server";
 
 import Categories from "@/features/products/page/Categories";
 import { categoriesQueryOptions } from "@/features/products/services/categories.service";
