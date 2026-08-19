@@ -17,6 +17,7 @@ import { useId } from "react";
 import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { formatNumber } from "@/lib/format";
+import { PAGE_SIZE_OPTIONS, clampPage, getTotalPages } from "@/lib/pagination";
 import { cn } from "@/lib/utils";
 import { formatMessage, formatPlural, messages } from "@/messages";
 import type { PaginationProps } from "@/interfaces";
@@ -37,8 +38,6 @@ import {
     paginationSummaryVariants,
     paginationVariants,
 } from "./pagination.style";
-
-const DEFAULT_PAGE_SIZE_OPTIONS = [8, 12, 24] as const;
 
 const DEFAULT_ITEM_LABEL = messages.components.pagination.items;
 
@@ -69,18 +68,18 @@ export default function Pagination({
     totalItems,
     onPageChange,
     onPageSizeChange,
-    pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
+    pageSizeOptions = PAGE_SIZE_OPTIONS,
     itemLabel = DEFAULT_ITEM_LABEL,
     className,
 }: PaginationProps) {
     // Id propio: en una misma pantalla puede haber más de una lista paginada.
     const pageSizeId = useId();
 
-    const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+    const totalPages = getTotalPages(totalItems, pageSize);
 
     // La página puede quedar fuera de rango si el filtro encoge la colección;
     // se acota aquí para que el resumen y los botones nunca se contradigan.
-    const currentPage = Math.min(Math.max(page, 1), totalPages);
+    const currentPage = clampPage(page, totalPages);
 
     const firstItem = totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1;
     const lastItem = Math.min(currentPage * pageSize, totalItems);

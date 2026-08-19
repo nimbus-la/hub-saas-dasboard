@@ -25,3 +25,15 @@ export const categoriesPageBodyVariants = cva([
     "flex min-w-0 flex-col",
     SPACING_CLASS.gap.lg,
 ]);
+
+
+/**
+ * Pie de paginación.
+ *
+ * La línea de arriba lo separa de la tabla: el pie no es otra fila, es lo que
+ * dice qué parte de la colección se está viendo. Mismo tratamiento que en la
+ * rejilla de productos, para que las dos pantallas se paginen igual.
+ */
+export const categoriesPagePaginationVariants = cva([
+    "border-t border-neutral-200 pt-4",
+]);

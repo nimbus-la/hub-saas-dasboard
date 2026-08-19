@@ -18,6 +18,7 @@ export * from "./components";
 
 /** Dominio */
 export * from "./menu.types";
+export * from "./pagination.types";
 
 
 /** Infraestructura */

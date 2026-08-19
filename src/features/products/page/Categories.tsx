@@ -3,7 +3,7 @@
 import * as React from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
-import { ConfirmDialog, notify, PageHeader, StatusBadge } from "@/components";
+import { ConfirmDialog, notify, PageHeader, Pagination, StatusBadge } from "@/components";
 import { getApiErrorMessage } from "@/lib/http";
 import { formatMessage, messages } from "@/messages";
 
@@ -12,7 +12,7 @@ import { useProductsCategories } from "../hooks";
 import type { CategoryFormValues, CategoryList } from "../interfaces";
 import { DEFAULT_CATEGORY_STATUS_FILTER, EMPTY_CATEGORY_FORM_VALUES, filterCategories, formatCategoryCount, getEmptyMessage, isDuplicateCategoryName, type CategoryStatusFilter } from "../libs";
 import { toCreateCategoryParams, toUpdateCategoryParams } from "../mappers";
-import { categoriesPageBodyVariants, categoriesPageVariants } from "../style";
+import { categoriesPageBodyVariants, categoriesPagePaginationVariants, categoriesPageVariants } from "../style";
 
 
 /** Destino de la flecha de regreso. La misma ruta que declara el menú lateral. */
@@ -21,6 +21,11 @@ const PRODUCTS_LIST_HREF = "/products";
 
 export default function Categories() {
     const categories = useProductsCategories();
+
+    // El pie de paginación lo gobierna el hook de datos: la página y la
+    // consulta que la pide viajan juntas. Aquí sólo se enchufa a los controles
+    // y se vuelve a la primera al cambiar un filtro.
+    const { pagination } = categories;
 
 
     const form = useForm<CategoryFormValues>({
@@ -53,19 +58,43 @@ export default function Categories() {
     const [isDeleteOpen, setIsDeleteOpen] = React.useState(false);
 
 
+    /*
+     * El buscador y el filtro de estado siguen siendo de memoria y se aplican
+     * **sobre la página que hay cargada**, que es lo único que la pantalla
+     * tiene. Cuando el backend acepte esos dos filtros, entran como parámetros
+     * de `service.list` junto a la página y esto desaparece.
+     */
     const visibleCategories = React.useMemo(
-        () => filterCategories(categories.data?.data ?? [], { query, status }),
-        [categories, query, status]
+        () => filterCategories(categories.data, { query, status }),
+        [categories.data, query, status]
     );
 
 
     const hasFilters = query.trim().length > 0 || status !== "all";
 
 
+    /*
+     * Cualquier cambio de filtro devuelve a la primera página: quedarse en la 3
+     * de un resultado que ahora tiene una sola desorienta, y con la paginación
+     * en el servidor además haría pedir una página que no existe.
+     */
+    const handleQueryChange = React.useCallback((value: string) => {
+        setQuery(value);
+        pagination.reset();
+    }, [pagination]);
+
+
+    const handleStatusChange = React.useCallback((value: CategoryStatusFilter) => {
+        setStatus(value);
+        pagination.reset();
+    }, [pagination]);
+
+
     const handleClearFilters = React.useCallback(() => {
         setQuery("");
         setStatus(DEFAULT_CATEGORY_STATUS_FILTER);
-    }, []);
+        pagination.reset();
+    }, [pagination]);
 
 
     const handleCreateCategory = React.useCallback(() => {
@@ -93,8 +122,8 @@ export default function Categories() {
      * tiene la lista entera, y así el aviso sale al escribir en lugar de enviar.
      */
     const isNameTaken = React.useCallback(
-        (name: string) => isDuplicateCategoryName(categories.data?.data ?? [], name, formTarget?.id),
-        [categories, formTarget]
+        (name: string) => isDuplicateCategoryName(categories.data, name, formTarget?.id),
+        [categories.data, formTarget]
     );
 
 
@@ -175,7 +204,7 @@ export default function Categories() {
                         <StatusBadge
                             size="xs"
                             tone="neutral"
-                            label={formatCategoryCount(categories.data?.data.length ?? 0)}
+                            label={formatCategoryCount(categories.total)}
                             className="tabular-nums"
                         />
                     }
@@ -184,12 +213,12 @@ export default function Categories() {
                 <section className={categoriesPageBodyVariants()}>
                     <CategoriesToolbar
                         query={query}
-                        onQueryChange={setQuery}
+                        onQueryChange={handleQueryChange}
                         status={status}
-                        onStatusChange={setStatus}
+                        onStatusChange={handleStatusChange}
                         onCreateCategory={handleCreateCategory}
                         visibleCount={visibleCategories.length}
-                        totalCount={categories.data?.data.length ?? 0}
+                        totalCount={categories.total}
                         onClearFilters={handleClearFilters}
                     />
 
@@ -199,6 +228,22 @@ export default function Categories() {
                         onDeleteCategory={handleDeleteRequest}
                         emptyMessage={getEmptyMessage(categories.isLoading, categories.isError, hasFilters)}
                     />
+
+                    {/* El pie sólo aparece cuando hay algo que paginar: sobre un
+                        catálogo vacío no dice nada que el propio mensaje de la
+                        tabla no diga ya. El total es el del backend —no el de
+                        las filas visibles—, que es lo que hay que recorrer. */}
+                    {categories.total > 0 && (
+                        <Pagination
+                            page={pagination.pageNumber}
+                            pageSize={pagination.pageSize}
+                            totalItems={categories.total}
+                            onPageChange={pagination.goToPage}
+                            onPageSizeChange={pagination.changePageSize}
+                            itemLabel={message.itemLabel}
+                            className={categoriesPagePaginationVariants()}
+                        />
+                    )}
                 </section>
 
                 <CategoryFormModal
