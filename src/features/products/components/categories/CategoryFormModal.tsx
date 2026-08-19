@@ -1,14 +1,16 @@
 "use client";
 
 import * as React from "react";
-import { Controller, useFormContext } from "react-hook-form";
+import { Controller, useFormContext, useWatch } from "react-hook-form";
 
 import { GenericButton, Modal, Switch, TextAreaField, TextField } from "@/components";
 import {
     CATEGORY_ACTIVE_HINT,
+    CATEGORY_FIELD_HINTS,
     CATEGORY_FORM_RULES,
     CATEGORY_MODAL_COPY,
     duplicateCategoryNameMessage,
+    hasCategoryChanges,
 } from "@/features/products/libs/category-form";
 import { messages } from "@/messages";
 
@@ -71,13 +73,45 @@ export default function CategoryFormModal({
         () => ({
             ...CATEGORY_FORM_RULES.name,
             validate: {
-                length: CATEGORY_FORM_RULES.name.validate,
+                ...CATEGORY_FORM_RULES.name.validate,
                 unique: (value: string) =>
                     !isNameTaken(value) || duplicateCategoryNameMessage(value),
             },
         }),
         [isNameTaken]
     );
+
+
+    /*
+     * Lo escrito ahora mismo, para decidir si el botón se puede pulsar.
+     *
+     * Se vigilan los tres campos por nombre —y no el formulario entero— porque
+     * `useWatch` sin `name` devuelve los valores como parciales y obligaría a
+     * un `?? ""` por campo justo donde se compara si algo cambió.
+     */
+    const [name, description, isActive] = useWatch({
+        control,
+        name: ["name", "description", "isActive"],
+    });
+
+
+    /*
+     * Cuándo se puede enviar.
+     *
+     * Dos condiciones, y la segunda solo al editar: el formulario tiene que ser
+     * válido —mismas reglas en los dos modos— y, si se está editando, algo
+     * tiene que haber cambiado respecto a lo guardado. Reabrir una categoría,
+     * mirarla y pulsar "Guardar cambios" mandaría una petición que no cambia
+     * nada, así que hasta que se toque un campo el botón se queda apagado.
+     *
+     * `isValid` viene de react-hook-form, que revalida el formulario entero en
+     * cada cambio; así el botón se enciende y se apaga solo, sin repetir aquí
+     * ninguna de las reglas.
+     */
+    const hasChanges =
+        !category || hasCategoryChanges({ name, description, isActive }, category);
+
+    const canSubmit = formState.isValid && hasChanges && !formState.isSubmitting;
 
 
     /*
@@ -124,7 +158,7 @@ export default function CategoryFormModal({
                         type="submit"
                         form={FORM_ID}
                         label={generalMessage.submit}
-                        disabled={formState.isSubmitting}
+                        disabled={!canSubmit}
                     />
                 </>
             }
@@ -150,7 +184,7 @@ export default function CategoryFormModal({
                             required
                             error={fieldState.error?.message ?? false}
                             placeholder={message.name.placeholder}
-                            helperText={message.name.helper}
+                            helperText={CATEGORY_FIELD_HINTS.name}
                             autoComplete="off"
                         />
                     )}
@@ -166,6 +200,7 @@ export default function CategoryFormModal({
                             label={message.description.label}
                             error={fieldState.error?.message ?? false}
                             placeholder={message.description.placeholder}
+                            helperText={CATEGORY_FIELD_HINTS.description}
                             rows={3}
                         />
                     )}

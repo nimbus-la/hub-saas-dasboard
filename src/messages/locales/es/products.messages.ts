@@ -365,15 +365,23 @@ export const products = {
 
             close: "Cerrar el formulario de categoría",
 
+            /**
+             * Las ayudas llevan los límites dentro, en huecos `{min}` y `{max}`.
+             *
+             * Los números no se escriben aquí a mano: los rellena
+             * `CATEGORY_FIELD_HINTS` con las mismas constantes que validan el
+             * campo. Escribirlos en el texto los dejaría diciendo "mínimo 2"
+             * el día que la regla pase a exigir tres.
+             */
             name: {
                 label: "Nombre",
                 placeholder: "Ej. Bebidas calientes",
-                helper: "Así aparecerá como sección de la carta.",
+                helper: "Entre {min} y {max} caracteres. Así aparecerá como sección de la carta.",
             },
             description: {
                 label: "Descripción",
                 placeholder: "Ej. Cafés, tés e infusiones preparados al momento.",
-                helper: "Opcional. Una frase de apoyo bajo el nombre de la sección.",
+                helper: "Opcional. Si la escribes, entre {min} y {max} caracteres.",
             },
 
             activeLabel: "Categoría activa",
@@ -391,6 +399,20 @@ export const products = {
             nameMax: "El nombre no puede pasar de {max} caracteres.",
             nameMin: "El nombre necesita al menos {min} caracteres.",
             descriptionMax: "La descripción supera los {max} caracteres.",
+            /** Vacía sí vale —el campo es opcional—; a medias, no. */
+            descriptionMin: "Si escribes una descripción, dale al menos {min} caracteres.",
+
+            /**
+             * Caracteres no admitidos.
+             *
+             * El mensaje enumera lo que **sí** se puede escribir en vez de
+             * nombrar el que sobra: quien pegó un nombre desde una hoja de
+             * cálculo no sabe cuál de los cuarenta caracteres molesta, y con la
+             * lista de permitidos lo ve de un vistazo.
+             */
+            nameChars: "El nombre solo admite letras, números, espacios y los signos , . & - '",
+            descriptionChars: "La descripción solo admite letras, números, espacios y signos de puntuación.",
+
             /** El nombre repetido lo detecta la pantalla, que tiene la lista entera. */
             nameTaken: 'Ya existe una categoría llamada "{name}". Usa otro nombre.',
         },
