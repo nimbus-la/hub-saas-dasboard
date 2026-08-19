@@ -1,7 +1,7 @@
 import type { ApiEnvelope, ApiResponseWithPagination, HttpClient, HttpRequestConfig, PaginationParams } from "@/interfaces";
 import { DEFAULT_PAGE_SIZE, FIRST_PAGE } from "@/lib/pagination";
 import { ENDPOINTS } from "@/utils";
-import type { CategoriesService, CategoryList, CategoryListApiResponse, CreateCategoryParams, UpdateCategoryParams } from "../interfaces";
+import type { CategoriesService, CategoryList, CategoryListApiResponse, CategoryListParams, CreateCategoryParams, UpdateCategoryParams } from "../interfaces";
 import { toCategory, toCategoryList } from "../mappers";
 
 
@@ -78,19 +78,24 @@ const withTenantBody = <TPayload extends object>(
 
 
 /**
- * Paginación en la query string.
+ * Página y filtros en la query string.
  *
- * Los dos números entran como parámetros de la petición y no en la ruta —la
- * ruta es la colección, la página es una forma de pedirla— y se fusionan sobre
- * lo que traiga la llamada, igual que el inquilino, para no pisar un filtro
- * futuro.
+ * Todo entra como parámetros de la petición y no en la ruta: la ruta es la
+ * colección, y la página o el texto buscado son formas de pedirla. Se fusionan
+ * sobre lo que traiga la llamada, igual que el inquilino.
+ *
+ * Se vuelca con un spread y no campo a campo porque `CategoryListParams` ya usa
+ * los nombres del backend —`pageNumber`, `pageSize`, `text`, `isActive`—, así
+ * que no hay ninguna traducción que hacer. Los filtros que no aplican no están
+ * en el objeto, de modo que tampoco llegan a la URL; y aunque llegaran como
+ * `undefined`, el cliente HTTP los omite.
  */
-const withPagination = (
-    { pageNumber, pageSize }: PaginationParams,
+const withListParams = (
+    params: CategoryListParams,
     config?: HttpRequestConfig
 ): HttpRequestConfig => ({
     ...config,
-    params: { ...config?.params, pageNumber, pageSize },
+    params: { ...config?.params, ...params },
 });
 
 
@@ -121,20 +126,19 @@ export const DEFAULT_CATEGORIES_PAGINATION: PaginationParams = {
  * invalidar `all` refresca listado y detalles de una vez, y `lists()` refresca
  * todas las páginas del listado sin tener que saber en cuál está el usuario.
  *
- * La paginación **sí** entra en la clave del listado, y es obligatorio que
- * entre: cada página es una respuesta distinta del backend. Con una clave común
- * para todas, ir a la página 2 sobrescribiría en caché lo que había en la 1 y
- * volver atrás dispararía otra petición para recuperar lo que ya se tenía.
+ * La página y los filtros **sí** entran en la clave del listado, y es
+ * obligatorio que entren: cada combinación es una respuesta distinta del
+ * backend. Con una clave común, ir a la página 2 sobrescribiría en caché lo que
+ * había en la 1, y buscar "café" tiraría el listado sin filtrar.
  *
- * Los filtros de la barra —texto y estado— no están en la clave porque todavía
- * no viajan al backend; el día que lo hagan entran aquí al lado de la página,
- * por el mismo motivo.
+ * Que estén en la clave es además lo que hace barata la búsqueda: borrar una
+ * letra vuelve a una clave que ya se pidió, y la respuesta sale de la caché sin
+ * tocar la red.
  */
 export const categoryKeys = {
     all: ["products_categories"] as const,
     lists: () => [...categoryKeys.all, "products_categories_list"] as const,
-    list: ({ pageNumber, pageSize }: PaginationParams) =>
-        [...categoryKeys.lists(), { pageNumber, pageSize }] as const,
+    list: (params: CategoryListParams) => [...categoryKeys.lists(), params] as const,
     detail: (id: string) => [...categoryKeys.all, "products_categories_detail", id] as const,
 };
 
@@ -146,25 +150,27 @@ const categoryPath = (id: string): string =>
 export function createCategoriesService(http: HttpClient): CategoriesService {
     return {
         /*
-         * La página es un argumento propio y no una entrada más de
-         * `config.params`: es lo único que el llamante tiene que decidir
-         * siempre, y como parámetro con tipo, olvidarla no compila. Metida en
-         * `params` sería opcional, y una petición sin página devuelve lo que el
-         * backend considere por defecto — que no tiene por qué ser lo que la
-         * tabla está enseñando.
+         * Qué se pide —página y filtros— es un argumento propio y no una entrada
+         * más de `config.params`: es lo único que el llamante tiene que decidir
+         * siempre, y como parámetro con tipo, olvidar la página no compila.
+         * Metida en `params` sería opcional, y una petición sin página devuelve
+         * lo que el backend considere por defecto — que no tiene por qué ser lo
+         * que la tabla está enseñando.
          */
         list: async (
-            pagination: PaginationParams,
+            params: CategoryListParams,
             config: HttpRequestConfig | undefined
         ): Promise<ApiResponseWithPagination<CategoryList[]>> => {
             const { data } = await http.get<ApiResponseWithPagination<CategoryListApiResponse[]>>(
                 ENDPOINTS.PRODUCTS_CATEGORY,
-                withTenantParam(withPagination(pagination, config))
+                withTenantParam(withListParams(params, config))
             );
 
             // El sobre se conserva entero —`pageNumber`, `pageSize` y `total`
             // vienen del backend— y sólo se traduce la lista: el pie necesita
-            // el total para saber cuántas páginas dibujar.
+            // el total para saber cuántas páginas dibujar. Con filtros puestos
+            // ese total es el de los resultados, no el del catálogo, que es
+            // justo lo que hay que paginar.
             return { ...data, data: toCategoryList(data.data) };
         },
 
@@ -220,13 +226,13 @@ export function createCategoriesService(http: HttpClient): CategoriesService {
  */
 export function categoriesQueryOptions(
     http: HttpClient,
-    pagination: PaginationParams = DEFAULT_CATEGORIES_PAGINATION
+    params: CategoryListParams = DEFAULT_CATEGORIES_PAGINATION
 ) {
     const service = createCategoriesService(http);
 
     return {
-        queryKey: categoryKeys.list(pagination),
+        queryKey: categoryKeys.list(params),
         queryFn: ({ signal }: { signal: AbortSignal }) =>
-            service.list(pagination, { signal }),
+            service.list(params, { signal }),
     };
 };

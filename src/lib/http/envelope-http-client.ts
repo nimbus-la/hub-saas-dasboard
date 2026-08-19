@@ -1,5 +1,5 @@
 import { HttpClient, HttpRequest, HttpResponse } from "@/interfaces";
-import { API_SUCCESS_CODE } from "@/utils";
+import { API_NON_FAILURE_CODES } from "@/utils";
 
 import { BaseHttpClient } from "./base-http-client";
 import { isApiEnvelope, toApiErrorFields } from "./envelope";
@@ -37,7 +37,11 @@ export class EnvelopeHttpClient extends BaseHttpClient {
 
         const envelope = response.data;
 
-        if (envelope.code !== API_SUCCESS_CODE) {
+        // Se pregunta por la lista de códigos que **no** son un fallo, y no por
+        // el de éxito: "no se encontraron resultados" llega con código propio,
+        // HTTP 200 y una página vacía válida dentro. Tratarlo como error haría
+        // perder unos datos que el backend sí mandó. Ver `API_NON_FAILURE_CODES`.
+        if (!API_NON_FAILURE_CODES.includes(envelope.code)) {
             throw new HttpError({
                 kind: "response",
                 status: response.status,

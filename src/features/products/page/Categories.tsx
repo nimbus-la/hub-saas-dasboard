@@ -10,7 +10,7 @@ import { formatMessage, messages } from "@/messages";
 import { CategoriesTable, CategoriesToolbar, CategoryFormModal } from "../components/categories";
 import { useProductsCategories } from "../hooks";
 import type { CategoryFormValues, CategoryList } from "../interfaces";
-import { DEFAULT_CATEGORY_STATUS_FILTER, EMPTY_CATEGORY_FORM_VALUES, filterCategories, formatCategoryCount, getEmptyMessage, isDuplicateCategoryName, type CategoryStatusFilter } from "../libs";
+import { EMPTY_CATEGORY_FORM_VALUES, formatCategoryCount, getEmptyMessage, isDuplicateCategoryName } from "../libs";
 import { toCreateCategoryParams, toUpdateCategoryParams } from "../mappers";
 import { categoriesPageBodyVariants, categoriesPagePaginationVariants, categoriesPageVariants } from "../style";
 
@@ -22,10 +22,13 @@ const PRODUCTS_LIST_HREF = "/products";
 export default function Categories() {
     const categories = useProductsCategories();
 
-    // El pie de paginación lo gobierna el hook de datos: la página y la
-    // consulta que la pide viajan juntas. Aquí sólo se enchufa a los controles
-    // y se vuelve a la primera al cambiar un filtro.
-    const { pagination } = categories;
+    /**
+     * La barra y el pie los gobierna el hook de datos: el texto, el estado y la
+     * página forman una sola pregunta al servidor y tienen que moverse juntos.
+     * Esta pantalla no filtra nada —el backend devuelve la página ya filtrada—;
+     * sólo enchufa los controles y decide qué hacer con los diálogos.
+     */
+    const { filters, pagination } = categories;
 
 
     const form = useForm<CategoryFormValues>({
@@ -37,9 +40,6 @@ export default function Categories() {
 
     const message = messages.products.categories;
 
-
-    const [query, setQuery] = React.useState<string>("");
-    const [status, setStatus] = React.useState<CategoryStatusFilter>(DEFAULT_CATEGORY_STATUS_FILTER);
 
     // ── Formulario ──────────────────────────────────────────────────────────
     // Un solo modal para el alta y la edición: lo que decide el modo es
@@ -56,45 +56,6 @@ export default function Categories() {
     // que la siguiente fila lo reemplaza.
     const [deleteTarget, setDeleteTarget] = React.useState<CategoryList | null>(null);
     const [isDeleteOpen, setIsDeleteOpen] = React.useState(false);
-
-
-    /*
-     * El buscador y el filtro de estado siguen siendo de memoria y se aplican
-     * **sobre la página que hay cargada**, que es lo único que la pantalla
-     * tiene. Cuando el backend acepte esos dos filtros, entran como parámetros
-     * de `service.list` junto a la página y esto desaparece.
-     */
-    const visibleCategories = React.useMemo(
-        () => filterCategories(categories.data, { query, status }),
-        [categories.data, query, status]
-    );
-
-
-    const hasFilters = query.trim().length > 0 || status !== "all";
-
-
-    /*
-     * Cualquier cambio de filtro devuelve a la primera página: quedarse en la 3
-     * de un resultado que ahora tiene una sola desorienta, y con la paginación
-     * en el servidor además haría pedir una página que no existe.
-     */
-    const handleQueryChange = React.useCallback((value: string) => {
-        setQuery(value);
-        pagination.reset();
-    }, [pagination]);
-
-
-    const handleStatusChange = React.useCallback((value: CategoryStatusFilter) => {
-        setStatus(value);
-        pagination.reset();
-    }, [pagination]);
-
-
-    const handleClearFilters = React.useCallback(() => {
-        setQuery("");
-        setStatus(DEFAULT_CATEGORY_STATUS_FILTER);
-        pagination.reset();
-    }, [pagination]);
 
 
     const handleCreateCategory = React.useCallback(() => {
@@ -118,8 +79,13 @@ export default function Categories() {
 
 
     /**
-     * La unicidad del nombre la comprueba la patanlla por que es la única que
-     * tiene la lista entera, y así el aviso sale al escribir en lugar de enviar.
+     * Aviso de nombre repetido, al escribir en lugar de al enviar.
+     *
+     * Es una comprobación **de cortesía y no una garantía**: sólo ve las
+     * categorías de la página cargada, que desde que el listado se pagina en el
+     * servidor no son todas. Detecta el choque frecuente —el que está a la
+     * vista— y el resto lo tiene que rechazar el backend al guardar, que es el
+     * único que puede afirmarlo mirando el catálogo entero.
      */
     const isNameTaken = React.useCallback(
         (name: string) => isDuplicateCategoryName(categories.data, name, formTarget?.id),
@@ -172,7 +138,7 @@ export default function Categories() {
     }, []);
 
 
-    /*
+    /**
      * El diálogo se cierra al resolverse la promesa y no antes: hasta entonces
      * `loading` mantiene el botón ocupado. Por eso cerrar es cosa de esta
      * pantalla y no del propio diálogo.
@@ -211,22 +177,33 @@ export default function Categories() {
                 />
 
                 <section className={categoriesPageBodyVariants()}>
+                    {/* Los manejadores del buscador y del selector son los del
+                        hook, sin envolver: la espera del buscador y la vuelta a
+                        la primera página ya están resueltas ahí dentro. Lo que
+                        se escribe se pinta al instante; lo que se pide espera. */}
                     <CategoriesToolbar
-                        query={query}
-                        onQueryChange={handleQueryChange}
-                        status={status}
-                        onStatusChange={handleStatusChange}
+                        query={filters.query}
+                        onQueryChange={filters.setQuery}
+                        status={filters.status}
+                        onStatusChange={filters.setStatus}
                         onCreateCategory={handleCreateCategory}
-                        visibleCount={visibleCategories.length}
+                        visibleCount={categories.data.length}
                         totalCount={categories.total}
-                        onClearFilters={handleClearFilters}
+                        onClearFilters={filters.clear}
                     />
 
                     <CategoriesTable
-                        categories={visibleCategories}
+                        categories={categories.data}
                         onEditCategory={handleEditCategory}
                         onDeleteCategory={handleDeleteRequest}
-                        emptyMessage={getEmptyMessage(categories.isLoading, categories.isError, hasFilters)}
+                        emptyMessage={getEmptyMessage({
+                            isPending: categories.isLoading,
+                            isError: categories.isError,
+                            // El texto aplicado, no el que se está tecleando:
+                            // la tabla está vacía por culpa del primero.
+                            query: filters.params.text ?? "",
+                            status: filters.status,
+                        })}
                     />
 
                     {/* El pie sólo aparece cuando hay algo que paginar: sobre un

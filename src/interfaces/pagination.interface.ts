@@ -38,6 +38,19 @@ export interface UsePaginationOptions {
      * a la que ya está en caché y la precarga se desperdicia.
      */
     initialPageSize?: number;
+
+    /**
+     * Huella de lo que se está listando. Cuando cambia, se vuelve a la página 1.
+     *
+     * Es lo que hace que aplicar un filtro no deje al usuario en la página 4 de
+     * unos resultados que ahora tienen una sola.
+     *
+     * Es una cadena y no el objeto de filtros a propósito: se compara por valor
+     * (`!==`) durante el render, y un objeto —nuevo en cada render si alguien
+     * olvida memoizarlo— provocaría un reinicio infinito en lugar de un error
+     * visible. Componerla es tan barato como `` `${texto}|${estado}` ``.
+     */
+    resetKey?: string;
 }
 
 

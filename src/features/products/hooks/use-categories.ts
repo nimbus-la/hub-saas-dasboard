@@ -8,28 +8,36 @@ import { useHttpClient } from "@/context";
 import { useClampedPage, usePagination } from "@/hooks";
 import { CategoriesService, CategoryList, CreateCategoryParams, UpdateCategoryParams } from "../interfaces";
 import { DEFAULT_CATEGORIES_PAGINATION, categoriesQueryOptions, categoryKeys, createCategoriesService } from "../services";
+import { useCategoryFilters } from "./use-category-filters";
 
 
 /**
- * Listado paginado de categorías, con su alta y su edición.
+ * Listado de categorías: filtrado y paginado por el backend, con su alta y su
+ * edición.
  *
- * La paginación vive **dentro** del hook y no en la pantalla a propósito: el
- * número de página y la consulta que lo usa tienen que moverse a la vez, y
- * dejarlos separados abre la ventana en la que la tabla enseña una página y el
- * pie marca otra. La pantalla recibe `pagination` ya montada y sólo la enchufa
- * al pie.
+ * Los filtros y la paginación viven **dentro** del hook y no en la pantalla a
+ * propósito: los tres —texto, estado y página— forman una sola pregunta al
+ * servidor, y repartirlos abre la ventana en la que la tabla enseña una
+ * respuesta y los controles describen otra. La pantalla recibe `filters` y
+ * `pagination` ya montados y sólo los enchufa a la barra y al pie.
  *
- * El orden de los tres pasos es el que impone la dependencia entre ellos:
- * primero la página, con ella la consulta, y con el total que devuelve la
- * consulta el ajuste de la página. Ver `usePagination`.
+ * El orden de los pasos es el que impone la dependencia entre ellos, y no se
+ * puede barajar:
+ *
+ *   1. Los filtros, que además publican su huella (`filters.key`).
+ *   2. La página, que vuelve a la 1 en cuanto esa huella cambia.
+ *   3. La consulta, que necesita las dos cosas para saber qué pedir.
+ *   4. El ajuste de la página, que necesita el `total` que devuelve la consulta.
  */
 
 
 /**
  * La lista vacía es una constante y no un `[]` literal.
  *
- * Se devuelve mientras no hay datos, y un array nuevo en cada render invalidaría
- * el `useMemo` del filtro de la pantalla en cada uno de ellos.
+ * Se devuelve mientras no hay datos, y un array nuevo en cada render rompería la
+ * igualdad por referencia de todo lo que la reciba: los `useCallback` de la
+ * pantalla y el modelo de filas de la tabla se recrearían sin que hubiera
+ * cambiado nada.
  */
 const NO_CATEGORIES: CategoryList[] = [];
 
@@ -45,13 +53,24 @@ export function useProductsCategories() {
     );
 
 
+    const filters = useCategoryFilters();
+
+
+    /*
+     * `resetKey` es lo que evita quedarse en la página 4 de un resultado que
+     * ahora tiene una sola. Se pasa la huella de los filtros y no un efecto que
+     * llame a `pagination.reset()`: el hook la compara durante el render, así
+     * que la vuelta a la página 1 y el cambio de filtro entran en la **misma**
+     * consulta en lugar de en dos. Ver `usePagination`.
+     */
     const pagination = usePagination({
         initialPageSize: DEFAULT_CATEGORIES_PAGINATION.pageSize,
+        resetKey: filters.key,
     });
 
 
     const query = useQuery({
-        ...categoriesQueryOptions(http, pagination.params),
+        ...categoriesQueryOptions(http, { ...pagination.params, ...filters.params }),
 
         /*
          * Al cambiar de página se mantiene en pantalla lo anterior mientras
@@ -98,11 +117,17 @@ export function useProductsCategories() {
 
 
     return {
-        /** Las categorías de la página actual, ya mapeadas. */
+        /** Las categorías de la página actual, ya mapeadas y ya filtradas. */
         data: query.data?.data ?? NO_CATEGORIES,
 
-        /** Cuántas hay en total, en todas las páginas. Lo dice el backend. */
+        /**
+         * Cuántas cumplen los filtros, en todas las páginas. Lo dice el backend.
+         * Con la barra vacía es el catálogo entero.
+         */
         total: query.data?.total ?? 0,
+
+        /** Estado de la barra: texto, estado y sus manejadores. */
+        filters,
 
         /** Estado del pie: página, tamaño y sus manejadores. */
         pagination,
@@ -111,6 +136,13 @@ export function useProductsCategories() {
         isLoading: query.isLoading,
         isPending: query.isPending,
         isError: query.isError,
+
+        /**
+         * Hay una petición en curso, incluida la que se dispara al dejar de
+         * escribir. Sirve para atenuar la tabla mientras llega lo nuevo: con
+         * `keepPreviousData` lo que se ve son los resultados del texto anterior.
+         */
+        isFetching: query.isFetching,
 
         create: createCategory,
         update: updateCategory
