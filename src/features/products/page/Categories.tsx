@@ -31,7 +31,6 @@ export default function Categories() {
 
 
     const message = messages.products.categories;
-    console.log("form data: ", form.watch())
 
 
     const [query, setQuery] = React.useState<string>("");
