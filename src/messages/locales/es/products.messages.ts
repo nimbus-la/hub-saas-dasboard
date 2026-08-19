@@ -267,6 +267,18 @@ export const products = {
         } satisfies Plural,
 
         /**
+         * Cómo se llama lo que se pagina, en el pie de la tabla.
+         *
+         * Es sólo el nombre, sin la cantidad: el pie ya escribe el número por
+         * su cuenta —"Mostrando 1–12 de 40 categorías"— y un `{count}` aquí
+         * saldría repetido.
+         */
+        itemLabel: {
+            one: "categoría",
+            other: "categorías",
+        } satisfies Plural,
+
+        /**
          * Qué dice la tabla cuando no pinta filas.
          *
          * Son cuatro situaciones y la diferencia importa: cargando, la API

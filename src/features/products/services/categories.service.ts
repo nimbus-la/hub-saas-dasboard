@@ -1,4 +1,5 @@
-import type { ApiEnvelope, ApiResponseWithPagination, HttpClient, HttpRequestConfig } from "@/interfaces";
+import type { ApiEnvelope, ApiResponseWithPagination, HttpClient, HttpRequestConfig, PaginationParams } from "@/interfaces";
+import { DEFAULT_PAGE_SIZE, FIRST_PAGE } from "@/lib/pagination";
 import { ENDPOINTS } from "@/utils";
 import type { CategoriesService, CategoryList, CategoryListApiResponse, CreateCategoryParams, UpdateCategoryParams } from "../interfaces";
 import { toCategory, toCategoryList } from "../mappers";
@@ -77,6 +78,39 @@ const withTenantBody = <TPayload extends object>(
 
 
 /**
+ * Paginación en la query string.
+ *
+ * Los dos números entran como parámetros de la petición y no en la ruta —la
+ * ruta es la colección, la página es una forma de pedirla— y se fusionan sobre
+ * lo que traiga la llamada, igual que el inquilino, para no pisar un filtro
+ * futuro.
+ */
+const withPagination = (
+    { pageNumber, pageSize }: PaginationParams,
+    config?: HttpRequestConfig
+): HttpRequestConfig => ({
+    ...config,
+    params: { ...config?.params, pageNumber, pageSize },
+});
+
+
+/**
+ * La página que se pide cuando nadie dice otra cosa.
+ *
+ * La usan la precarga del servidor y el primer render del navegador, y **tiene
+ * que ser la misma en los dos**: la clave de caché lleva la paginación dentro,
+ * así que si el servidor guardara la página 1 de 12 en 12 y el cliente pidiera
+ * la de 10 en 10, la hidratación no encontraría nada y la tabla volvería a
+ * pedir el listado nada más cargar. Por eso sale de una constante exportada y
+ * no de un literal en cada lado.
+ */
+export const DEFAULT_CATEGORIES_PAGINATION: PaginationParams = {
+    pageNumber: FIRST_PAGE,
+    pageSize: DEFAULT_PAGE_SIZE,
+};
+
+
+/**
  * Claves de caché de este recurso.
  *
  * Viven aquí, y no junto a los hooks, porque el Server Component que precarga
@@ -84,17 +118,23 @@ const withTenantBody = <TPayload extends object>(
  * para llamar a una función suya.
  *
  * La jerarquía hace que invalidar por el prefijo alcance a todo lo que cuelga:
- * invalidar `all` refresca listado y detalles de una vez.
+ * invalidar `all` refresca listado y detalles de una vez, y `lists()` refresca
+ * todas las páginas del listado sin tener que saber en cuál está el usuario.
  *
- * El listado no lleva filtros en la clave a propósito. Las categorías son unas
- * decenas: se piden todas y la pantalla busca y filtra en memoria con
- * `filterCategories`. El día que un recurso necesite filtrar en el servidor
- * —ventas— sus filtros sí entran en la clave, para que cada combinación se
- * cachee por separado.
+ * La paginación **sí** entra en la clave del listado, y es obligatorio que
+ * entre: cada página es una respuesta distinta del backend. Con una clave común
+ * para todas, ir a la página 2 sobrescribiría en caché lo que había en la 1 y
+ * volver atrás dispararía otra petición para recuperar lo que ya se tenía.
+ *
+ * Los filtros de la barra —texto y estado— no están en la clave porque todavía
+ * no viajan al backend; el día que lo hagan entran aquí al lado de la página,
+ * por el mismo motivo.
  */
 export const categoryKeys = {
     all: ["products_categories"] as const,
-    list: () => [...categoryKeys.all, "products_categories_list"] as const,
+    lists: () => [...categoryKeys.all, "products_categories_list"] as const,
+    list: ({ pageNumber, pageSize }: PaginationParams) =>
+        [...categoryKeys.lists(), { pageNumber, pageSize }] as const,
     detail: (id: string) => [...categoryKeys.all, "products_categories_detail", id] as const,
 };
 
@@ -105,12 +145,26 @@ const categoryPath = (id: string): string =>
 
 export function createCategoriesService(http: HttpClient): CategoriesService {
     return {
-        list: async (config: HttpRequestConfig | undefined): Promise<ApiResponseWithPagination<CategoryList[]>> => {
+        /*
+         * La página es un argumento propio y no una entrada más de
+         * `config.params`: es lo único que el llamante tiene que decidir
+         * siempre, y como parámetro con tipo, olvidarla no compila. Metida en
+         * `params` sería opcional, y una petición sin página devuelve lo que el
+         * backend considere por defecto — que no tiene por qué ser lo que la
+         * tabla está enseñando.
+         */
+        list: async (
+            pagination: PaginationParams,
+            config: HttpRequestConfig | undefined
+        ): Promise<ApiResponseWithPagination<CategoryList[]>> => {
             const { data } = await http.get<ApiResponseWithPagination<CategoryListApiResponse[]>>(
                 ENDPOINTS.PRODUCTS_CATEGORY,
-                withTenantParam(config)
+                withTenantParam(withPagination(pagination, config))
             );
 
+            // El sobre se conserva entero —`pageNumber`, `pageSize` y `total`
+            // vienen del backend— y sólo se traduce la lista: el pie necesita
+            // el total para saber cuántas páginas dibujar.
             return { ...data, data: toCategoryList(data.data) };
         },
 
@@ -164,11 +218,15 @@ export function createCategoriesService(http: HttpClient): CategoriesService {
  * `signal` llega desde TanStack Query y baja hasta `fetch`: si la consulta deja
  * de interesar, la petición se cancela de verdad en la red.
  */
-export function categoriesQueryOptions(http: HttpClient) {
+export function categoriesQueryOptions(
+    http: HttpClient,
+    pagination: PaginationParams = DEFAULT_CATEGORIES_PAGINATION
+) {
     const service = createCategoriesService(http);
 
     return {
-        queryKey: categoryKeys.list(),
-        queryFn: ({ signal }: { signal: AbortSignal }) => service.list({ signal }),
+        queryKey: categoryKeys.list(pagination),
+        queryFn: ({ signal }: { signal: AbortSignal }) =>
+            service.list(pagination, { signal }),
     };
 };
