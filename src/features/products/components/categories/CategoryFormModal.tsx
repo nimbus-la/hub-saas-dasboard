@@ -9,7 +9,6 @@ import {
     CATEGORY_FIELD_HINTS,
     CATEGORY_FORM_RULES,
     CATEGORY_MODAL_COPY,
-    duplicateCategoryNameMessage,
     hasCategoryChanges,
 } from "@/features/products/libs/category-form";
 import { messages } from "@/messages";
@@ -36,12 +35,6 @@ interface CategoryFormModalProps {
     category?: CategoryList | undefined;
 
     /**
-     * ¿Ya hay otra categoría con este nombre? La respuesta la tiene la
-     * pantalla, que es la que sostiene la lista completa.
-     */
-    isNameTaken: (name: string) => boolean;
-
-    /**
      * Recibe los valores ya validados. Cerrar el modal es cosa de quien lo abre.
      *
      * Puede devolver una promesa: mientras esté pendiente, react-hook-form
@@ -57,7 +50,6 @@ export default function CategoryFormModal({
     open,
     onOpenChange,
     category,
-    isNameTaken,
     onSubmit,
     className,
 }: CategoryFormModalProps) {
@@ -67,19 +59,6 @@ export default function CategoryFormModal({
 
     const mode = category ? "edit" : "create";
     const generalMessage = CATEGORY_MODAL_COPY[mode];
-
-
-    const nameRules = React.useMemo(
-        () => ({
-            ...CATEGORY_FORM_RULES.name,
-            validate: {
-                ...CATEGORY_FORM_RULES.name.validate,
-                unique: (value: string) =>
-                    !isNameTaken(value) || duplicateCategoryNameMessage(value),
-            },
-        }),
-        [isNameTaken]
-    );
 
 
     /*
@@ -172,7 +151,7 @@ export default function CategoryFormModal({
                 <Controller
                     control={control}
                     name="name"
-                    rules={nameRules}
+                    rules={CATEGORY_FORM_RULES.name}
                     render={({ field, fieldState }) => (
                         <TextField
                             {...field}

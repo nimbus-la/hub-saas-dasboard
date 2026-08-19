@@ -10,7 +10,7 @@ import { formatMessage, messages } from "@/messages";
 import { CategoriesTable, CategoriesToolbar, CategoryFormModal } from "../components/categories";
 import { useProductsCategories } from "../hooks";
 import type { CategoryFormValues, CategoryList } from "../interfaces";
-import { EMPTY_CATEGORY_FORM_VALUES, formatCategoryCount, getEmptyMessage, isDuplicateCategoryName } from "../libs";
+import { EMPTY_CATEGORY_FORM_VALUES, formatCategoryCount, getEmptyMessage } from "../libs";
 import { toCreateCategoryParams, toUpdateCategoryParams } from "../mappers";
 import { categoriesPageBodyVariants, categoriesPagePaginationVariants, categoriesPageVariants } from "../style";
 
@@ -76,21 +76,6 @@ export default function Categories() {
 
         setIsFormOpen(true);
     }, []);
-
-
-    /**
-     * Aviso de nombre repetido, al escribir en lugar de al enviar.
-     *
-     * Es una comprobación **de cortesía y no una garantía**: sólo ve las
-     * categorías de la página cargada, que desde que el listado se pagina en el
-     * servidor no son todas. Detecta el choque frecuente —el que está a la
-     * vista— y el resto lo tiene que rechazar el backend al guardar, que es el
-     * único que puede afirmarlo mirando el catálogo entero.
-     */
-    const isNameTaken = React.useCallback(
-        (name: string) => isDuplicateCategoryName(categories.data, name, formTarget?.id),
-        [categories.data, formTarget]
-    );
 
 
     /**
@@ -227,7 +212,6 @@ export default function Categories() {
                     open={isFormOpen}
                     onOpenChange={setIsFormOpen}
                     category={formTarget ?? undefined}
-                    isNameTaken={isNameTaken}
                     onSubmit={handleFormSubmit}
                 />
 

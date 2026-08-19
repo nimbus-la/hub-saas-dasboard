@@ -457,9 +457,6 @@ export const products = {
              */
             nameChars: "El nombre solo admite letras, números, espacios y los signos , . & - '",
             descriptionChars: "La descripción solo admite letras, números, espacios y signos de puntuación.",
-
-            /** El nombre repetido lo detecta la pantalla, que tiene la lista entera. */
-            nameTaken: 'Ya existe una categoría llamada "{name}". Usa otro nombre.',
         },
 
         /* ── Borrado ────────────────────────────────────────────────────── */
