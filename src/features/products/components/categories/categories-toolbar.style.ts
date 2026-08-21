@@ -37,11 +37,17 @@ export const categoriesToolbarSearchVariants = cva(["w-full sm:max-w-xs"]);
 /**
  * Selector de estado.
  *
- * Ancho fijo a partir de `sm` y no `w-auto`: el campo cambiaría de anchura al
- * pasar de "Todos los estados" a "Activa", y con él se movería el botón de
- * crear que tiene al lado.
+ * Aquí sí `w-auto`, al revés de lo que pedía el campo con borde que había
+ * antes. Aquel tenía ancho fijo porque la caja se veía crecer al pasar de
+ * "Todos los estados" a "Activas"; éste no dibuja caja hasta que se pasa el
+ * puntero, así que reservarle ancho sólo dejaría el fondo del hover flotando
+ * lejos del texto.
+ *
+ * Y el cambio de anchura no arrastra a nadie: el botón de crear va pegado al
+ * margen derecho con `ms-auto`, de modo que lo único que se mueve al elegir
+ * otro estado es el hueco entre los dos.
  */
-export const categoriesToolbarFilterVariants = cva(["w-full sm:w-56"]);
+export const categoriesToolbarFilterVariants = cva(["w-full sm:w-auto"]);
 
 
 /** Acción principal: siempre pegada al margen derecho en escritorio. */

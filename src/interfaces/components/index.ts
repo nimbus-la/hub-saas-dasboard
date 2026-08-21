@@ -18,6 +18,8 @@ export * from "./buttons.interfaces";
 
 export * from "./cards.interfaces";
 
+export * from "./filters.interfaces";
+
 export * from "./inputs.interfaces";
 
 export * from "./layout.interfaces";
