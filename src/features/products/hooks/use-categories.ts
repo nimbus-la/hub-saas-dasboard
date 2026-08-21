@@ -12,30 +12,28 @@ import { useCategoryFilters } from "./use-category-filters";
 
 
 /**
- * Listado de categorías: filtrado y paginado por el backend, con su alta y su
- * edición.
+ * Listado de categorías —filtrado y paginado por el backend— junto con su alta
+ * y su edición.
  *
- * Los filtros y la paginación viven **dentro** del hook y no en la pantalla a
- * propósito: los tres —texto, estado y página— forman una sola pregunta al
- * servidor, y repartirlos abre la ventana en la que la tabla enseña una
- * respuesta y los controles describen otra. La pantalla recibe `filters` y
- * `pagination` ya montados y sólo los enchufa a la barra y al pie.
+ * Los filtros y la paginación viven dentro del hook y no en la pantalla: texto,
+ * estado y página forman una sola pregunta al servidor, y separarlos abre la
+ * ventana en la que la tabla enseña una respuesta y los controles describen
+ * otra. La pantalla recibe `filters` y `pagination` ya montados.
  *
- * El orden de los pasos es el que impone la dependencia entre ellos, y no se
- * puede barajar:
+ * El orden de los pasos lo impone la dependencia entre ellos:
  *
- *   1. Los filtros, que además publican su huella (`filters.key`).
+ *   1. Los filtros, que publican su huella (`filters.key`).
  *   2. La página, que vuelve a la 1 en cuanto esa huella cambia.
  *   3. La consulta, que necesita las dos cosas para saber qué pedir.
- *   4. El ajuste de la página, que necesita el `total` que devuelve la consulta.
+ *   4. El ajuste de la página, que necesita el `total` de la consulta.
  */
 
 
 /**
  * La lista vacía es una constante y no un `[]` literal.
  *
- * Se devuelve mientras no hay datos, y un array nuevo en cada render rompería la
- * igualdad por referencia de todo lo que la reciba: los `useCallback` de la
+ * Se devuelve mientras no hay datos, y un array nuevo en cada render rompería
+ * la igualdad por referencia de todo lo que la reciba: los `useCallback` de la
  * pantalla y el modelo de filas de la tabla se recrearían sin que hubiera
  * cambiado nada.
  */
@@ -47,6 +45,11 @@ export function useProductsCategories() {
     const queryClient = useQueryClient();
 
 
+    /*
+     * Una sola instancia del servicio para todo el hook: la consulta y las dos
+     * mutaciones trabajan sobre la misma. Se memoiza por `http` porque el
+     * cliente sólo cambia si cambia el contexto.
+     */
     const service = React.useMemo<CategoriesService>(
         () => createCategoriesService(http),
         [http]
@@ -58,10 +61,10 @@ export function useProductsCategories() {
 
     /*
      * `resetKey` es lo que evita quedarse en la página 4 de un resultado que
-     * ahora tiene una sola. Se pasa la huella de los filtros y no un efecto que
-     * llame a `pagination.reset()`: el hook la compara durante el render, así
-     * que la vuelta a la página 1 y el cambio de filtro entran en la **misma**
-     * consulta en lugar de en dos. Ver `usePagination`.
+     * ahora tiene una sola. Se le pasa la huella de los filtros en vez de un
+     * efecto que llame a `pagination.reset()`: el hook la compara durante el
+     * render, así que la vuelta a la página 1 y el cambio de filtro entran en
+     * la misma consulta y no en dos. Ver `usePagination`.
      */
     const pagination = usePagination({
         initialPageSize: DEFAULT_CATEGORIES_PAGINATION.pageSize,
@@ -69,16 +72,20 @@ export function useProductsCategories() {
     });
 
 
+    /*
+     * La clave y la función de consulta salen del servicio, que es de donde las
+     * toma también la precarga del servidor. Aquí sólo se le suma lo propio del
+     * cliente.
+     */
     const query = useQuery({
-        ...categoriesQueryOptions(http, { ...pagination.params, ...filters.params }),
+        ...categoriesQueryOptions(service, { ...pagination.params, ...filters.params }),
 
         /*
          * Al cambiar de página se mantiene en pantalla lo anterior mientras
-         * llega lo nuevo.
-         *
-         * Sin esto, cada clic en el pie vacía la tabla y la vuelve a llenar: la
-         * altura del bloque salta y el estado vacío —"todavía no hay
-         * categorías"— aparece durante un instante diciendo algo que es falso.
+         * llega lo nuevo. Sin esto cada clic en el pie vacía la tabla y la
+         * vuelve a llenar: la altura del bloque salta y el estado vacío
+         * —"todavía no hay categorías"— aparece un instante diciendo algo que
+         * es falso.
          */
         placeholderData: keepPreviousData,
     });
@@ -90,10 +97,10 @@ export function useProductsCategories() {
 
 
     /**
-     * Se invalidan **todas** las páginas del listado, no sólo la actual.
+     * Refresca todas las páginas del listado, no sólo la actual.
      *
-     * Crear una categoría reordena la colección entera: lo que estaba en la
-     * página 2 pasa a la 3. Refrescar sólo la que se está viendo dejaría a las
+     * Crear o editar una categoría reordena la colección entera: lo que estaba
+     * en la página 2 pasa a la 3. Invalidar sólo la página visible dejaría las
      * demás en caché con datos que ya no son.
      */
     const invalidate = () =>
