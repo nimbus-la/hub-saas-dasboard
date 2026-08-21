@@ -346,7 +346,6 @@ export const products = {
             filterLabel: "Filtrar categorías por estado",
             /** Opción del filtro que no filtra. Es un valor, no la ausencia de uno. */
             allStatuses: "Todos los estados",
-            filterEmpty: "Ningún estado coincide",
 
             create: "Crear categoría",
 

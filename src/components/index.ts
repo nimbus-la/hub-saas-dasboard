@@ -71,6 +71,12 @@ export * from './pagination/pagination.style';
 export * from './tabs/filter-tabs.style';
 export { FilterTabs } from './tabs/FilterTabs';
 
+// ── Filtros ─────────────────────────────────────────────────────────────────
+// `FilterTabs` reparte las opciones en una fila; `FilterSelect` las guarda en
+// un desplegable. Se elige por cuántas hay, no por gusto.
+export * from './filters/filter-select.style';
+export { default as FilterSelect } from './filters/FilterSelect';
+
 // ── Formularios ─────────────────────────────────────────────────────────────
 export { InputSelector } from './inputs/InputSelector';
 export { TextAreaField } from './inputs/TextAreaField';

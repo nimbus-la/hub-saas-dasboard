@@ -52,6 +52,20 @@ export const components = {
     },
 
 
+    /* ── Filtros ────────────────────────────────────────────────────────── */
+
+    filterSelect: {
+        /**
+         * Qué se lee cuando el filtro no tiene nada elegido.
+         *
+         * Es un verbo y no "Selecciona una opción" como en el campo de
+         * formulario: sin borde, el control se parece a un botón, y de un botón
+         * se espera leer lo que hace.
+         */
+        placeholder: "Filtrar",
+    },
+
+
     /* ── Tablas ─────────────────────────────────────────────────────────── */
 
     dataTable: {

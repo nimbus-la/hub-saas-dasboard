@@ -2,7 +2,7 @@
 
 import GenericButton from "@/components/buttons/GenericButton";
 import LinkButton from "@/components/buttons/LinkButton";
-import { InputSelector } from "@/components/inputs/InputSelector";
+import FilterSelect from "@/components/filters/FilterSelect";
 import { TextField } from "@/components/inputs/TextField";
 import { cn } from "@/lib/utils";
 import { formatMessage, messages } from "@/messages";
@@ -77,17 +77,13 @@ export default function CategoriesToolbar({
                     className={categoriesToolbarSearchVariants()}
                 />
 
-                <InputSelector
+                <FilterSelect
                     size="md"
                     value={status}
-                    onChange={(value) =>
-                        onStatusChange((value || "all") as CategoryStatusFilter)
-                    }
+                    onChange={(value) => onStatusChange((value || "all") as CategoryStatusFilter)}
                     options={CATEGORY_STATUS_OPTIONS}
-                    leftIcon={<ICON_TOKENS.FILTER aria-hidden="true" />}
                     placeholder={COPY.allStatuses}
                     aria-label={COPY.filterLabel}
-                    emptyMessage={COPY.filterEmpty}
                     className={categoriesToolbarFilterVariants()}
                 />
 
