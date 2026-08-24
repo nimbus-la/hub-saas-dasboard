@@ -5,12 +5,6 @@ import { Controller, useFormContext } from "react-hook-form";
 import { InputSelector, TextAreaField, TextField } from "@/components";
 import { cn } from "@/lib/utils";
 import { messages } from "@/messages";
-import {
-    PRODUCT_CATEGORY_OPTIONS,
-    PRODUCT_DESCRIPTION_MAX,
-    PRODUCT_FORM_RULES,
-    PRODUCT_NAME_LIMITS,
-} from "@/features/products/libs/product-form";
 
 import ProductImageField from "./ProductImageField";
 import {
@@ -19,6 +13,7 @@ import {
     productBasicsStepVariants,
 } from "./product-basics-step.style";
 import { ProductFormValues } from "../../interfaces";
+import { PRODUCT_CATEGORY_OPTIONS, PRODUCT_FORM_RULES, PRODUCT_VALIDATION } from "../../utils";
 
 
 /**
@@ -63,7 +58,7 @@ export default function ProductBasicsStep({
                             size="md"
                             error={fieldState.error?.message ?? false}
                             placeholder={stepMessaages.name.placeholder}
-                            maxLength={PRODUCT_NAME_LIMITS.max}
+                            maxLength={PRODUCT_VALIDATION.name.max}
                             autoComplete="off"
                         />
                     )}
@@ -99,7 +94,7 @@ export default function ProductBasicsStep({
                             label={stepMessaages.description.label}
                             error={fieldState.error?.message ?? false}
                             placeholder={stepMessaages.description.placeholder}
-                            maxLength={PRODUCT_DESCRIPTION_MAX}
+                            maxLength={PRODUCT_VALIDATION.description.max}
                             showCount
                             rows={4}
                             className={productBasicsFullRowVariants()}

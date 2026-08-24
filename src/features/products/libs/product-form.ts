@@ -8,102 +8,13 @@
 // Aquí no hay una sola clase de Tailwind ni un solo componente: es texto y
 // reglas. La pantalla decide cómo se pintan.
 
-import type { RegisterOptions } from "react-hook-form";
 
-import { PRODUCT_CATEGORIES } from "@/lib/products";
 import { formatMessage, messages } from "@/messages";
 
 /** Atajo al bloque del catálogo que da nombre a todo lo de este archivo. */
 const copy = messages.products.create;
 
-/* -------------------------------------------------------------------------- */
-/*  Valores del formulario                                                     */
-/* -------------------------------------------------------------------------- */
 
-/**
- * Lo que el formulario tiene en la mano en cada momento.
- *
- * `image` es el `File` recién elegido, no una URL: la subida ocurre al guardar
- * el producto entero, no al soltar el archivo. Hasta entonces la foto sólo
- * existe en memoria y se previsualiza con un objeto de blob.
- */
-export interface ProductFormValues {
-    name: string;
-    category: string;
-    description: string;
-    image: File | null;
-}
-
-
-/* -------------------------------------------------------------------------- */
-/*  Reglas de validación                                                       */
-/* -------------------------------------------------------------------------- */
-
-/**
- * Límites de los campos de texto.
- *
- * El nombre cabe en la tarjeta del catálogo a dos líneas y en la comanda de
- * cocina a una; la descripción es un párrafo corto de carta, no una ficha
- * técnica. Se declaran aquí para que el contador del campo y la regla no
- * puedan discrepar.
- */
-export const PRODUCT_NAME_LIMITS = { min: 3, max: 60 } as const;
-export const PRODUCT_DESCRIPTION_MAX = 280;
-
-/** Opciones del selector de categoría, en el orden de la carta. */
-export const PRODUCT_CATEGORY_OPTIONS = PRODUCT_CATEGORIES.map((category) => ({
-    label: category,
-    value: category,
-}));
-
-type FieldRules<K extends keyof ProductFormValues> = RegisterOptions<
-    ProductFormValues,
-    K
->;
-
-/**
- * Reglas de cada campo, en el formato que espera react-hook-form.
- *
- * Van juntas y fuera de los componentes por dos motivos. Uno, el mensaje y el
- * número que lo provoca tienen que viajar en el mismo sitio: un `minLength: 3`
- * en el componente y un "al menos tres caracteres" en otro archivo se
- * desincronizan al primer cambio. Y dos, cuando el alta también se valide en
- * el servidor, esto es lo que hay que portar.
- *
- * Los mensajes dicen siempre qué falta y qué hacer. "Campo obligatorio" no es
- * un mensaje de error, es una etiqueta.
- */
-export const PRODUCT_FORM_RULES = {
-    name: {
-        required: copy.validation.nameRequired,
-        maxLength: {
-            value: PRODUCT_NAME_LIMITS.max,
-            message: formatMessage(copy.validation.nameMax, {
-                max: PRODUCT_NAME_LIMITS.max,
-            }),
-        },
-        // Se valida sobre el texto sin espacios de los extremos: tres espacios
-        // seguidos cumplen cualquier `minLength` y no son un nombre.
-        validate: (value: string) =>
-            value.trim().length >= PRODUCT_NAME_LIMITS.min ||
-            formatMessage(copy.validation.nameMin, {
-                min: PRODUCT_NAME_LIMITS.min,
-            }),
-    } satisfies FieldRules<"name">,
-
-    category: {
-        required: copy.validation.categoryRequired,
-    } satisfies FieldRules<"category">,
-
-    description: {
-        maxLength: {
-            value: PRODUCT_DESCRIPTION_MAX,
-            message: formatMessage(copy.validation.descriptionMax, {
-                max: PRODUCT_DESCRIPTION_MAX,
-            }),
-        },
-    } satisfies FieldRules<"description">,
-} as const;
 
 /* -------------------------------------------------------------------------- */
 /*  Imagen                                                                     */

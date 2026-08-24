@@ -1,3 +1,5 @@
+import { RegisterOptions } from "react-hook-form";
+
 export interface ProductRecipeFormValues {
     itemId: string;
     quantity: string;
@@ -28,3 +30,10 @@ export interface ProductFormStep {
     subtitle: string;
     fields: readonly (keyof ProductFormValues)[];
 }
+
+
+
+export type ProductFieldRules<K extends keyof ProductFormValues> = RegisterOptions<
+    ProductFormValues,
+    K
+>
