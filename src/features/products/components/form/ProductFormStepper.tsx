@@ -2,8 +2,9 @@ import { Check } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { messages } from "@/messages";
-import { formatStepPosition, type ProductFormStep } from "@/features/products/libs/product-form";
 import { ICON_SIZE, ICON_STROKE } from "@/tokens";
+
+import { ProductFormStep } from "../../interfaces";
 
 import {
     stepperConnectorVariants,
@@ -15,6 +16,7 @@ import {
     stepperTextVariants,
     stepperVariants,
 } from "./product-form-stepper.style";
+import { formatStepPosition } from "../../libs";
 
 
 /**
@@ -87,11 +89,11 @@ export default function ProductFormStepper({
                                         {`${formatStepPosition(index)}: `}
                                     </span>
 
-                                    {step.label}
+                                    {step.title}
                                 </span>
 
                                 <span className={stepperHintVariants()}>
-                                    {step.hint}
+                                    {step.subtitle}
                                 </span>
                             </span>
 

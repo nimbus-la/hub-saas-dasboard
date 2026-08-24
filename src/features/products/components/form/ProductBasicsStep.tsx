@@ -1,6 +1,6 @@
 "use client";
 
-import { Controller, type Control } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 
 import { InputSelector, TextAreaField, TextField } from "@/components";
 import { cn } from "@/lib/utils";
@@ -10,7 +10,6 @@ import {
     PRODUCT_DESCRIPTION_MAX,
     PRODUCT_FORM_RULES,
     PRODUCT_NAME_LIMITS,
-    type ProductFormValues,
 } from "@/features/products/libs/product-form";
 
 import ProductImageField from "./ProductImageField";
@@ -19,6 +18,7 @@ import {
     productBasicsGridVariants,
     productBasicsStepVariants,
 } from "./product-basics-step.style";
+import { ProductFormValues } from "../../interfaces";
 
 
 /**
@@ -33,15 +33,15 @@ import {
  */
 
 interface ProductBasicsStepProps {
-    control: Control<ProductFormValues>;
     className?: string;
 }
 
 export default function ProductBasicsStep({
-    control,
     className,
 }: ProductBasicsStepProps) {
     const stepMessaages = messages.products.create.basics;
+
+    const { control } = useFormContext<ProductFormValues>();
 
     return (
         // El `fieldset` agrupa los campos del paso y la leyenda le pone nombre
@@ -71,7 +71,7 @@ export default function ProductBasicsStep({
 
                 <Controller
                     control={control}
-                    name="category"
+                    name="categoryId"
                     rules={PRODUCT_FORM_RULES.category}
                     render={({ field, fieldState }) => (
                         <InputSelector
@@ -114,7 +114,7 @@ export default function ProductBasicsStep({
                 propio componente, que es quien conoce el archivo. */}
             <Controller
                 control={control}
-                name="image"
+                name="imageUrl"
                 render={({ field }) => (
                     <ProductImageField
                         value={field.value}

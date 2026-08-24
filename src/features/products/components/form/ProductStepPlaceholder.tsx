@@ -8,7 +8,6 @@ import { Hammer } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { formatMessage, messages } from "@/messages";
-import { formatStepPosition, type ProductFormStep } from "@/features/products/libs/product-form";
 import { ICON_SIZE, ICON_STROKE_BY_SIZE } from "@/tokens";
 
 import {
@@ -18,6 +17,8 @@ import {
     productStepPlaceholderTitleVariants,
     productStepPlaceholderVariants,
 } from "./product-step-placeholder.style";
+import { ProductFormStep } from "../../interfaces";
+import { formatStepPosition } from "../../libs";
 
 
 /** Lo que dice un paso todavía sin campos. Ver `@/messages`. */
@@ -51,13 +52,13 @@ export default function ProductStepPlaceholder({
                 <p className={productStepPlaceholderTitleVariants()}>
                     {formatMessage(COPY.title, {
                         position: formatStepPosition(index),
-                        label: step.label,
+                        label: step.title,
                     })}
                 </p>
 
                 <p className={productStepPlaceholderMessageVariants()}>
                     {formatMessage(COPY.message, {
-                        hint: step.hint.toLowerCase(),
+                        hint: step.subtitle.toLowerCase(),
                     })}
                 </p>
             </div>

@@ -3,9 +3,10 @@
 import Link from "next/link";
 import * as React from "react";
 
+import { FormProvider } from "react-hook-form";
+
 import GenericButton from "@/components/buttons/GenericButton";
 import PageHeader from "@/components/layout/PageHeader";
-import { PRODUCT_FORM_STEPS } from "@/features/products/libs/product-form";
 import { messages } from "@/messages";
 import { ICON_TOKENS } from "@/tokens";
 
@@ -15,6 +16,10 @@ import {
     ProductStepPlaceholder,
 } from "../components/form";
 import { useProductForm } from "../hooks/use-product-form";
+import { PRODUCTS_LIST_HREF } from "../libs";
+import { PRODUCT_FORM_STEPS } from "../utils";
+
+
 import {
     createProductActionsVariants,
     createProductBodyVariants,
@@ -24,7 +29,7 @@ import {
     createProductPageVariants,
     createProductPanelVariants,
 } from "../style";
-import { PRODUCTS_LIST_HREF } from "../libs";
+
 
 
 /**
@@ -37,7 +42,7 @@ import { PRODUCTS_LIST_HREF } from "../libs";
  */
 
 export default function CreateProduct() {
-    // Todo lo que dice esta pantalla
+    // Mensajes para mostrar en pantalla
     const productMessage = messages.products.create;
 
     const {
@@ -78,82 +83,84 @@ export default function CreateProduct() {
             : null;
 
     return (
-        <div className={createProductPageVariants()}>
-            <PageHeader
-                title={productMessage.title}
-                subtitle={productMessage.subtitle}
-                backHref={PRODUCTS_LIST_HREF}
-                backLabel={productMessage.backLabel}
-            />
-
-            {/* `noValidate`: la validación es la del formulario, con mensajes
-                en español y pegados a su campo. Los globos del navegador
-                aparecen de uno en uno y no se pueden estilar. */}
-            <form
-                noValidate
-                onSubmit={submitStep}
-                className={createProductPanelVariants()}
-            >
-                <ProductFormStepper
-                    steps={PRODUCT_FORM_STEPS}
-                    currentIndex={stepIndex}
+        <FormProvider {...form}>
+            <div className={createProductPageVariants()}>
+                <PageHeader
+                    title={productMessage.title}
+                    subtitle={productMessage.subtitle}
+                    backHref={PRODUCTS_LIST_HREF}
+                    backLabel={productMessage.backLabel}
                 />
 
-                <div
-                    ref={bodyRef}
-                    tabIndex={-1}
-                    aria-label={step.label}
-                    className={createProductBodyVariants()}
+                {/* `noValidate`: la validación es la del formulario, con mensajes
+                en español y pegados a su campo. Los globos del navegador
+                aparecen de uno en uno y no se pueden estilar. */}
+                <form
+                    noValidate
+                    onSubmit={submitStep}
+                    className={createProductPanelVariants()}
                 >
-                    {step.id === "basics" ? (
-                        <ProductBasicsStep control={form.control} />
-                    ) : (
-                        <ProductStepPlaceholder step={step} index={stepIndex} />
-                    )}
-                </div>
+                    <ProductFormStepper
+                        steps={PRODUCT_FORM_STEPS}
+                        currentIndex={stepIndex}
+                    />
 
-                <footer className={createProductFooterVariants()}>
-                    {footerNote && (
-                        <p className={createProductFooterNoteVariants()}>
-                            {footerNote}
-                        </p>
-                    )}
-
-                    <div className={createProductActionsVariants()}>
-                        {isFirstStep ? (
-                            <Link
-                                href={PRODUCTS_LIST_HREF}
-                                className={createProductCancelVariants()}
-                            >
-                                {messages.common.actions.cancel}
-                            </Link>
+                    <div
+                        ref={bodyRef}
+                        tabIndex={-1}
+                        aria-label={step.title}
+                        className={createProductBodyVariants()}
+                    >
+                        {step.id === "basics" ? (
+                            <ProductBasicsStep />
                         ) : (
-                            <GenericButton
-                                type="button"
-                                variant="ghost"
-                                label={messages.common.actions.back}
-                                startIcon={ICON_TOKENS.BACK}
-                                onClick={goToPreviousStep}
-                            />
+                            <ProductStepPlaceholder step={step} index={stepIndex} />
+                        )}
+                    </div>
+
+                    <footer className={createProductFooterVariants()}>
+                        {footerNote && (
+                            <p className={createProductFooterNoteVariants()}>
+                                {footerNote}
+                            </p>
                         )}
 
-                        {/* En el último paso el botón cambia de papel: ya no
+                        <div className={createProductActionsVariants()}>
+                            {isFirstStep ? (
+                                <Link
+                                    href={PRODUCTS_LIST_HREF}
+                                    className={createProductCancelVariants()}
+                                >
+                                    {messages.common.actions.cancel}
+                                </Link>
+                            ) : (
+                                <GenericButton
+                                    type="button"
+                                    variant="ghost"
+                                    label={messages.common.actions.back}
+                                    startIcon={ICON_TOKENS.BACK}
+                                    onClick={goToPreviousStep}
+                                />
+                            )}
+
+                            {/* En el último paso el botón cambia de papel: ya no
                             queda a dónde avanzar, y guardar todavía no es
                             posible. La nota del pie explica por qué. */}
-                        <GenericButton
-                            type="submit"
-                            variant="primary"
-                            label={
-                                isLastStep
-                                    ? productMessage.submit
-                                    : messages.common.actions.continue
-                            }
-                            disabled={isLastStep}
-                            {...(!isLastStep && { endIcon: ICON_TOKENS.NEXT })}
-                        />
-                    </div>
-                </footer>
-            </form>
-        </div>
+                            <GenericButton
+                                type="submit"
+                                variant="primary"
+                                label={
+                                    isLastStep
+                                        ? productMessage.submit
+                                        : messages.common.actions.continue
+                                }
+                                disabled={isLastStep}
+                                {...(!isLastStep && { endIcon: ICON_TOKENS.NEXT })}
+                            />
+                        </div>
+                    </footer>
+                </form>
+            </div>
+        </FormProvider>
     );
 };
