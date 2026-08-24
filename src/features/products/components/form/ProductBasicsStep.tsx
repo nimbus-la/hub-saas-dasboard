@@ -32,9 +32,6 @@ import {
  * campo que falla.
  */
 
-/** Lo que dice este paso. Ver `@/messages`. */
-const COPY = messages.products.create.basics;
-
 interface ProductBasicsStepProps {
     control: Control<ProductFormValues>;
     className?: string;
@@ -44,12 +41,14 @@ export default function ProductBasicsStep({
     control,
     className,
 }: ProductBasicsStepProps) {
+    const stepMessaages = messages.products.create.basics;
+
     return (
         // El `fieldset` agrupa los campos del paso y la leyenda le pone nombre
         // al grupo para quien navega con lector de pantalla. No se ve porque en
         // pantalla ese nombre ya lo da el indicador de la cabecera.
         <fieldset className={cn(productBasicsStepVariants(), className)}>
-            <legend className="sr-only">{COPY.legend}</legend>
+            <legend className="sr-only">{stepMessaages.legend}</legend>
 
             <div className={productBasicsGridVariants()}>
                 <Controller
@@ -59,14 +58,12 @@ export default function ProductBasicsStep({
                     render={({ field, fieldState }) => (
                         <TextField
                             {...field}
-                            label={COPY.name.label}
+                            label={stepMessaages.name.label}
                             required
                             size="md"
                             error={fieldState.error?.message ?? false}
-                            placeholder={COPY.name.placeholder}
-                            helperText={COPY.name.helper}
+                            placeholder={stepMessaages.name.placeholder}
                             maxLength={PRODUCT_NAME_LIMITS.max}
-                            showCount
                             autoComplete="off"
                         />
                     )}
@@ -79,14 +76,14 @@ export default function ProductBasicsStep({
                     render={({ field, fieldState }) => (
                         <InputSelector
                             {...field}
-                            label={COPY.category.label}
+                            label={stepMessaages.category.label}
                             required
                             size="md"
                             options={PRODUCT_CATEGORY_OPTIONS}
                             error={fieldState.error?.message ?? false}
-                            placeholder={COPY.category.placeholder}
-                            helperText={COPY.category.helper}
-                            emptyMessage={COPY.category.empty}
+                            placeholder={stepMessaages.category.placeholder}
+                            helperText={stepMessaages.category.helper}
+                            emptyMessage={stepMessaages.category.empty}
                             clearable
                         />
                     )}
@@ -99,9 +96,9 @@ export default function ProductBasicsStep({
                     render={({ field, fieldState }) => (
                         <TextAreaField
                             {...field}
-                            label={COPY.description.label}
+                            label={stepMessaages.description.label}
                             error={fieldState.error?.message ?? false}
-                            placeholder={COPY.description.placeholder}
+                            placeholder={stepMessaages.description.placeholder}
                             maxLength={PRODUCT_DESCRIPTION_MAX}
                             showCount
                             rows={4}

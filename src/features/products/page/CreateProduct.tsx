@@ -24,12 +24,7 @@ import {
     createProductPageVariants,
     createProductPanelVariants,
 } from "../style";
-
-/** Destino de la flecha de regreso y del botón de cancelar. */
-const PRODUCTS_LIST_HREF = "/products";
-
-/** Todo lo que dice esta pantalla. Ver `@/messages`. */
-const COPY = messages.products.create;
+import { PRODUCTS_LIST_HREF } from "../libs";
 
 
 /**
@@ -42,6 +37,9 @@ const COPY = messages.products.create;
  */
 
 export default function CreateProduct() {
+    // Todo lo que dice esta pantalla
+    const productMessage = messages.products.create;
+
     const {
         form,
         step,
@@ -74,7 +72,7 @@ export default function CreateProduct() {
      * asteriscos es ruido.
      */
     const footerNote = isLastStep
-        ? COPY.cannotSaveYet
+        ? productMessage.cannotSaveYet
         : step.fields.length > 0
             ? messages.common.forms.requiredFields
             : null;
@@ -82,10 +80,10 @@ export default function CreateProduct() {
     return (
         <div className={createProductPageVariants()}>
             <PageHeader
-                title={COPY.title}
-                subtitle={COPY.subtitle}
+                title={productMessage.title}
+                subtitle={productMessage.subtitle}
                 backHref={PRODUCTS_LIST_HREF}
-                backLabel={COPY.backLabel}
+                backLabel={productMessage.backLabel}
             />
 
             {/* `noValidate`: la validación es la del formulario, con mensajes
@@ -147,7 +145,7 @@ export default function CreateProduct() {
                             variant="primary"
                             label={
                                 isLastStep
-                                    ? COPY.submit
+                                    ? productMessage.submit
                                     : messages.common.actions.continue
                             }
                             disabled={isLastStep}

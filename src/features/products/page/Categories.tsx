@@ -10,13 +10,9 @@ import { formatMessage, messages } from "@/messages";
 import { CategoriesTable, CategoriesToolbar, CategoryFormModal } from "../components/categories";
 import { useProductsCategories } from "../hooks";
 import type { CategoryFormValues, CategoryList } from "../interfaces";
-import { EMPTY_CATEGORY_FORM_VALUES, formatCategoryCount, getEmptyMessage } from "../libs";
+import { EMPTY_CATEGORY_FORM_VALUES, formatCategoryCount, getEmptyMessage, PRODUCTS_LIST_HREF } from "../libs";
 import { toCreateCategoryParams, toUpdateCategoryParams } from "../mappers";
 import { categoriesPageBodyVariants, categoriesPagePaginationVariants, categoriesPageVariants } from "../style";
-
-
-/** Destino de la flecha de regreso. La misma ruta que declara el menú lateral. */
-const PRODUCTS_LIST_HREF = "/products";
 
 
 /**
