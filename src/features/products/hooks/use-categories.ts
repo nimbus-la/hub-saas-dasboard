@@ -125,7 +125,7 @@ export function useProductsCategories() {
 
     return {
         /** Las categorías de la página actual, ya mapeadas y ya filtradas. */
-        data: query.data?.data ?? NO_CATEGORIES,
+        data: query.data?.rows ?? NO_CATEGORIES,
 
         /**
          * Cuántas cumplen los filtros, en todas las páginas. Lo dice el backend.

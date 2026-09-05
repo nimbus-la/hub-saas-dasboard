@@ -28,7 +28,7 @@ export type ApiEnvelopeStatus = 'SUCCESS' | 'ERROR' | 'WARNING' | 'INFO';
  * El backend nunca devuelve un objeto plano, lo envuelve junto a un 
  * estado, código y mensaje.
  */
-export interface ApiEnvelope<TData = unknown> {
+export interface ApiEnvelope<TContent = unknown> {
     /** Ver `ApiEnvelopeStatus` es lo que elige el tono de la alerta. */
     status: ApiEnvelopeStatus;
 
@@ -45,14 +45,37 @@ export interface ApiEnvelope<TData = unknown> {
     /** Texto ya redactado que describe la respuesta. */
     message: string;
 
-    /** Datos de la respuesta. */
-    data: TData;
+    /**
+     * Contenido de la respuesta.
+     *
+     * Cuando la operación pagina, aquí llega un `ApiResponseWithPagination`:
+     * los elementos van en `rows` y el resto de campos son el estado del pie.
+     */
+    content: TContent;
+
+    /**
+     * Identificador de la traza en el backend.
+     *
+     * Se tipa porque llega en toda respuesta, pero la aplicación no lo lee: es
+     * el hilo del que tira quien mira los registros del servidor cuando alguien
+     * reporta un fallo. Opcional porque no forma parte del contrato que el
+     * frontend necesita para funcionar.
+     */
+    traceId?: string;
 };
 
 
 
-export interface ApiResponseWithPagination<TData> {
-    data: TData;
+/**
+ * El `content` de una respuesta paginada.
+ *
+ * Los elementos viven en `rows` y no en la raíz para que el sobre pueda llevar
+ * al lado el estado del pie: qué página es, de qué tamaño y cuántos elementos
+ * hay en total —el de los resultados con los filtros puestos, no el de la
+ * colección entera—.
+ */
+export interface ApiResponseWithPagination<TRow> {
+    rows: TRow;
     pageNumber: number;
     pageSize: number;
     total: number;

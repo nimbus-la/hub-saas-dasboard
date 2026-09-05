@@ -87,7 +87,12 @@ export interface HttpRequest extends HttpRequestConfig {
 };
 
 
-/** Respuesta con sus metadatos. */
+/**
+ * Respuesta con sus metadatos.
+ *
+ * `data` es el cuerpo tal como llegó, sin abrir: en este backend eso es el
+ * sobre entero, con su `code`, su `message` y su `content` dentro.
+ */
 export interface HttpResponse<TData = unknown> {
     data: TData;
     status: number;
@@ -113,37 +118,47 @@ export type ErrorInterceptor = (
 ) => void | Promise<void>;
 
 
-/** Contrato del cliente HTTP */
+/**
+ * Contrato del cliente HTTP
+ *
+ * Los verbos devuelven el sobre completo y no su `content`: el `code` y el
+ * `message` son los que deciden la alerta, y perderlos aquí obligaría a cada
+ * servicio a pedir la respuesta cruda para recuperarlos. El parámetro de tipo
+ * es el `content`, que es lo único que cambia de un endpoint a otro.
+ *
+ * `request` es la excepción: trabaja al nivel del transporte, donde `TData` es
+ * el cuerpo entero de la respuesta —el sobre incluido—.
+ */
 export interface HttpClient {
     request<TData>(
         request: HttpRequest
     ): Promise<HttpResponse<TData>>;
 
-    get<TData>(
+    get<TContent>(
         url: string,
         config?: HttpRequestConfig
-    ): Promise<ApiEnvelope<TData>>;
+    ): Promise<ApiEnvelope<TContent>>;
 
-    post<TData>(
+    post<TContent>(
         url: string,
         body?: unknown,
         config?: HttpRequestConfig
-    ): Promise<ApiEnvelope<TData>>;
+    ): Promise<ApiEnvelope<TContent>>;
 
-    put<TData>(
+    put<TContent>(
         url: string,
         body?: unknown,
         config?: HttpRequestConfig
-    ): Promise<ApiEnvelope<TData>>;
+    ): Promise<ApiEnvelope<TContent>>;
 
-    patch<TData>(
+    patch<TContent>(
         url: string,
         body?: unknown,
         config?: HttpRequestConfig
-    ): Promise<ApiEnvelope<TData>>;
+    ): Promise<ApiEnvelope<TContent>>;
 
-    delete<TData>(
+    delete<TContent>(
         url: string,
         config?: HttpRequestConfig
-    ): Promise<ApiEnvelope<TData>>;
+    ): Promise<ApiEnvelope<TContent>>;
 };
