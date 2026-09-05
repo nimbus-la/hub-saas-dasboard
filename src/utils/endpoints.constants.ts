@@ -43,4 +43,7 @@ export const ENDPOINTS = {
      */
     PRODUCTS_CATEGORY: "products/categories",
 
+    // ── Autenticación ───────────────────────────────────────────────────────
+    AUTH_LOGIN: "auth/login",
+
 } as const;

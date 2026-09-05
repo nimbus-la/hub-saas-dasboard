@@ -49,6 +49,13 @@ export interface ApiEnvelope<TData = unknown> {
     data: TData;
 };
 
+export interface ApiEnvelopeContent<TContent = unknown> {
+    status: ApiEnvelopeStatus;
+    code: string;
+    httpStatus: number;
+    message: string;
+    content: TContent;
+}
 
 
 export interface ApiResponseWithPagination<TData> {

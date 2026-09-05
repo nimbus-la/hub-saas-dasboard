@@ -11,29 +11,25 @@ import {
 import { GenericButton, TextField } from "@/components";
 import { cn } from "@/lib/utils";
 
-interface LoginFormData {
-  email: string;
-  password: string;
-  rememberMe: boolean;
-}
+import type { LoginCredentials } from "../../types/login.types";
 
 interface LoginFormProps {
-  onSubmit: (data: LoginFormData) => Promise<void>;
+  onSubmit: (data: LoginCredentials) => Promise<void>;
 }
 
 export default function LoginForm({ onSubmit }: LoginFormProps) {
-  const [email, setEmail] = React.useState("");
+  const [tenantSlug, setTenantSlug] = React.useState("");
+  const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [rememberMe] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const data: LoginFormData = {
-      email,
+    const data: LoginCredentials = {
+      tenantSlug,
+      username,
       password,
-      rememberMe,
     };
 
     try {
@@ -52,29 +48,40 @@ export default function LoginForm({ onSubmit }: LoginFormProps) {
         <h1 className="text-h2 font-bold text-neutral-900">Bienvenidos</h1>
 
         <p className="text-body-sm text-neutral-600">
-          Ingresa tu correo electrónico y contraseña para acceder a tu cuenta.
+          Ingresa tus datos para acceder a tu cuenta.
         </p>
       </div>
 
       {/* ── Campos ───────────────────────────────────────────── */}
       <div className={cn("mt-8 w-full max-w-md", loginFormFieldsVariants())}>
         <TextField
-          id="login-email"
-          label="Email"
-          type="email"
-          placeholder="Enter your email"
-          value={email}
-          onChange={setEmail}
+          id="login-tenant"
+          label="Tenant"
+          type="text"
+          placeholder="Ingresa tu tenant"
+          value={tenantSlug}
+          onChange={setTenantSlug}
           size="md"
-          autoComplete="email"
+          required
+        />
+
+        <TextField
+          id="login-username"
+          label="Usuario"
+          type="text"
+          placeholder="Ingresa tu usuario"
+          value={username}
+          onChange={setUsername}
+          size="md"
+          autoComplete="username"
           required
         />
 
         <TextField
           id="login-password"
-          label="Password"
+          label="Contraseña"
           type="password"
-          placeholder="Enter your password"
+          placeholder="Ingresa tu contraseña"
           value={password}
           onChange={setPassword}
           size="md"
