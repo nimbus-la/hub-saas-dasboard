@@ -129,25 +129,27 @@ export function createCategoriesService(http: HttpClient): CategoriesService {
             params: CategoryListParams,
             config: HttpRequestConfig | undefined
         ): Promise<ApiResponseWithPagination<CategoryList[]>> => {
-            const { data } = await http.get<ApiResponseWithPagination<CategoryListApiResponse[]>>(
+            const { content } = await http.get<ApiResponseWithPagination<CategoryListApiResponse[]>>(
                 ENDPOINTS.PRODUCTS_CATEGORY,
                 withTenantParam(withListParams(params, config))
             );
 
-            // Sólo se traduce la lista; el resto del sobre (`pageNumber`,
+            // Sólo se traducen las filas; el resto del contenido (`pageNumber`,
             // `pageSize`, `total`) se conserva tal cual porque el pie necesita
             // el total para calcular cuántas páginas hay. Con filtros puestos
             // ese total es el de los resultados, que es lo que se pagina.
-            return { ...data, data: toCategoryList(data.data) };
+            return { ...content, rows: toCategoryList(content.rows) };
         },
 
-        detail: async (id: string, config: HttpRequestConfig | undefined): Promise<ApiResponseWithPagination<CategoryList>> => {
-            const { data } = await http.get<ApiResponseWithPagination<CategoryListApiResponse>>(
+        // Un detalle no pagina: su `content` es la categoría, sin `rows` ni
+        // estado de pie alrededor.
+        detail: async (id: string, config: HttpRequestConfig | undefined): Promise<CategoryList> => {
+            const { content } = await http.get<CategoryListApiResponse>(
                 categoryPath(id),
                 withTenantParam(config)
             );
 
-            return { ...data, data: toCategory(data.data) };
+            return toCategory(content);
         },
 
         create: async (payload: CreateCategoryParams, config: HttpRequestConfig | undefined): Promise<ApiEnvelope<null>> =>
