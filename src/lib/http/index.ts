@@ -84,6 +84,7 @@ export function createHttpClient(options: CreateHttpClientOptions = {}): HttpCli
     const transport = new FetchHttpClient({
         baseUrl: options.baseUrl ?? DEFAULT_BASE_URL,
         headers: { Accept: "application/json" },
+        credentials: "include",
         ...(options.onRequest ? { onRequest: options.onRequest } : {}),
     });
 
