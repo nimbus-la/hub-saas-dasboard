@@ -13,6 +13,7 @@ import { ICON_TOKENS } from "@/tokens";
 import {
     ProductBasicsStep,
     ProductFormStepper,
+    ProductRecipeStep,
     ProductStepPlaceholder,
 } from "../components/form";
 import { useProductForm } from "../hooks/use-product-form";
@@ -111,9 +112,10 @@ export default function CreateProduct() {
                         aria-label={step.title}
                         className={createProductBodyVariants()}
                     >
-                        {step.id === "basics" ? (
-                            <ProductBasicsStep />
-                        ) : (
+                        {step.id === "basics" && (<ProductBasicsStep />)}
+                        {step.id === "recipe" && (<ProductRecipeStep />)}
+
+                        {step.id === "pricing" && (
                             <ProductStepPlaceholder step={step} index={stepIndex} />
                         )}
                     </div>
