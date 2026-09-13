@@ -21,6 +21,7 @@ import {
     productRecipeListVariants,
     productRecipeStepVariants
 } from "./product-recipe-step.style";
+import RecipeSummary from "./RecipeSummary";
 
 
 /**
@@ -104,11 +105,16 @@ export default function ProductRecipeStep() {
                 texto suelto en medio del paso. */}
             {
                 hasLines ? (
-                    <RecipeTable
-                        lines={lines}
-                        onQuantityChange={handleQuantityChange}
-                        onRemove={handleRemove}
-                    />
+                    <>
+
+                        <RecipeTable
+                            lines={lines}
+                            onQuantityChange={handleQuantityChange}
+                            onRemove={handleRemove}
+                        />
+
+                        <RecipeSummary />
+                    </>
                 ) : (
                     <div className={productRecipeCardVariants()}>
                         <div className={productRecipeEmptyVariants()}>

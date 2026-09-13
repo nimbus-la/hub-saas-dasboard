@@ -4,3 +4,4 @@ export { default as ProductImageField } from './ProductImageField';
 export { default as ProductRecipeStep } from './ProductRecipeStep';
 export { default as ProductStepPlaceholder } from './ProductStepPlaceholder';
 export { default as RecipeTable } from './RecipeTable';
+export { default as RecipeSummary } from './RecipeSummary';
