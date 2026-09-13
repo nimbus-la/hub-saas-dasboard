@@ -44,7 +44,7 @@ export const productRecipeListCountVariants = cva([
 ]);
 
 
-/** Tarjeta que contiene cabecera, filas, aviso y total. */
+/** Marco del estado vacío. La tabla no lo lleva: su encabezado ya la delimita. */
 export const productRecipeCardVariants = cva([
     "overflow-hidden border border-neutral-200 bg-white",
     RADIUS_SEMANTIC.surface,

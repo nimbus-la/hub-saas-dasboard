@@ -47,8 +47,8 @@ export const RECIPE_STEP: ProductFormStep = {
 
 
 export const PRODUCT_FORM_STEPS: readonly ProductFormStep[] = [
-    BASICS_STEP,
     RECIPE_STEP,
+    BASICS_STEP,
     PRICING_STEP,
 ]
 

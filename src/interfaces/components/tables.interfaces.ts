@@ -14,8 +14,15 @@ export interface DataTableProps<TData, TValue> {
     getRowId?: (row: TData) => string;
     /** Notifica las filas seleccionadas — útil para acciones en lote. */
     onSelectedRowsChange?: (selectedRows: TData[]) => void;
+    /**
+     * Ordenamiento de toda la tabla. Por defecto activo.
+     * Apágalo en tablas editables: reordenar mueve la fila que se está escribiendo.
+     */
+    enableSorting?: boolean;
     /** Orden inicial, p. ej. `[{ id: "placedAt", desc: true }]`. */
     initialSorting?: SortingState;
+    /** Clases extra por fila, p. ej. para teñir un estado. Van al final del `cn()`, como las de `meta`. */
+    getRowClassName?: (row: TData) => string | undefined;
     /** Contenido de la última columna (menú de acciones de la fila). */
     renderRowActions?: (row: TData) => ReactNode;
     /** Texto mostrado cuando la colección viene vacía. */
