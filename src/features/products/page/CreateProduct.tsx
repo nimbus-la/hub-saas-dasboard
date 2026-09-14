@@ -52,6 +52,7 @@ export default function CreateProduct() {
         stepIndex,
         isFirstStep,
         isLastStep,
+        isStepValid,
         submitStep,
         goToPreviousStep,
     } = useProductForm();
@@ -147,7 +148,9 @@ export default function CreateProduct() {
 
                             {/* En el último paso el botón cambia de papel: ya no
                             queda a dónde avanzar, y guardar todavía no es
-                            posible. La nota del pie explica por qué. */}
+                            posible. La nota del pie explica por qué. En los
+                            demás pasos se habilita solo cuando todos los campos
+                            del paso están completos y sin errores. */}
                             <GenericButton
                                 type="submit"
                                 variant="primary"
@@ -156,7 +159,7 @@ export default function CreateProduct() {
                                         ? productMessage.submit
                                         : messages.common.actions.continue
                                 }
-                                disabled={isLastStep}
+                                disabled={isLastStep || !isStepValid}
                                 {...(!isLastStep && { endIcon: ICON_TOKENS.NEXT })}
                             />
                         </div>
