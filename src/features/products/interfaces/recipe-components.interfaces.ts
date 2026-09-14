@@ -1,3 +1,7 @@
+import type * as React from "react";
+
+import type { Ingredient } from "@/lib/ingredients";
+
 import type { RecipeRow } from "./recipe.interfaces";
 
 
@@ -21,4 +25,20 @@ export interface RecipeQuantityCellProps {
 
 export interface RecipeEmptyStateProps {
     className?: string;
+}
+
+
+export interface IngredientSearchFieldProps {
+    /** Ids de los insumos que ya están en la receta, para no volver a ofrecerlos. */
+    selectedIds: readonly string[];
+    onAdd: (ingredient: Ingredient) => void;
+    /** Llega al campo de búsqueda, para poder devolverle el foco desde afuera. */
+    ref?: React.Ref<HTMLInputElement>;
+    className?: string;
+}
+
+
+export interface IngredientSearchResultProps {
+    ingredient: Ingredient;
+    onAdd: (ingredient: Ingredient) => void;
 }

@@ -254,6 +254,11 @@ export const products = {
 
                 /** Nombre accesible del panel de resultados. */
                 resultsLabel: "Insumos encontrados",
+                /** Lo que anuncia el lector de pantalla cuando aparecen resultados. */
+                resultsCount: {
+                    one: "{count} insumo encontrado",
+                    other: "{count} insumos encontrados",
+                } satisfies Plural,
                 /**
                  * Lo que precede al contenido del resultado para quien lo oye.
                  *

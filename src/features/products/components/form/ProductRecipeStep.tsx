@@ -7,6 +7,7 @@ import { formatPlural, messages } from "@/messages";
 
 import type { ProductRecipeStepProps } from "../../interfaces";
 import { useRecipeLines } from "../../hooks/use-recipe-lines";
+import IngredientSearchField from "./IngredientSearchField";
 import RecipeEmptyState from "./RecipeEmptyState";
 import RecipeSummary from "./RecipeSummary";
 import RecipeTable from "./RecipeTable";
@@ -30,19 +31,19 @@ const recipeMessages = messages.products.create.recipe;
  * qué mostrar según haya o no insumos.
  */
 export default function ProductRecipeStep({ className }: ProductRecipeStepProps) {
-    const { rows, removeLine } = useRecipeLines();
+    const { rows, selectedIds, addIngredient, removeLine } = useRecipeLines();
 
     const hasRows = rows.length > 0;
 
-    const titleRef = React.useRef<HTMLHeadingElement>(null);
+    const searchRef = React.useRef<HTMLInputElement>(null);
     const previousRowCount = React.useRef(rows.length);
 
     // Si se quita la última fila, la tabla desaparece junto con el botón que
-    // tenía el foco. Lo llevamos al título de la lista para que quien usa el
-    // teclado no termine al inicio de la página.
+    // tenía el foco. Lo llevamos al buscador, que es donde se sigue armando la
+    // receta.
     React.useEffect(() => {
         if (previousRowCount.current > 0 && rows.length === 0) {
-            titleRef.current?.focus();
+            searchRef.current?.focus();
         }
 
         previousRowCount.current = rows.length;
@@ -54,13 +55,15 @@ export default function ProductRecipeStep({ className }: ProductRecipeStepProps)
         <fieldset className={cn(productRecipeStepVariants(), className)}>
             <legend className="sr-only">{recipeMessages.legend}</legend>
 
+            <IngredientSearchField
+                ref={searchRef}
+                selectedIds={selectedIds}
+                onAdd={addIngredient}
+            />
+
             <div className={productRecipeListVariants()}>
                 <div className={productRecipeListHeaderVariants()}>
-                    <h3
-                        ref={titleRef}
-                        tabIndex={-1}
-                        className={productRecipeListTitleVariants()}
-                    >
+                    <h3 className={productRecipeListTitleVariants()}>
                         {recipeMessages.list.title}
                     </h3>
 

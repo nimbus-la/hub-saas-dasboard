@@ -8,16 +8,19 @@ import { formatList } from "@/lib/format";
 import {
     getIngredient,
     isIngredientOutOfStock,
+    searchIngredients,
     type Ingredient,
 } from "@/lib/ingredients";
 import { formatPlural, messages } from "@/messages";
 
 import type {
+    IngredientSearchResult,
     ProductRecipeFormValues,
     RecipeCost,
     RecipeLine,
     RecipeRow,
 } from "../interfaces";
+import { RECIPE_SEARCH_RESULTS, RECIPE_VALIDATION } from "../utils";
 import { parseRecipeQuantity } from "./recipe-form.lib";
 
 
@@ -117,4 +120,48 @@ export function formatOutOfStockNotice(ingredients: readonly Ingredient[]): stri
         ingredients.length,
         { names }
     );
+}
+
+
+/**
+ * Busca insumos para añadir a la receta.
+ *
+ * Deja por fuera los que ya están en la receta y no busca nada si la receta
+ * llegó al tope. Separa las coincidencias de las que se pueden añadir para
+ * saber si el insumo no existe o si ya está en la receta, porque en cada caso
+ * la persona tiene que hacer algo distinto.
+ */
+export function searchRecipeIngredients(
+    query: string,
+    selectedIds: readonly string[]
+): IngredientSearchResult {
+    const term = query.trim();
+
+    if (selectedIds.length >= RECIPE_VALIDATION.maxIngredients) {
+        return { status: "full", results: [], hiddenCount: 0 };
+    }
+
+    if (!term) {
+        return { status: "idle", results: [], hiddenCount: 0 };
+    }
+
+    const matches = searchIngredients(term);
+    const selected = new Set(selectedIds);
+    const available = matches.filter((ingredient) => !selected.has(ingredient.id));
+
+    if (matches.length === 0) {
+        return { status: "empty", results: [], hiddenCount: 0 };
+    }
+
+    if (available.length === 0) {
+        return { status: "allAdded", results: [], hiddenCount: 0 };
+    }
+
+    const results = available.slice(0, RECIPE_SEARCH_RESULTS);
+
+    return {
+        status: "results",
+        results,
+        hiddenCount: available.length - results.length,
+    };
 }

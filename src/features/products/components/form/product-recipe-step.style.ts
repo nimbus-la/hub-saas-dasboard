@@ -30,12 +30,8 @@ export const productRecipeListHeaderVariants = cva([
 ]);
 
 
-/**
- * Título de la lista. Recibe el foco cuando se quita el último insumo, y ese
- * foco no se dibuja porque el título no es un control.
- */
 export const productRecipeListTitleVariants = cva([
-    "text-neutral-800 focus-visible:outline-none",
+    "text-neutral-800",
     TYPOGRAPHY.subtitleLg,
 ]);
 

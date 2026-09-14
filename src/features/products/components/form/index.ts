@@ -1,3 +1,5 @@
+export { default as IngredientSearchField } from './IngredientSearchField';
+export { default as IngredientSearchResult } from './IngredientSearchResult';
 export { default as ProductBasicsStep } from './ProductBasicsStep';
 export { default as ProductFormStepper } from './ProductFormStepper';
 export { default as ProductImageField } from './ProductImageField';

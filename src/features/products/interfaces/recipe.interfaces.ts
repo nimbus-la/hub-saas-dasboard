@@ -74,6 +74,28 @@ export type RecipeRow = Pick<RecipeLine, "index" | "ingredient" | "isOutOfStock"
 
 
 /**
+ * En qué situación está el buscador de insumos.
+ *
+ * - `idle` cuando no se ha escrito nada.
+ * - `results` cuando hay insumos para añadir.
+ * - `empty` cuando ningún insumo del inventario coincide.
+ * - `allAdded` cuando todo lo que coincide ya está en la receta.
+ * - `full` cuando la receta llegó al tope de insumos.
+ */
+export type IngredientSearchStatus = "idle" | "results" | "empty" | "allAdded" | "full";
+
+
+/** Lo que devuelve una búsqueda de insumos para la receta. */
+export interface IngredientSearchResult {
+    status: IngredientSearchStatus;
+    /** Insumos que se muestran, ya sin los que están en la receta. */
+    results: Ingredient[];
+    /** Coincidencias que se pueden añadir pero no caben en la lista. */
+    hiddenCount: number;
+}
+
+
+/**
  * Lo que cuesta la receta.
  *
  * `isComplete` es falso cuando alguna línea todavía no tiene una cantidad
