@@ -21,8 +21,6 @@ export function useProductForm() {
         reValidateMode: "onChange",
     });
 
-    console.log('form log: ', form.watch())
-
     const [stepIndex, setStepIndex] = React.useState<number>(0);
 
     const step = getProductFormStep(stepIndex);

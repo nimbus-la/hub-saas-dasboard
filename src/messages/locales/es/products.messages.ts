@@ -85,9 +85,25 @@ export const products = {
         other: "{count} ingredientes",
     } satisfies Plural,
 
+    /**
+     * Unidades de medida del inventario.
+     *
+     * Cada unidad tiene tres textos porque se muestra en sitios distintos. La
+     * abreviatura va junto a una cifra (`1.200 g`), el plural se usa dentro de
+     * una frase ("la cantidad en gramos") y el label sirve cuando la unidad
+     * aparece sola, como en el rótulo de una columna.
+     *
+     * Las claves son los valores que envía el backend, así que no se traducen.
+     */
+    units: {
+        gramo: { label: "Gramos", plural: "gramos", abbreviation: "g" },
+        mililitro: { label: "Mililitros", plural: "mililitros", abbreviation: "ml" },
+        unidad: { label: "Unidades", plural: "unidades", abbreviation: "u" },
+    },
+
 
     /* ====================================================================== */
-    /*  Catálogo                                                              */
+    /*  Catálogo                                                            */
     /* ====================================================================== */
 
     list: {

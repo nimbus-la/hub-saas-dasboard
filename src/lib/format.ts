@@ -107,3 +107,21 @@ const dateFormatter = new Intl.DateTimeFormat(LOCALE, {
 
 export const formatDate = (value: Date | string | number): string =>
     dateFormatter.format(value instanceof Date ? value : new Date(value));
+
+// ── Enumeraciones ───────────────────────────────────────────────────────────
+
+/**
+ * Convierte una lista en una frase, por ejemplo `["A", "B", "C"]` queda como
+ * `A, B y C`.
+ *
+ * Usamos `Intl.ListFormat` en lugar de un `join(", ")` porque la conjunción
+ * cambia según el idioma, y hasta en español la "y" pasa a ser "e" cuando la
+ * siguiente palabra empieza por i.
+ */
+const listFormatter = new Intl.ListFormat(LOCALE, {
+    style: "long",
+    type: "conjunction",
+});
+
+export const formatList = (items: readonly string[]): string =>
+    listFormatter.format(items);
