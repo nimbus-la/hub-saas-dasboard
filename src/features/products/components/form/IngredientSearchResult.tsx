@@ -45,7 +45,7 @@ export default function IngredientSearchResult({ ingredient, onAdd }: Ingredient
                 hace el botón y después lea el insumo. */}
             <span className="sr-only">{searchMessages.add}</span>
 
-            <Avatar size="md" aria-hidden="true">
+            <Avatar size="md" shape="square" aria-hidden="true">
                 {ingredient.image && <AvatarImage src={ingredient.image} alt="" />}
                 <AvatarFallback>{getProductInitials(ingredient.name)}</AvatarFallback>
             </Avatar>

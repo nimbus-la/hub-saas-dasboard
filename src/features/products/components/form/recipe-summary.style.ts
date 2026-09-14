@@ -1,58 +1,48 @@
 import { cva } from "class-variance-authority";
 
-import { SPACING_CLASS, TYPOGRAPHY } from "@/tokens";
+import { RADIUS_SEMANTIC, SPACING_CLASS, TYPOGRAPHY } from "@/tokens";
 
 
 /**
  * Estilos de RecipeSummary
  *
- * Cierra la lista: primero el aviso —si lo hay— y después el total. Ese orden
- * no es casual. El aviso explica una consecuencia sobre el producto y el total
- * es una cifra que se consulta, así que lo último que queda en pantalla al
- * terminar de leer la receta es lo que cuesta.
- *
- * El total va dentro de la misma caja que la lista, separado por una línea y
- * sobre fondo hundido: es el pie de una tabla, no una tarjeta aparte. Ponerlo
- * fuera lo dejaría flotando sin decir de qué es la suma.
+ * Va debajo de la tabla. Primero el aviso de insumos agotados, si lo hay, y
+ * al final el costo total, que es lo último que se quiere ver después de
+ * revisar la receta.
  */
 
 
-/**
- * Banda del aviso, dentro del panel.
- *
- * El aviso va **entre** la lista y el total y no debajo de la tarjeta: es una
- * consecuencia de lo que hay en la lista, y sacándolo fuera dejaría de leerse
- * como parte de ella. La banda le da el relleno y la línea que lo separa de la
- * última fila; el aviso pone su propio borde y su tinte.
- */
-export const recipeNoticeVariants = cva([
-    "border-t border-neutral-200 bg-white",
-    SPACING_CLASS.padding.lg,
+/** Contenedor del aviso y el total. */
+export const recipeSummaryVariants = cva([
+    "flex flex-col",
+    SPACING_CLASS.gap.md,
 ]);
 
 
-/** Pie del panel: la línea del total. */
+/** Barra del costo total, sobre fondo gris para separarla de la tabla. */
 export const recipeTotalVariants = cva([
-    "flex flex-wrap items-baseline justify-between",
-    "border-t border-neutral-200 bg-neutral-100",
+    "flex flex-wrap items-baseline justify-between bg-neutral-100",
+    RADIUS_SEMANTIC.surface,
     SPACING_CLASS.gap.sm,
     SPACING_CLASS.paddingX.lg,
     SPACING_CLASS.paddingY.md,
 ]);
 
 
-/** Bloque de la izquierda: rótulo y explicación de la cuenta. */
+/** Título del total y la explicación de cómo se calcula. */
 export const recipeTotalTextVariants = cva(["flex min-w-0 flex-col"]);
 
 
-/** `Costo total de la receta`. */
 export const recipeTotalLabelVariants = cva([
     "text-neutral-800",
     TYPOGRAPHY.subtitleMd,
 ]);
 
 
-/** De dónde sale la cifra, o qué falta para que esté completa. */
+/**
+ * Explica de dónde sale la cifra. Si falta alguna cantidad, cambia de texto y
+ * de color para avisar que el total todavía no está completo.
+ */
 export const recipeTotalHintVariants = cva([TYPOGRAPHY.caption], {
     variants: {
         pending: {
@@ -65,11 +55,8 @@ export const recipeTotalHintVariants = cva([TYPOGRAPHY.caption], {
 
 
 /**
- * El importe.
- *
- * `tabular-nums` porque la cifra cambia con cada tecla que se escribe en una
- * cantidad: sin ella el total baila de ancho a cada pulsación y arrastra
- * consigo el rótulo de al lado.
+ * El importe. Usa cifras de ancho fijo porque cambia con cada tecla, y así el
+ * número no se mueve de lado mientras se escribe.
  */
 export const recipeTotalAmountVariants = cva([
     "text-neutral-800 tabular-nums",

@@ -35,12 +35,13 @@ import {
  */
 
 
-function Avatar({ className, size = "md", ...props }: AvatarProps) {
+function Avatar({ className, size = "md", shape = "circle", ...props }: AvatarProps) {
     return (
         <AvatarPrimitive.Root
             data-slot="avatar"
             data-size={size}
-            className={cn(avatarVariants({ size }), className)}
+            data-shape={shape}
+            className={cn(avatarVariants({ size, shape }), className)}
             {...props}
         />
     )

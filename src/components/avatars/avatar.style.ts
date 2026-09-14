@@ -19,12 +19,19 @@ import { AVATAR_SIZE, RADIUS_FULL_CLASS } from "@/tokens";
  * El borde va en un `::after` en vez de en el propio elemento: dibujado
  * encima de la imagen la recorta limpiamente, y con `mix-blend-darken` no se
  * ve una línea gris sobre las fotos claras.
+ *
+ * La forma solo se decide aquí. La imagen, las iniciales y el borde usan
+ * `rounded-inherit` y copian el radio de la raíz, así que cambiar la forma no
+ * obliga a tocar las demás piezas.
+ *
+ * La forma redonda es para personas. La cuadrada es para cosas, como un
+ * producto o un insumo, y su radio crece con el tamaño según `AVATAR_SIZE`
+ * para que una miniatura grande no se vea con esquinas casi rectas.
  */
 export const avatarVariants = cva(
     [
         "group/avatar relative flex shrink-0 select-none",
-        RADIUS_FULL_CLASS,
-        "after:absolute after:inset-0 after:rounded-full",
+        "after:absolute after:inset-0 after:rounded-inherit",
         "after:border after:border-neutral-300 after:mix-blend-darken",
     ],
     {
@@ -37,16 +44,29 @@ export const avatarVariants = cva(
                 xl: AVATAR_SIZE.xl.sizeClass,
                 "2xl": AVATAR_SIZE["2xl"].sizeClass,
             },
+            shape: {
+                circle: RADIUS_FULL_CLASS,
+                // El radio de la forma cuadrada depende del tamaño y se pone
+                // en `compoundVariants`.
+                square: "",
+            },
         },
-        defaultVariants: { size: "md" },
+        compoundVariants: [
+            { shape: "square", size: "xs", class: AVATAR_SIZE.xs.radiusClass },
+            { shape: "square", size: "sm", class: AVATAR_SIZE.sm.radiusClass },
+            { shape: "square", size: "md", class: AVATAR_SIZE.md.radiusClass },
+            { shape: "square", size: "lg", class: AVATAR_SIZE.lg.radiusClass },
+            { shape: "square", size: "xl", class: AVATAR_SIZE.xl.radiusClass },
+            { shape: "square", size: "2xl", class: AVATAR_SIZE["2xl"].radiusClass },
+        ],
+        defaultVariants: { size: "md", shape: "circle" },
     }
 );
 
 
 /** Imagen. Recortada en cuadrado para que no se deforme al redondearla. */
 export const avatarImageVariants = cva([
-    "aspect-square size-full object-cover",
-    RADIUS_FULL_CLASS,
+    "aspect-square size-full object-cover rounded-inherit",
 ]);
 
 
@@ -57,8 +77,7 @@ export const avatarImageVariants = cva([
  */
 export const avatarFallbackVariants = cva([
     "flex size-full items-center justify-center",
-    "bg-neutral-200 text-neutral-600",
-    RADIUS_FULL_CLASS,
+    "bg-neutral-200 text-neutral-600 rounded-inherit",
     "group-data-[size=xs]/avatar:text-label-xs",
     "group-data-[size=sm]/avatar:text-label-sm",
     "group-data-[size=md]/avatar:text-label-md",

@@ -31,7 +31,7 @@ const recipeMessages = messages.products.create.recipe;
  * qué mostrar según haya o no insumos.
  */
 export default function ProductRecipeStep({ className }: ProductRecipeStepProps) {
-    const { rows, selectedIds, addIngredient, removeLine } = useRecipeLines();
+    const { rows, lines, selectedIds, addIngredient, removeLine } = useRecipeLines();
 
     const hasRows = rows.length > 0;
 
@@ -77,7 +77,7 @@ export default function ProductRecipeStep({ className }: ProductRecipeStepProps)
                 {hasRows ? (
                     <>
                         <RecipeTable rows={rows} onRemove={removeLine} />
-                        <RecipeSummary />
+                        <RecipeSummary lines={lines} />
                     </>
                 ) : (
                     <RecipeEmptyState />

@@ -66,7 +66,7 @@ const recipeColumns: ColumnDef<RecipeRow>[] = [
                 <TitleSubtitleCell
                     media={
                         // Es decorativa porque el nombre va justo al lado.
-                        <Avatar size="md" aria-hidden="true">
+                        <Avatar size="md" shape="square" aria-hidden="true">
                             {ingredient.image && <AvatarImage src={ingredient.image} alt="" />}
                             <AvatarFallback>{getProductInitials(ingredient.name)}</AvatarFallback>
                         </Avatar>

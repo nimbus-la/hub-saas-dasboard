@@ -2,7 +2,7 @@ import type * as React from "react";
 
 import type { Ingredient } from "@/lib/ingredients";
 
-import type { RecipeRow } from "./recipe.interfaces";
+import type { RecipeLine, RecipeRow } from "./recipe.interfaces";
 
 
 export interface ProductRecipeStepProps {
@@ -41,4 +41,11 @@ export interface IngredientSearchFieldProps {
 export interface IngredientSearchResultProps {
     ingredient: Ingredient;
     onAdd: (ingredient: Ingredient) => void;
+}
+
+
+export interface RecipeSummaryProps {
+    /** Líneas con cantidad y costo, las que devuelve `useRecipeLines`. */
+    lines: readonly RecipeLine[];
+    className?: string;
 }
