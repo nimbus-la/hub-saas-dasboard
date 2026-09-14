@@ -10,6 +10,7 @@
 
 import { formatPlural, messages } from "@/messages";
 import type { BadgeTone } from "@/interfaces";
+import { normalizeText } from "@/utils/formatters.utils";
 
 /**
  * Estado operativo del producto.
@@ -209,14 +210,6 @@ export function filterProducts(
             normalizeText(product.category).includes(term)
         );
     });
-}
-
-/** Minúsculas y sin diacríticos: "Café" → "cafe". */
-function normalizeText(value: string): string {
-    return value
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/\p{Diacritic}/gu, "");
 }
 
 /** Cuántos productos hay por categoría dentro de una colección ya filtrada. */
