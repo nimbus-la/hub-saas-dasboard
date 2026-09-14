@@ -60,6 +60,20 @@ export interface RecipeLine {
 
 
 /**
+ * Una fila de la tabla de la receta.
+ *
+ * Se arma con los `fields` de `useFieldArray` y no con los valores observados,
+ * porque `fields` cambia en el mismo momento en que se quita o se añade una
+ * línea. `id` es la clave que react-hook-form genera para cada línea.
+ *
+ * No trae la cantidad porque de eso se encarga el campo de cada fila.
+ */
+export type RecipeRow = Pick<RecipeLine, "index" | "ingredient" | "isOutOfStock"> & {
+    id: string;
+};
+
+
+/**
  * Lo que cuesta la receta.
  *
  * `isComplete` es falso cuando alguna línea todavía no tiene una cantidad
@@ -68,36 +82,4 @@ export interface RecipeLine {
 export interface RecipeCost {
     total: number;
     isComplete: boolean;
-}
-
-
-/* -------------------------------------------------------------------------- */
-/*  Provisionales                                                              */
-/* -------------------------------------------------------------------------- */
-
-/**
- * Insumo de los datos de prueba que usa hoy la tabla de la receta.
- *
- * Se elimina junto con `MockRecipeLine` cuando la tabla lea la receta del
- * formulario y use `RecipeLine`.
- */
-export interface MockRecipeIngredient {
-    id: string;
-    name: string;
-    sku: string;
-    stock: number;
-    /** Abreviatura de la unidad, como `g`, `ml` o `und`. */
-    unit: string;
-    /** Nombre de la unidad para la etiqueta accesible, como `gramos`. */
-    unitName: string;
-    isPerishable: boolean;
-}
-
-
-/** Línea de los datos de prueba que usa hoy la tabla de la receta. */
-export interface MockRecipeLine {
-    index: number;
-    ingredient: MockRecipeIngredient;
-    quantity: string;
-    isOutOfStock: boolean;
 }

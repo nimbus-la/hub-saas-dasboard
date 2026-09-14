@@ -1,13 +1,14 @@
 "use client";
 
-import * as React from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 
-import { DataTable, GenericButton, StatusBadge, TextField, TitleSubtitleCell } from "@/components";
-import { formatNumber } from "@/lib/format";
+import { DataTable, GenericButton, StatusBadge, TitleSubtitleCell } from "@/components";
+import { formatIngredientQuantity } from "@/lib/ingredients";
 import { formatMessage, messages } from "@/messages";
 import { ICON_TOKENS } from "@/tokens";
 
+import type { RecipeRow, RecipeTableProps } from "../../interfaces";
+import RecipeQuantityCell from "./RecipeQuantityCell";
 import {
     recipeMetaVariants,
     recipeNameVariants,
@@ -16,71 +17,18 @@ import {
     recipeStockValueVariants,
     recipeStockVariants,
     recipeTableRowVariants,
-    recipeUnitVariants,
 } from "./recipe-table.style";
-import type { MockRecipeLine } from "../../interfaces";
 
 
-/** Lo que dice esta tabla. Ver `@/messages`. */
 const recipeMessages = messages.products.create.recipe.list;
-
-/** Existencias — el mismo par de palabras que usa el buscador. */
-const recipeStockMessages = messages.products.create.recipe.stock;
+const stockMessages = messages.products.create.recipe.stock;
 
 
-/**
- * Tabla de insumos de la receta.
- *
- * Envuelve al `DataTable` del sistema con las columnas del dominio, igual que
- * `CategoriesTable`. No guarda estado: recibe las líneas y devuelve hacia arriba
- * la intención —cambiar una cantidad, quitar un insumo—.
- */
-
-
-/**
- * Cambio de cantidad, para la celda que lo necesita.
- *
- * Va por contexto y no por una columna que lo capture: las columnas tienen que
- * ser una constante de módulo (ver abajo). Provisional: cuando la receta viva en
- * el formulario, la celda usará `useFormContext` y este contexto sobra.
- */
-const QuantityChangeContext = React.createContext<
-    (index: number, quantity: string) => void
->(() => {});
-
-
-/** Celda de cantidad. Componente con nombre porque usa hooks. */
-function RecipeQuantityCell({ line }: { line: MockRecipeLine }) {
-    const onQuantityChange = React.useContext(QuantityChangeContext);
-    const { ingredient, index, quantity } = line;
-
-    return (
-        <TextField
-            size="sm"
-            // `text` con `inputMode`: `number` trae su propio spinner, que
-            // aparecería encima del sufijo de unidad, y en algunos navegadores
-            // cambia el valor al girar la rueda del ratón sobre el campo.
-            type="text"
-            inputMode="decimal"
-            autoComplete="off"
-            value={quantity}
-            onChange={(value) => onQuantityChange(index, value)}
-            aria-label={formatMessage(recipeMessages.quantityLabel, {
-                name: ingredient.name,
-                unit: ingredient.unitName,
-            })}
-            rightIcon={<span className={recipeUnitVariants()}>{ingredient.unit}</span>}
-        />
-    );
-}
-
-
-// ── Columnas ────────────────────────────────────────────────────────────────
-// Constante de módulo, y aquí no es opcional: `flexRender` monta cada `cell`
-// con `React.createElement(cell)`, así que la función ES el tipo del componente.
-// Declaradas dentro del componente, cada tecla crearía un tipo nuevo, React
-// desmontaría el campo y se perdería el foco en cada pulsación.
-const recipeColumns: ColumnDef<MockRecipeLine>[] = [
+// Las columnas se declaran fuera del componente a propósito. `flexRender` usa
+// cada `cell` como si fuera un componente, y si las columnas se crearan en
+// cada render, React desmontaría el campo de cantidad con cada tecla y se
+// perdería el foco.
+const recipeColumns: ColumnDef<RecipeRow>[] = [
     {
         id: "ingredient",
         header: recipeMessages.columns.ingredient,
@@ -110,9 +58,9 @@ const recipeColumns: ColumnDef<MockRecipeLine>[] = [
     {
         id: "quantity",
         header: recipeMessages.columns.quantity,
-        // 10rem: un campo `sm` con cinco dígitos y el sufijo de unidad dentro.
+        // 10rem alcanza para un campo `sm` con cinco dígitos y la unidad.
         meta: { headerClassName: "w-40", cellClassName: "w-40" },
-        cell: ({ row }) => <RecipeQuantityCell line={row.original} />,
+        cell: ({ row }) => <RecipeQuantityCell row={row.original} />,
     },
     {
         id: "stock",
@@ -124,11 +72,11 @@ const recipeColumns: ColumnDef<MockRecipeLine>[] = [
             return (
                 <div className={recipeStockVariants()}>
                     <span className={recipeStockValueVariants({ outOfStock: isOutOfStock })}>
-                        {`${formatNumber(ingredient.stock)} ${ingredient.unit}`}
+                        {formatIngredientQuantity(ingredient.stock, ingredient.unit)}
                     </span>
 
                     <span className={recipeStockHintVariants({ outOfStock: isOutOfStock })}>
-                        {isOutOfStock ? recipeStockMessages.outOfStock : recipeStockMessages.available}
+                        {isOutOfStock ? stockMessages.outOfStock : stockMessages.available}
                     </span>
                 </div>
             );
@@ -137,48 +85,43 @@ const recipeColumns: ColumnDef<MockRecipeLine>[] = [
 ];
 
 
-interface RecipeTableProps {
-    lines: MockRecipeLine[];
-    onQuantityChange: (index: number, quantity: string) => void;
-    onRemove: (index: number) => void;
-    className?: string;
-}
-
-export default function RecipeTable({
-    lines,
-    onQuantityChange,
-    onRemove,
-    className,
-}: RecipeTableProps) {
+/**
+ * Tabla de insumos de la receta.
+ *
+ * Arma las columnas de la receta sobre el `DataTable` del sistema, igual que
+ * `CategoriesTable`. Los valores de cantidad los maneja react-hook-form desde
+ * cada celda, así que la tabla solo avisa hacia arriba cuando hay que quitar
+ * una línea.
+ */
+export default function RecipeTable({ rows, onRemove, className }: RecipeTableProps) {
     return (
-        <QuantityChangeContext.Provider value={onQuantityChange}>
-            <DataTable
-                data={lines}
-                columns={recipeColumns}
-                // El insumo no se repite en una receta, así que su id es
-                // estable al quitar filas aunque cambie el `index`.
-                getRowId={(line) => line.ingredient.id}
-                // Tabla editable: reordenar movería la fila que se escribe.
-                enableSorting={false}
-                getRowClassName={(line) =>
-                    recipeTableRowVariants({ outOfStock: line.isOutOfStock })
-                }
-                renderRowActions={(line) => (
-                    // Sin confirmación: es un borrador y volver a añadir el
-                    // insumo son dos pulsaciones.
-                    <GenericButton
-                        type="button"
-                        variant="danger"
-                        size="sm"
-                        icon={ICON_TOKENS.DELETE}
-                        aria-label={formatMessage(recipeMessages.remove, {
-                            name: line.ingredient.name,
-                        })}
-                        onClick={() => onRemove(line.index)}
-                    />
-                )}
-                {...(className && { className })}
-            />
-        </QuantityChangeContext.Provider>
+        <DataTable
+            data={rows}
+            columns={recipeColumns}
+            // Se usa el id que react-hook-form le da a cada línea, que no cambia
+            // aunque la fila se mueva de posición al quitar otra.
+            getRowId={(row) => row.id}
+            // La tabla se edita, y ordenarla movería la fila en la que se está
+            // escribiendo.
+            enableSorting={false}
+            getRowClassName={(row) =>
+                recipeTableRowVariants({ outOfStock: row.isOutOfStock })
+            }
+            renderRowActions={(row) => (
+                // No pide confirmación porque todavía es un borrador y volver a
+                // añadir el insumo toma dos clics.
+                <GenericButton
+                    type="button"
+                    variant="danger"
+                    size="sm"
+                    icon={ICON_TOKENS.DELETE}
+                    aria-label={formatMessage(recipeMessages.remove, {
+                        name: row.ingredient.name,
+                    })}
+                    onClick={() => onRemove(row.index)}
+                />
+            )}
+            {...(className && { className })}
+        />
     );
 };

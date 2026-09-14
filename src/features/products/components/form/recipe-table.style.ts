@@ -84,17 +84,6 @@ export const recipeSkuVariants = cva(["truncate", TYPOGRAPHY.code]);
 
 
 /* -------------------------------------------------------------------------- */
-/*  Cantidad                                                                   */
-/* -------------------------------------------------------------------------- */
-
-/** Sufijo de unidad dentro del campo. La hereda del insumo. */
-export const recipeUnitVariants = cva([
-    "select-none text-neutral-600",
-    TYPOGRAPHY.labelSm,
-]);
-
-
-/* -------------------------------------------------------------------------- */
 /*  Existencias                                                                */
 /* -------------------------------------------------------------------------- */
 

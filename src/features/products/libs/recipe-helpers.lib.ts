@@ -16,6 +16,7 @@ import type {
     ProductRecipeFormValues,
     RecipeCost,
     RecipeLine,
+    RecipeRow,
 } from "../interfaces";
 import { parseRecipeQuantity } from "./recipe-form.lib";
 
@@ -45,6 +46,30 @@ export function resolveRecipeLines(
             ingredient,
             quantity,
             cost: quantity === null ? null : quantity * ingredient.unitCost,
+            isOutOfStock: isIngredientOutOfStock(ingredient),
+        }];
+    });
+}
+
+
+/**
+ * Arma las filas de la tabla a partir de los `fields` de `useFieldArray`.
+ *
+ * Igual que en `resolveRecipeLines`, se deja por fuera la línea cuyo insumo ya
+ * no existe y cada fila guarda su posición original en la receta.
+ */
+export function resolveRecipeRows(
+    fields: readonly (ProductRecipeFormValues & { id: string })[]
+): RecipeRow[] {
+    return fields.flatMap((field, index) => {
+        const ingredient = getIngredient(field.itemId);
+
+        if (!ingredient) return [];
+
+        return [{
+            id: field.id,
+            index,
+            ingredient,
             isOutOfStock: isIngredientOutOfStock(ingredient),
         }];
     });

@@ -3,5 +3,7 @@ export { default as ProductFormStepper } from './ProductFormStepper';
 export { default as ProductImageField } from './ProductImageField';
 export { default as ProductRecipeStep } from './ProductRecipeStep';
 export { default as ProductStepPlaceholder } from './ProductStepPlaceholder';
-export { default as RecipeTable } from './RecipeTable';
+export { default as RecipeEmptyState } from './RecipeEmptyState';
+export { default as RecipeQuantityCell } from './RecipeQuantityCell';
 export { default as RecipeSummary } from './RecipeSummary';
+export { default as RecipeTable } from './RecipeTable';
