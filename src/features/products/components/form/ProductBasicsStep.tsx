@@ -1,17 +1,10 @@
 "use client";
 
-import { Controller, type Control } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 
 import { InputSelector, TextAreaField, TextField } from "@/components";
 import { cn } from "@/lib/utils";
 import { messages } from "@/messages";
-import {
-    PRODUCT_CATEGORY_OPTIONS,
-    PRODUCT_DESCRIPTION_MAX,
-    PRODUCT_FORM_RULES,
-    PRODUCT_NAME_LIMITS,
-    type ProductFormValues,
-} from "@/features/products/libs/product-form";
 
 import ProductImageField from "./ProductImageField";
 import {
@@ -19,6 +12,8 @@ import {
     productBasicsGridVariants,
     productBasicsStepVariants,
 } from "./product-basics-step.style";
+import { ProductFormValues } from "../../interfaces";
+import { PRODUCT_CATEGORY_OPTIONS, PRODUCT_FORM_RULES, PRODUCT_VALIDATION } from "../../utils";
 
 
 /**
@@ -33,15 +28,15 @@ import {
  */
 
 interface ProductBasicsStepProps {
-    control: Control<ProductFormValues>;
     className?: string;
 }
 
 export default function ProductBasicsStep({
-    control,
     className,
 }: ProductBasicsStepProps) {
     const stepMessaages = messages.products.create.basics;
+
+    const { control } = useFormContext<ProductFormValues>();
 
     return (
         // El `fieldset` agrupa los campos del paso y la leyenda le pone nombre
@@ -63,7 +58,7 @@ export default function ProductBasicsStep({
                             size="md"
                             error={fieldState.error?.message ?? false}
                             placeholder={stepMessaages.name.placeholder}
-                            maxLength={PRODUCT_NAME_LIMITS.max}
+                            maxLength={PRODUCT_VALIDATION.name.max}
                             autoComplete="off"
                         />
                     )}
@@ -71,7 +66,7 @@ export default function ProductBasicsStep({
 
                 <Controller
                     control={control}
-                    name="category"
+                    name="categoryId"
                     rules={PRODUCT_FORM_RULES.category}
                     render={({ field, fieldState }) => (
                         <InputSelector
@@ -99,7 +94,7 @@ export default function ProductBasicsStep({
                             label={stepMessaages.description.label}
                             error={fieldState.error?.message ?? false}
                             placeholder={stepMessaages.description.placeholder}
-                            maxLength={PRODUCT_DESCRIPTION_MAX}
+                            maxLength={PRODUCT_VALIDATION.description.max}
                             showCount
                             rows={4}
                             className={productBasicsFullRowVariants()}
@@ -114,7 +109,7 @@ export default function ProductBasicsStep({
                 propio componente, que es quien conoce el archivo. */}
             <Controller
                 control={control}
-                name="image"
+                name="imageUrl"
                 render={({ field }) => (
                     <ProductImageField
                         value={field.value}

@@ -85,9 +85,25 @@ export const products = {
         other: "{count} ingredientes",
     } satisfies Plural,
 
+    /**
+     * Unidades de medida del inventario.
+     *
+     * Cada unidad tiene tres textos porque se muestra en sitios distintos. La
+     * abreviatura va junto a una cifra (`1.200 g`), el plural se usa dentro de
+     * una frase ("la cantidad en gramos") y el label sirve cuando la unidad
+     * aparece sola, como en el rótulo de una columna.
+     *
+     * Las claves son los valores que envía el backend, así que no se traducen.
+     */
+    units: {
+        gramo: { label: "Gramos", plural: "gramos", abbreviation: "g" },
+        mililitro: { label: "Mililitros", plural: "mililitros", abbreviation: "ml" },
+        unidad: { label: "Unidades", plural: "unidades", abbreviation: "u" },
+    },
+
 
     /* ====================================================================== */
-    /*  Catálogo                                                              */
+    /*  Catálogo                                                            */
     /* ====================================================================== */
 
     list: {
@@ -208,6 +224,156 @@ export const products = {
                 label: "Descripción",
                 placeholder:
                     "Ej. Doble carne de res a la parrilla, queso cheddar, cebolla caramelizada y salsa BBQ de la casa.",
+            },
+        },
+
+        /* ── Paso 2: receta e insumos ───────────────────────────────────── */
+
+        recipe: {
+            /** Nombre del grupo de campos. No se ve: en pantalla lo da el indicador. */
+            legend: "Receta e insumos del producto",
+
+            /**
+             * Existencias del insumo.
+             *
+             * Fuera de `search` y de `list` porque las dos lo dicen igual: la
+             * cifra de stock significa lo mismo se mire donde se mire, y dos
+             * copias de "Agotado" se acabarían separando en la primera
+             * revisión de textos.
+             */
+            stock: {
+                available: "disponible",
+                outOfStock: "Agotado",
+            },
+
+            /* Buscador del inventario. */
+            search: {
+                label: "Buscar insumo",
+                placeholder: "Escribe el nombre o el SKU del insumo",
+                helper: "Añade lo que se consume al preparar una unidad del producto. Los insumos retirados del inventario no aparecen aquí.",
+
+                /** Nombre accesible del panel de resultados. */
+                resultsLabel: "Insumos encontrados",
+                /** Lo que anuncia el lector de pantalla cuando aparecen resultados. */
+                resultsCount: {
+                    one: "{count} insumo encontrado",
+                    other: "{count} insumos encontrados",
+                } satisfies Plural,
+                /**
+                 * Lo que precede al contenido del resultado para quien lo oye.
+                 *
+                 * No es un `aria-label`: ése sustituiría a todo lo que la fila
+                 * enseña —nombre, SKU, costo y existencias— por cuatro palabras.
+                 * Va delante, en `sr-only`, para que el botón se anuncie como
+                 * lo que hace **y** con lo que dice.
+                 */
+                add: "Añadir a la receta:",
+
+                /**
+                 * Cuando la búsqueda no devuelve nada.
+                 *
+                 * Repite el término tal y como se escribió —para que la errata se
+                 * vea— y dice dónde mirar si el insumo debería existir.
+                 */
+                empty: "Ningún insumo del inventario coincide con «{query}». Revisa la escritura o dalo de alta en Inventario.",
+                /** Cuando todo lo que coincide ya está en la receta. */
+                allAdded: "Todos los insumos que coinciden con «{query}» ya están en la receta.",
+
+                /** `de 24 · viendo 6` — qué parte del inventario se está viendo. */
+                more: "Se muestran los {shown} primeros de {total}. Afina la búsqueda para ver el resto.",
+
+                /** Costo por unidad de medida, en el resultado: `$ 32 / g`. */
+                unitCost: "{cost} / {unit}",
+            },
+
+            /* Lista de insumos ya añadidos. */
+            list: {
+                /** `Insumos de la receta` — encabeza el bloque de la lista. */
+                title: "Insumos de la receta",
+
+                /**
+                 * Rótulos de columna.
+                 *
+                 * Se ven en escritorio y se oyen siempre: en móvil la fila se
+                 * apila y cada dato lleva su rótulo delante, porque una cifra
+                 * suelta debajo de un nombre no dice si es lo que se usa o lo
+                 * que queda.
+                 */
+                columns: {
+                    ingredient: "Insumo",
+                    quantity: "Cantidad",
+                    stock: "Stock disponible",
+                    optional: "Opcional",
+                    actions: "Acciones",
+                },
+
+                /**
+                 * Etiqueta accesible del interruptor de opcional. El lector de
+                 * pantalla la lee junto con el estado, como "Pan brioche es
+                 * opcional, activado".
+                 */
+                optionalLabel: "{name} es opcional",
+
+                /** Etiqueta accesible del campo de cantidad. Nombra el insumo y su unidad. */
+                quantityLabel: "Cantidad de {name} en {unit}",
+                remove: "Quitar {name} de la receta",
+                perishable: "Perecedero",
+
+                /** `1 insumo` · `6 insumos` */
+                count: {
+                    zero: "Sin insumos",
+                    one: "{count} insumo",
+                    other: "{count} insumos",
+                } satisfies Plural,
+
+                /** Tope de líneas: una receta más larga que esto suele ser dos recetas. */
+                limitReached: "La receta admite hasta {max} insumos. Quita alguno para añadir otro.",
+
+                empty: {
+                    title: "La receta todavía no tiene insumos",
+                    message:
+                        "Busca un insumo del inventario y añádelo para calcular lo que cuesta preparar el producto.",
+                },
+            },
+
+            /**
+             * Aviso de insumos agotados.
+             *
+             * Dice la consecuencia antes que la causa —lo que le importa a quien
+             * está dando de alta el producto es que no se va a poder vender— y
+             * termina en lo que hay que hacer para arreglarlo. Enumera los
+             * insumos porque con seis líneas en pantalla "hay uno agotado" deja
+             * a quien lo lee buscando cuál.
+             */
+            outOfStockNotice: {
+                title: "El producto se publicará como no disponible",
+                description: {
+                    /* Sin comillas: `{names}` llega ya entrecomillado, porque el
+                       plural las necesita alrededor de cada nombre y no del
+                       conjunto. */
+                    one: "{names} está agotado en el inventario. Repón sus existencias para que el producto vuelva a la carta.",
+                    other: "{names} están agotados en el inventario. Repón sus existencias para que el producto vuelva a la carta.",
+                } satisfies Plural,
+            },
+
+            /* Costo de la receta. */
+            total: {
+                label: "Costo total de la receta",
+                hint: "Costo por unidad de cada insumo multiplicado por la cantidad indicada.",
+                /** Mientras alguna línea no tenga una cantidad válida. */
+                pending: "Indica la cantidad de cada insumo para calcular el costo.",
+            },
+
+            /* ── Validación ─────────────────────────────────────────────── */
+
+            validation: {
+                quantityRequired: "Indica cuánto se usa de este insumo.",
+                quantityMin: "La cantidad tiene que ser mayor que 0.",
+                quantityMax: "La cantidad no puede pasar de {max} {unit}.",
+
+                recipeRequired: "Añade al menos un insumo del inventario para continuar.",
+                recipeMax: "La receta admite hasta {max} insumos. Quita los que sobren para continuar.",
+                ingredientDuplicated: "Hay insumos repetidos en la receta. Deja una sola línea por insumo.",
             },
         },
 

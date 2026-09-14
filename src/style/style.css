@@ -402,6 +402,13 @@
     animation-play-state: paused;
 }
 
+/* Toma el radio del elemento padre. La usa el avatar para que la imagen, las
+   iniciales y el borde sigan la forma de la raíz, así la forma redonda o
+   cuadrada se decide en un solo lugar. */
+@utility rounded-inherit {
+    border-radius: inherit;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
