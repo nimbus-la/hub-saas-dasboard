@@ -3,16 +3,20 @@ import { ApiEnvelope, ApiErrorFields } from "@/interfaces";
 /**
  * ¿Esto es un sobre?
  * 
- * Se comprueban `code` y la presencia de `data`, que son los dos campos de los
- * que dependen el desenvuelto. No exige `status` ni `message`, un sobre al que
- * le falte uno de esos sigue siendo desenvolvible.
+ * Se comprueban `code` y la presencia de `content`, que son los dos campos de
+ * los que dependen el desenvuelto. No exige `status` ni `message`, un sobre al
+ * que le falte uno de esos sigue siendo desenvolvible.
+ *
+ * Se pregunta por la presencia de la clave y no por su valor porque `content`
+ * llega a `null` en las operaciones que no devuelven cuerpo —un borrado, un
+ * alta— y eso sigue siendo un sobre válido.
  */
 export function isApiEnvelope(value: unknown): value is ApiEnvelope {
     if (typeof value !== "object" || value === null) return false;
 
     const candidate = value as Record<string, unknown>;
 
-    return typeof candidate["code"] === "string" && "data" in candidate;
+    return typeof candidate["code"] === "string" && "content" in candidate;
 }
 
 
