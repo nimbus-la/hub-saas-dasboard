@@ -43,4 +43,16 @@ export const ENDPOINTS = {
      */
     PRODUCTS_CATEGORY: "products/categories",
 
+    // ── Empleados ──────────────────────────────────────────────────────────
+
+    /**
+     * Empleados y usuarios del panel.
+     *
+     * Colección suelta a la que el servicio le añade el identificador para el
+     * detalle, la edición y la baja. Está documentada para que se busque desde
+     * aquí el día que el backend confirme la ruta: si mañana cambia, este es el
+     * único lugar que tocar.
+     */
+    EMPLOYEES: "employees",
+
 } as const;
