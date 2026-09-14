@@ -368,10 +368,8 @@ export const products = {
 
             validation: {
                 quantityRequired: "Indica cuánto se usa de este insumo.",
-                quantityInvalid: "Escribe la cantidad en números. Por ejemplo, 150.",
                 quantityMin: "La cantidad tiene que ser mayor que 0.",
                 quantityMax: "La cantidad no puede pasar de {max} {unit}.",
-                quantityDecimals: "Usa como máximo {max} decimales. Por ejemplo, 0,25.",
 
                 recipeRequired: "Añade al menos un insumo del inventario para continuar.",
                 recipeMax: "La receta admite hasta {max} insumos. Quita los que sobren para continuar.",

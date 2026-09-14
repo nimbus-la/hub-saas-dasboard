@@ -1,7 +1,7 @@
 // ── Reglas del paso de receta ───────────────────────────────────────────────
-// Cómo se lee una cantidad escrita y qué reglas debe cumplir la receta para
-// poder continuar. Están en `libs` y no en `utils` porque las reglas usan el
-// parser de cantidades, y `utils` no debe importar nada de `libs`.
+// Qué debe cumplir cada cantidad y la receta completa para poder continuar.
+// La cantidad ya llega como número desde `NumberField`, que se encarga de los
+// separadores y de no dejar escribir decimales de más.
 
 import { getUnitName, type IngredientUnit } from "@/lib/ingredients";
 import { formatMessage, messages } from "@/messages";
@@ -21,39 +21,11 @@ const message = messages.products.create.recipe.validation;
 /*  Cantidad                                                                   */
 /* -------------------------------------------------------------------------- */
 
-/** Acepta dígitos con un separador decimal opcional, como `150`, `0,5` o `2.25`. */
-const QUANTITY_PATTERN = /^\d+([.,]\d+)?$/;
-
-
-/** Deja la cantidad lista para convertirla, sin espacios y con punto decimal. */
-const normalizeQuantity = (value: string): string =>
-    value.trim().replace(",", ".");
-
-
-/**
- * Convierte la cantidad escrita en un número.
- *
- * Devuelve `null` si el campo está vacío o si lo escrito no es una cantidad,
- * en lugar de devolver `0` o `NaN`. Así podemos distinguir una línea que falta
- * por llenar de una que de verdad vale cero.
- *
- * Se aceptan la coma, que es lo que sale del teclado en español, y el punto,
- * que es lo que suele venir al copiar desde una hoja de cálculo.
- */
-export function parseRecipeQuantity(value: string): number | null {
-    const normalized = normalizeQuantity(value);
-
-    if (!QUANTITY_PATTERN.test(normalized)) return null;
-
-    const quantity = Number(normalized);
-
-    return Number.isFinite(quantity) ? quantity : null;
-}
-
-
-/** Cuántos decimales tiene la cantidad escrita. */
-const countDecimals = (value: string): number =>
-    normalizeQuantity(value).split(".")[1]?.length ?? 0;
+/** Indica si la cantidad tiene valor y está dentro de los límites de la receta. */
+export const isRecipeQuantityInRange = (quantity: number | null): quantity is number =>
+    quantity !== null &&
+    quantity >= RECIPE_VALIDATION.quantity.min &&
+    quantity <= RECIPE_VALIDATION.quantity.max;
 
 
 /**
@@ -61,29 +33,25 @@ const countDecimals = (value: string): number =>
  *
  * Las validaciones van en orden y react-hook-form se detiene en la primera que
  * falla, así que la persona siempre ve el problema más básico primero.
+ *
+ * No hace falta revisar si es un número ni cuántos decimales tiene, porque
+ * `NumberField` solo deja escribir números con los decimales permitidos.
  */
 const buildRecipeQuantityRules = (
     unit: IngredientUnit
 ): ProductRecipeQuantityRules => ({
     validate: {
         required: (value) =>
-            value.trim() !== "" || message.quantityRequired,
-
-        number: (value) =>
-            parseRecipeQuantity(value) !== null || message.quantityInvalid,
-
-        decimals: (value) =>
-            countDecimals(value) <= RECIPE_VALIDATION.quantity.maxDecimals ||
-            formatMessage(message.quantityDecimals, {
-                max: RECIPE_VALIDATION.quantity.maxDecimals,
-            }),
+            value !== null || message.quantityRequired,
 
         min: (value) =>
-            (parseRecipeQuantity(value) ?? 0) >= RECIPE_VALIDATION.quantity.min ||
+            value === null ||
+            value >= RECIPE_VALIDATION.quantity.min ||
             message.quantityMin,
 
         max: (value) =>
-            (parseRecipeQuantity(value) ?? 0) <= RECIPE_VALIDATION.quantity.max ||
+            value === null ||
+            value <= RECIPE_VALIDATION.quantity.max ||
             formatMessage(message.quantityMax, {
                 max: RECIPE_VALIDATION.quantity.max,
                 unit: getUnitName(unit),

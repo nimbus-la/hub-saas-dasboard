@@ -21,7 +21,7 @@ import type {
     RecipeRow,
 } from "../interfaces";
 import { RECIPE_SEARCH_RESULTS, RECIPE_VALIDATION } from "../utils";
-import { parseRecipeQuantity } from "./recipe-form.lib";
+import { isRecipeQuantityInRange } from "./recipe-form.lib";
 
 
 const message = messages.products.create.recipe;
@@ -33,6 +33,10 @@ const message = messages.products.create.recipe;
  * Si el insumo de una línea ya no existe en el inventario, esa línea se deja
  * por fuera porque no hay nada que mostrar ni que sumar. Cada línea conserva
  * su `index` original para no confundir una fila con otra cuando falta alguna.
+ *
+ * Una cantidad fuera de los límites se trata igual que una vacía. Si se
+ * sumara, el total mostraría una cifra con un error en pantalla y además diría
+ * que está completo.
  */
 export function resolveRecipeLines(
     recipe: readonly ProductRecipeFormValues[]
@@ -42,7 +46,7 @@ export function resolveRecipeLines(
 
         if (!ingredient) return [];
 
-        const quantity = parseRecipeQuantity(item.quantity);
+        const quantity = isRecipeQuantityInRange(item.quantity) ? item.quantity : null;
 
         return [{
             index,

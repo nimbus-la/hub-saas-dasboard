@@ -34,6 +34,6 @@ export const RECIPE_SEARCH_RESULTS = 6;
  * más probable es que se quedara así sin que nadie lo revisara.
  */
 export const DEFAULT_RECIPE_LINE_VALUES: Omit<ProductRecipeFormValues, "itemId"> = {
-    quantity: "",
+    quantity: null,
     isOptional: false,
 };

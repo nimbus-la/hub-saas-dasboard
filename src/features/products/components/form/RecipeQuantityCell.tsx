@@ -2,13 +2,13 @@
 
 import { Controller, useFormContext } from "react-hook-form";
 
-import { TextField } from "@/components";
+import { NumberField } from "@/components";
 import { getUnitAbbreviation, getUnitName } from "@/lib/ingredients";
 import { formatMessage, messages } from "@/messages";
 
 import type { ProductFormValues, RecipeQuantityCellProps } from "../../interfaces";
 import { getRecipeQuantityRules } from "../../libs";
-import { recipeQuantityUnitVariants } from "./recipe-quantity-cell.style";
+import { RECIPE_VALIDATION } from "../../utils";
 
 
 const recipeMessages = messages.products.create.recipe.list;
@@ -17,9 +17,11 @@ const recipeMessages = messages.products.create.recipe.list;
 /**
  * Campo de cantidad de una línea de la receta.
  *
- * Usa `Controller` porque `TextField` entrega el texto en `onChange` y no el
- * evento del input, que es lo que espera `register`. El `ref` que pasa el
- * `Controller` es el que permite llevar el foco a este campo cuando falla.
+ * Usa `NumberField`, que muestra los puntos de miles mientras se escribe y
+ * entrega la cantidad como número. Va dentro de un `Controller` porque el
+ * campo entrega el número en `onChange` y no el evento del input. El `ref` que
+ * pasa el `Controller` es el que permite llevar el foco a este campo cuando
+ * falla.
  */
 export default function RecipeQuantityCell({ row }: RecipeQuantityCellProps) {
     const { control } = useFormContext<ProductFormValues>();
@@ -31,25 +33,21 @@ export default function RecipeQuantityCell({ row }: RecipeQuantityCellProps) {
             name={`recipe.${index}.quantity`}
             rules={getRecipeQuantityRules(ingredient.unit)}
             render={({ field, fieldState }) => (
-                <TextField
-                    {...field}
+                <NumberField
+                    ref={field.ref}
+                    name={field.name}
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    disabled={field.disabled ?? false}
                     size="sm"
-                    // Se usa `text` con `inputMode="decimal"` en lugar de
-                    // `number`, porque ese tipo agrega flechas que tapan la
-                    // unidad y cambia el valor si se mueve la rueda del mouse.
-                    type="text"
-                    inputMode="decimal"
-                    autoComplete="off"
+                    maxDecimals={RECIPE_VALIDATION.quantity.maxDecimals}
                     error={fieldState.error?.message ?? false}
                     aria-label={formatMessage(recipeMessages.quantityLabel, {
                         name: ingredient.name,
                         unit: getUnitName(ingredient.unit),
                     })}
-                    rightIcon={
-                        <span className={recipeQuantityUnitVariants()}>
-                            {getUnitAbbreviation(ingredient.unit)}
-                        </span>
-                    }
+                    suffix={getUnitAbbreviation(ingredient.unit)}
                 />
             )}
         />

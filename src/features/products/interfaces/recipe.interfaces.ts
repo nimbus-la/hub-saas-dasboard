@@ -37,12 +37,12 @@ export type ProductRecipeRules = NonNullable<
 /**
  * Una línea de la receta con su insumo ya buscado en el inventario.
  *
- * El formulario solo guarda el id del insumo y la cantidad tal como se
- * escribió. Esta interfaz junta eso con los datos del insumo y con lo que
- * cuesta la cantidad indicada.
+ * El formulario solo guarda el id del insumo y la cantidad. Esta interfaz
+ * junta eso con los datos del insumo y con lo que cuesta la cantidad indicada.
  *
- * `quantity` y `cost` quedan en `null` mientras lo escrito no sea una cantidad
- * válida, así sabemos si el total ya se puede dar por bueno.
+ * `quantity` y `cost` quedan en `null` mientras el campo de cantidad esté
+ * vacío o fuera de los límites, así sabemos si el total ya se puede dar por
+ * bueno.
  */
 export interface RecipeLine {
     /**
