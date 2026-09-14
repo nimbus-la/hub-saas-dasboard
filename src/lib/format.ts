@@ -36,6 +36,80 @@ const percentFormatter = new Intl.NumberFormat(LOCALE, {
 export const formatNumber = (value: number): string => numberFormatter.format(value);
 
 /**
+ * Los separadores de miles y de decimales del idioma de la interfaz. En
+ * es-CO son `.` y `,`.
+ *
+ * Se sacan de `Intl` formateando un número de ejemplo, así un cambio de país
+ * no obliga a buscar los separadores escritos a mano por todo el proyecto.
+ */
+const numberParts = numberFormatter.formatToParts(10000.5);
+
+export const NUMBER_SEPARATORS = {
+    group: numberParts.find((part) => part.type === "group")?.value ?? ".",
+    decimal: numberParts.find((part) => part.type === "decimal")?.value ?? ",",
+} as const;
+
+/**
+ * Interpreta un número pegado desde otro lugar, como una hoja de cálculo.
+ *
+ * Lo que se pega puede venir con el formato de Colombia (`1.234,56`) o con el
+ * de Estados Unidos (`1,234.56`), así que no basta con saber cuál separador
+ * usa la interfaz. Se decide así:
+ *
+ * - Si trae punto y coma, el que aparece al final es el decimal.
+ * - Si un separador se repite, como en `1.234.567`, son miles.
+ * - Si solo hay un separador y lo siguen exactamente tres dígitos, como en
+ *   `1.234` o `15,678`, son miles, porque con un máximo de dos decimales no
+ *   podría ser un decimal. La excepción es cuando antes solo hay un cero,
+ *   como en `0,001`. En cualquier otro caso es el decimal.
+ *
+ * Se quita todo lo que no sea número, como espacios o el símbolo `$`. Si
+ * sobran decimales se cortan, igual que pasa al escribirlos. Devuelve `null`
+ * si no queda ningún dígito.
+ */
+export function parsePastedNumber(
+    text: string,
+    { maxDecimals, allowNegative }: { maxDecimals: number; allowNegative: boolean }
+): number | null {
+    const isNegative = allowNegative && text.trim().startsWith("-");
+    const cleaned = text.replace(/[^\d.,]/g, "");
+
+    if (!/\d/.test(cleaned)) return null;
+
+    const lastDot = cleaned.lastIndexOf(".");
+    const lastComma = cleaned.lastIndexOf(",");
+
+    let decimalIndex = -1;
+
+    if (lastDot !== -1 && lastComma !== -1) {
+        decimalIndex = Math.max(lastDot, lastComma);
+    } else {
+        const separatorIndex = Math.max(lastDot, lastComma);
+        const separator = cleaned[separatorIndex];
+        const isRepeated = separator !== undefined && cleaned.indexOf(separator) !== separatorIndex;
+        const digitsAfter = cleaned.length - separatorIndex - 1;
+        // Un número con miles nunca empieza en cero, así que `0,001` es decimal.
+        const startsWithZero = /^0*$/.test(cleaned.slice(0, separatorIndex));
+        const looksLikeThousands = digitsAfter === 3 && maxDecimals < 3 && !startsWithZero;
+
+        if (separatorIndex !== -1 && !isRepeated && !looksLikeThousands) {
+            decimalIndex = separatorIndex;
+        }
+    }
+
+    const integerPart = (decimalIndex === -1 ? cleaned : cleaned.slice(0, decimalIndex)).replace(/\D/g, "");
+    const decimalPart = decimalIndex === -1
+        ? ""
+        : cleaned.slice(decimalIndex + 1).replace(/\D/g, "").slice(0, maxDecimals);
+
+    const parsed = Number(`${integerPart || "0"}${decimalPart ? `.${decimalPart}` : ""}`);
+
+    if (!Number.isFinite(parsed)) return null;
+
+    return isNegative ? -parsed : parsed;
+}
+
+/**
  * Porcentaje ya calculado sobre 100: `formatPercent(27.3)` → `27,3%`.
  *
  * Recibe la cifra tal como se lee ("27,3 por ciento"), no la fracción: casi

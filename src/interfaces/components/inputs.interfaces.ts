@@ -186,6 +186,72 @@ export interface TextFieldProps
 
 
 /* -------------------------------------------------------------------------- */
+/*  NumberField                                                                */
+/* -------------------------------------------------------------------------- */
+
+export type NumberFieldSize = InputSize;
+
+export interface NumberFieldProps
+    extends Omit<
+        React.ComponentPropsWithoutRef<"input">,
+        | "size"
+        | "type"
+        | "value"
+        | "defaultValue"
+        | "onChange"
+        | "className"
+        | "prefix"
+        | "inputMode"
+    > {
+    /**
+     * El número del campo, o `null` cuando está vacío. Nunca llega como texto
+     * formateado: los separadores solo existen en pantalla.
+     */
+    value?: number | null;
+    /** Valor inicial cuando el campo no se controla desde fuera. */
+    defaultValue?: number | null;
+    /** Recibe el número ya interpretado, o `null` si el campo quedó vacío. */
+    onChange?: (value: number | null) => void;
+
+    /** Cuántos decimales se pueden escribir. Con `0` solo se aceptan enteros. */
+    maxDecimals?: number;
+    /** Permite escribir números negativos. */
+    allowNegative?: boolean;
+
+    /** Texto de la etiqueta superior. */
+    label?: string;
+    /** Muestra el asterisco de campo obligatorio. */
+    required?: boolean;
+    /** Texto guía dentro del campo, nunca sustituye a la etiqueta. */
+    placeholder?: string;
+    /** Texto de ayuda debajo del campo. */
+    helperText?: string;
+    /** Estado de error: `true` o un mensaje (reemplaza al helperText). */
+    error?: boolean | string;
+    disabled?: boolean;
+    readOnly?: boolean;
+
+    /** Adorno a la izquierda del número, como el símbolo de la moneda. */
+    prefix?: React.ReactNode;
+    /** Adorno a la derecha del número, como la unidad de medida. */
+    suffix?: React.ReactNode;
+
+    /** Alto, tipografía, padding y tamaño de iconos. */
+    size?: NumberFieldSize;
+    /** Ocupa el 100% del contenedor padre. */
+    fullWidth?: boolean;
+
+    /** Clases del contenedor externo. */
+    className?: string;
+    /** Clases del campo (InputGroup). */
+    fieldClassName?: string;
+    /** Clases del `<input>`. */
+    inputClassName?: string;
+}
+
+
+
+/* -------------------------------------------------------------------------- */
 /*  TextAreaField                                                              */
 /* -------------------------------------------------------------------------- */
 
