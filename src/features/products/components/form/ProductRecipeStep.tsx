@@ -5,7 +5,7 @@ import * as React from "react";
 import { formatPlural, messages } from "@/messages";
 import { ICON_SIZE, ICON_STROKE_BY_SIZE, ICON_TOKENS } from "@/tokens";
 
-import type { RecipeLine } from "../../interfaces";
+import type { MockRecipeLine } from "../../interfaces";
 import RecipeTable from "./RecipeTable";
 
 import {
@@ -31,7 +31,7 @@ import RecipeSummary from "./RecipeSummary";
  * que la tabla tiene que saber pintar: insumo sano, perecedero, **agotado** y
  * una línea con la cantidad todavía sin escribir.
  */
-const MOCK_RECIPE_LINES: RecipeLine[] = [
+const MOCK_RECIPE_LINES: MockRecipeLine[] = [
     {
         index: 0,
         ingredient: { id: "i01", name: "Carne de res molida", sku: "PRO-001", stock: 0, unit: "g", unitName: "gramos", isPerishable: true },
@@ -64,7 +64,7 @@ export default function ProductRecipeStep() {
 
     // Estado local sobre los datos quemados: cuando la receta viva en el
     // formulario, esto pasa a `useFieldArray` + `useWatch`.
-    const [lines, setLines] = React.useState<RecipeLine[]>(MOCK_RECIPE_LINES);
+    const [lines, setLines] = React.useState<MockRecipeLine[]>(MOCK_RECIPE_LINES);
 
     const handleQuantityChange = (index: number, quantity: string) => {
         setLines((current) =>

@@ -18,7 +18,7 @@ import {
     recipeTableRowVariants,
     recipeUnitVariants,
 } from "./recipe-table.style";
-import type { RecipeLine } from "../../interfaces";
+import type { MockRecipeLine } from "../../interfaces";
 
 
 /** Lo que dice esta tabla. Ver `@/messages`. */
@@ -50,7 +50,7 @@ const QuantityChangeContext = React.createContext<
 
 
 /** Celda de cantidad. Componente con nombre porque usa hooks. */
-function RecipeQuantityCell({ line }: { line: RecipeLine }) {
+function RecipeQuantityCell({ line }: { line: MockRecipeLine }) {
     const onQuantityChange = React.useContext(QuantityChangeContext);
     const { ingredient, index, quantity } = line;
 
@@ -80,7 +80,7 @@ function RecipeQuantityCell({ line }: { line: RecipeLine }) {
 // con `React.createElement(cell)`, así que la función ES el tipo del componente.
 // Declaradas dentro del componente, cada tecla crearía un tipo nuevo, React
 // desmontaría el campo y se perdería el foco en cada pulsación.
-const recipeColumns: ColumnDef<RecipeLine>[] = [
+const recipeColumns: ColumnDef<MockRecipeLine>[] = [
     {
         id: "ingredient",
         header: recipeMessages.columns.ingredient,
@@ -138,7 +138,7 @@ const recipeColumns: ColumnDef<RecipeLine>[] = [
 
 
 interface RecipeTableProps {
-    lines: RecipeLine[];
+    lines: MockRecipeLine[];
     onQuantityChange: (index: number, quantity: string) => void;
     onRemove: (index: number) => void;
     className?: string;
