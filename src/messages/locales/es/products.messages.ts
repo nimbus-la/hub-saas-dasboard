@@ -303,8 +303,16 @@ export const products = {
                     ingredient: "Insumo",
                     quantity: "Cantidad",
                     stock: "Stock disponible",
+                    optional: "Opcional",
                     actions: "Acciones",
                 },
+
+                /**
+                 * Etiqueta accesible del interruptor de opcional. El lector de
+                 * pantalla la lee junto con el estado, como "Pan brioche es
+                 * opcional, activado".
+                 */
+                optionalLabel: "{name} es opcional",
 
                 /** Etiqueta accesible del campo de cantidad. Nombra el insumo y su unidad. */
                 quantityLabel: "Cantidad de {name} en {unit}",

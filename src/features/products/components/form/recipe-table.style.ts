@@ -28,6 +28,7 @@ export const RECIPE_COLUMN_CLASS = {
     ingredient: "min-w-56",
     quantity: "w-52",
     stock: "w-36",
+    optional: "w-24",
 } as const;
 
 

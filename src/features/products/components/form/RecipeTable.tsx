@@ -20,6 +20,7 @@ import { formatMessage, messages } from "@/messages";
 import { ICON_TOKENS } from "@/tokens";
 
 import type { RecipeRow, RecipeTableProps } from "../../interfaces";
+import RecipeOptionalCell from "./RecipeOptionalCell";
 import RecipeQuantityCell from "./RecipeQuantityCell";
 import {
     RECIPE_COLUMN_CLASS,
@@ -121,6 +122,16 @@ const recipeColumns: ColumnDef<RecipeRow>[] = [
                 </div>
             );
         },
+    },
+    {
+        id: "optional",
+        header: recipeMessages.columns.optional,
+        meta: {
+            align: "center",
+            headerClassName: RECIPE_COLUMN_CLASS.optional,
+            cellClassName: RECIPE_COLUMN_CLASS.optional,
+        },
+        cell: ({ row }) => <RecipeOptionalCell row={row.original} />,
     },
 ];
 

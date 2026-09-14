@@ -18,6 +18,11 @@ export interface RecipeTableProps {
 }
 
 
+export interface RecipeOptionalCellProps {
+    row: RecipeRow;
+}
+
+
 export interface RecipeQuantityCellProps {
     row: RecipeRow;
 }
