@@ -43,7 +43,7 @@ export function useProductForm() {
      * está arriba, y con el panel largo ni siquiera lo ve.
      */
     const submitStep = React.useCallback(
-        async (event: React.FormEvent<HTMLFormElement>) => {
+        async (event: React.SubmitEvent<HTMLFormElement>) => {
             event.preventDefault();
 
             // Nada que validar en un paso sin campos; `trigger([])` validaría

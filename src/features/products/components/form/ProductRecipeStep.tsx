@@ -31,7 +31,7 @@ const recipeMessages = messages.products.create.recipe;
  * qué mostrar según haya o no insumos.
  */
 export default function ProductRecipeStep({ className }: ProductRecipeStepProps) {
-    const { rows, lines, selectedIds, addIngredient, removeLine } = useRecipeLines();
+    const { rows, lines, selectedIds, addIngredient, removeLine, error } = useRecipeLines();
 
     const hasRows = rows.length > 0;
 
@@ -49,6 +49,13 @@ export default function ProductRecipeStep({ className }: ProductRecipeStepProps)
         previousRowCount.current = rows.length;
     }, [rows.length]);
 
+    // Cuando la receta completa no pasa la validación, por ejemplo al pulsar
+    // Continuar sin insumos, react-hook-form no tiene un campo al que llevar el
+    // foco. Lo llevamos al buscador, que es donde aparece el error.
+    React.useEffect(() => {
+        if (error) searchRef.current?.focus();
+    }, [error]);
+
     return (
         // El `legend` no se ve porque el nombre del paso ya aparece en el
         // indicador de arriba, pero sí lo lee el lector de pantalla.
@@ -58,6 +65,7 @@ export default function ProductRecipeStep({ className }: ProductRecipeStepProps)
             <IngredientSearchField
                 ref={searchRef}
                 selectedIds={selectedIds}
+                error={error?.message}
                 onAdd={addIngredient}
             />
 

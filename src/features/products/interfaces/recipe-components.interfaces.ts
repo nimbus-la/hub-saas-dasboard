@@ -32,6 +32,8 @@ export interface IngredientSearchFieldProps {
     /** Ids de los insumos que ya están en la receta, para no volver a ofrecerlos. */
     selectedIds: readonly string[];
     onAdd: (ingredient: Ingredient) => void;
+    /** Error de la receta completa. Se muestra debajo del campo en lugar de la ayuda. */
+    error?: string | undefined;
     /** Llega al campo de búsqueda, para poder devolverle el foco desde afuera. */
     ref?: React.Ref<HTMLInputElement>;
     className?: string;

@@ -40,6 +40,7 @@ const listMessages = messages.products.create.recipe.list;
 export default function IngredientSearchField({
     selectedIds,
     onAdd,
+    error,
     ref,
     className,
 }: IngredientSearchFieldProps) {
@@ -125,6 +126,9 @@ export default function IngredientSearchField({
                 label={searchMessages.label}
                 placeholder={searchMessages.placeholder}
                 helperText={helperText}
+                // La receta vacía no tiene un campo propio donde marcar el
+                // error, así que se muestra aquí, que es donde se arregla.
+                error={error ?? false}
                 value={query}
                 onChange={setQuery}
                 onKeyDown={handleInputKeyDown}

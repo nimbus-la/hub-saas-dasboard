@@ -36,13 +36,23 @@ const computeRecipeLines = (
  *   dejaría una línea fantasma sin insumo.
  */
 export function useRecipeLines() {
-    const { control } = useFormContext<ProductFormValues>();
+    const { control, register } = useFormContext<ProductFormValues>();
 
     const { fields, append, remove } = useFieldArray({
         control,
         name: "recipe",
         rules: RECIPE_RULES,
     });
+
+    // `useFieldArray` registra las reglas durante el render, pero al limpiar su
+    // efecto las marca como desmontadas. En desarrollo React monta, limpia y
+    // vuelve a montar los efectos para detectar errores, y en esa segunda vuelta
+    // las reglas quedaban desmontadas, así que react-hook-form no las validaba y
+    // se podía continuar con la receta vacía. Registrarlas otra vez en un efecto
+    // las deja activas mientras el paso esté en pantalla.
+    React.useEffect(() => {
+        register("recipe", RECIPE_RULES);
+    }, [register]);
 
     const rows = React.useMemo(() => resolveRecipeRows(fields), [fields]);
 
@@ -90,7 +100,13 @@ export function useRecipeLines() {
         selectedIds,
         addIngredient,
         removeLine,
-        /** Error de la receta completa, por ejemplo cuando no tiene insumos. */
-        error: errors.recipe?.root?.message,
+        /**
+         * Error de la receta completa, por ejemplo cuando no tiene insumos.
+         *
+         * Se devuelve el objeto y no solo el mensaje porque react-hook-form
+         * crea uno nuevo cada vez que valida. Así quien lo usa puede reaccionar
+         * cada vez que se pulsa Continuar, aunque el mensaje sea el mismo.
+         */
+        error: errors.recipe?.root,
     };
 }
