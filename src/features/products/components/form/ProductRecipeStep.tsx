@@ -1,5 +1,7 @@
 "use client";
 
+import * as React from "react";
+
 import { cn } from "@/lib/utils";
 import { formatPlural, messages } from "@/messages";
 
@@ -32,6 +34,20 @@ export default function ProductRecipeStep({ className }: ProductRecipeStepProps)
 
     const hasRows = rows.length > 0;
 
+    const titleRef = React.useRef<HTMLHeadingElement>(null);
+    const previousRowCount = React.useRef(rows.length);
+
+    // Si se quita la última fila, la tabla desaparece junto con el botón que
+    // tenía el foco. Lo llevamos al título de la lista para que quien usa el
+    // teclado no termine al inicio de la página.
+    React.useEffect(() => {
+        if (previousRowCount.current > 0 && rows.length === 0) {
+            titleRef.current?.focus();
+        }
+
+        previousRowCount.current = rows.length;
+    }, [rows.length]);
+
     return (
         // El `legend` no se ve porque el nombre del paso ya aparece en el
         // indicador de arriba, pero sí lo lee el lector de pantalla.
@@ -40,7 +56,11 @@ export default function ProductRecipeStep({ className }: ProductRecipeStepProps)
 
             <div className={productRecipeListVariants()}>
                 <div className={productRecipeListHeaderVariants()}>
-                    <h3 className={productRecipeListTitleVariants()}>
+                    <h3
+                        ref={titleRef}
+                        tabIndex={-1}
+                        className={productRecipeListTitleVariants()}
+                    >
                         {recipeMessages.list.title}
                     </h3>
 

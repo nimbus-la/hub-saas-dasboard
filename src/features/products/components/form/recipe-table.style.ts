@@ -6,39 +6,42 @@ import { SPACING_CLASS, TYPOGRAPHY } from "@/tokens";
 /**
  * Estilos de RecipeTable
  *
- * La tabla la pinta `DataTable`; aquí solo está lo que la receta decide: el
- * tinte del insumo agotado y cómo se lee cada celda. Los anchos de columna van
- * en `meta`, no aquí: la `<table>` alinea cabecera y celdas sola.
+ * La tabla la dibuja `DataTable`. Aquí solo va lo propio de la receta, que es
+ * el tinte de los insumos agotados, el ancho de las columnas y cómo se ve el
+ * contenido de cada celda.
  */
 
 
 /**
- * Fila del insumo agotado.
+ * Ancho de cada columna, para pasarlo en el `meta` de la columna.
  *
- * `error-lighter` y no `error-light`: la fila lleva un campo blanco y un botón,
- * y un fondo más saturado los convertiría en manchas.
+ * El insumo tiene un ancho mínimo porque su nombre se recorta con puntos
+ * suspensivos. Sin ese mínimo, en una pantalla estrecha la columna se encoge
+ * hasta dejar el nombre en dos letras, y así la tabla prefiere desplazarse de
+ * lado.
  *
- * El tinte va en las celdas y no en el `<tr>`: con `border-separate` una fila
- * no se puede redondear, sus celdas sí. Así la banda repite la forma del
- * encabezado —`rounded-l-lg` en la primera celda, `rounded-r-lg` en la
- * última— y se lee como la misma familia. Pintado en las celdas, además, tapa
- * el `hover:bg-neutral-50` de la fila sin tener que repetirlo.
+ * La cantidad es la columna más ancha de las fijas porque debajo del campo
+ * aparece el mensaje de error, y con menos espacio ese mensaje ocupa tres o
+ * cuatro líneas.
+ */
+export const RECIPE_COLUMN_CLASS = {
+    ingredient: "min-w-56",
+    quantity: "w-52",
+    stock: "w-36",
+} as const;
+
+
+/**
+ * Fila de un insumo agotado.
  *
- * El separador inferior se vuelve transparente: una línea recta bajo una banda
- * redondeada se cortaría contra las curvas de las esquinas.
- *
- * La sombra de 1px del mismo tono tapa la costura entre celdas. Cuando el borde
- * de una celda cae en un píxel fraccionario —el ancho de la tabla depende del
- * contenedor— el navegador suaviza los dos fondos por separado y deja una línea
- * más clara entre ellos. La última celda no la lleva: saldría por fuera de la
- * esquina redondeada.
+ * Se pinta cada celda y no el `<tr>`, porque el fondo de la fila no tapa el
+ * hover que `DataTable` le pone a las celdas. Se usa el tono `lighter` para
+ * que el campo blanco y el botón de la fila no parezcan manchas encima.
  */
 export const recipeTableRowVariants = cva([], {
     variants: {
         outOfStock: {
-            true: [
-                "[&>td]:bg-error-lighter",
-            ],
+            true: "[&>td]:bg-error-lighter",
             false: "",
         },
     },
@@ -50,12 +53,13 @@ export const recipeTableRowVariants = cva([], {
 /*  Insumo                                                                     */
 /* -------------------------------------------------------------------------- */
 
-/** Nombre. Sin tinte hereda el gris de `TitleSubtitleCell`. */
+/**
+ * Nombre del insumo. En un insumo agotado el texto pasa al tono más oscuro
+ * del rojo para que se siga leyendo bien sobre el fondo teñido.
+ */
 export const recipeNameVariants = cva([], {
     variants: {
         outOfStock: {
-            // Sobre el tinte el texto sube al tono más oscuro de la familia
-            // para seguir por encima de 4,5:1.
             true: "text-error-darker",
             false: "",
         },
@@ -64,7 +68,7 @@ export const recipeNameVariants = cva([], {
 });
 
 
-/** SKU y etiqueta de perecedero. */
+/** Línea del SKU y la etiqueta de perecedero. */
 export const recipeMetaVariants = cva(
     ["inline-flex min-w-0 items-center", SPACING_CLASS.gap.sm],
     {
@@ -79,7 +83,7 @@ export const recipeMetaVariants = cva(
 );
 
 
-/** Código del insumo. Monoespaciado: es un identificador, no una palabra. */
+/** El SKU va en letra monoespaciada porque es un código y no una palabra. */
 export const recipeSkuVariants = cva(["truncate", TYPOGRAPHY.code]);
 
 
@@ -105,9 +109,8 @@ export const recipeStockValueVariants = cva(
 
 
 /**
- * `disponible` · `Agotado`.
- *
- * La palabra cambia con la existencia, así que el estado no depende del color.
+ * La palabra debajo del stock, "disponible" o "Agotado". Como la palabra
+ * cambia, el estado se entiende aunque no se distingan los colores.
  */
 export const recipeStockHintVariants = cva([TYPOGRAPHY.caption], {
     variants: {
