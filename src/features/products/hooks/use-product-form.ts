@@ -10,8 +10,7 @@ import * as React from "react";
 import { useForm, useFormState } from "react-hook-form";
 
 import { ProductFormValues } from "../interfaces";
-import { DEFAULT_PRODUCT_FORM_VALUES, PRODUCT_FORM_STEP_LENGTH } from "../utils";
-import { getProductFormStep } from "../libs";
+import { DEFAULT_PRODUCT_FORM_VALUES, PRODUCT_FORM_STEP_LENGTH, getProductFormStep } from "../libs";
 
 
 export function useProductForm() {

@@ -5,7 +5,12 @@ import { Controller, useFormContext } from "react-hook-form";
 import { Switch } from "@/components";
 import { formatMessage, messages } from "@/messages";
 
-import type { ProductFormValues, RecipeOptionalCellProps } from "../../interfaces";
+import type { ProductFormValues, RecipeRow } from "../../interfaces";
+
+
+interface RecipeOptionalCellProps {
+    row: RecipeRow;
+}
 
 
 const recipeMessages = messages.products.create.recipe.list;

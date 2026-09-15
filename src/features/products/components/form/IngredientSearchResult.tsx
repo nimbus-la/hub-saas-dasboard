@@ -4,12 +4,12 @@ import {
     formatIngredientQuantity,
     getUnitAbbreviation,
     isIngredientOutOfStock,
+    type Ingredient,
 } from "@/lib/ingredients";
 import { getProductInitials } from "@/lib/products";
 import { formatMessage, messages } from "@/messages";
 import { ICON_SIZE, ICON_STROKE_BY_SIZE, ICON_TOKENS } from "@/tokens";
 
-import type { IngredientSearchResultProps } from "../../interfaces";
 import {
     ingredientSearchResultIconVariants,
     ingredientSearchResultMetaVariants,
@@ -20,6 +20,12 @@ import {
     ingredientSearchResultTextVariants,
     ingredientSearchResultVariants,
 } from "./ingredient-search-result.style";
+
+
+interface IngredientSearchResultProps {
+    ingredient: Ingredient;
+    onAdd: (ingredient: Ingredient) => void;
+}
 
 
 const searchMessages = messages.products.create.recipe.search;

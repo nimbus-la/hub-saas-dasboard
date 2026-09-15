@@ -3,7 +3,7 @@ import { formatCurrency } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { messages } from "@/messages";
 
-import type { RecipeSummaryProps } from "../../interfaces";
+import type { RecipeLine } from "../../interfaces";
 import {
     formatOutOfStockNotice,
     getOutOfStockIngredients,
@@ -17,6 +17,13 @@ import {
     recipeTotalTextVariants,
     recipeTotalVariants,
 } from "./recipe-summary.style";
+
+
+interface RecipeSummaryProps {
+    /** Líneas con cantidad y costo, las que devuelve `useRecipeLines`. */
+    lines: readonly RecipeLine[];
+    className?: string;
+}
 
 
 const recipeMessages = messages.products.create.recipe;

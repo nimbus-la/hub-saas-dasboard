@@ -1,7 +1,7 @@
 // ── Reglas del paso de receta ───────────────────────────────────────────────
-// Qué debe cumplir cada cantidad y la receta completa para poder continuar.
-// La cantidad ya llega como número desde `NumberField`, que se encarga de los
-// separadores y de no dejar escribir decimales de más.
+// Los límites de la receta y qué debe cumplir cada cantidad para poder
+// continuar. La cantidad ya llega como número desde `NumberField`, que se
+// encarga de los separadores y de no dejar escribir decimales de más.
 
 import { getUnitName, type IngredientUnit } from "@/lib/ingredients";
 import { formatMessage, messages } from "@/messages";
@@ -11,7 +11,35 @@ import type {
     ProductRecipeQuantityRules,
     ProductRecipeRules,
 } from "../interfaces";
-import { RECIPE_VALIDATION } from "../utils";
+
+
+/**
+ * Límites de la receta.
+ *
+ * La cantidad mínima es 0,01 y no 0, porque una línea con cero de algo no
+ * aporta nada a la receta. El máximo de 100.000 alcanza para cualquier plato
+ * medido en gramos o mililitros y evita cifras escritas por error.
+ *
+ * El tope de 40 insumos es para que la lista se pueda revisar de un vistazo.
+ * Una receta más larga casi siempre son dos recetas juntas.
+ */
+export const RECIPE_VALIDATION = {
+    quantity: { min: 0.01, max: 100_000, maxDecimals: 2 },
+    minIngredients: 1,
+    maxIngredients: 40,
+} as const;
+
+
+/**
+ * Valores con los que entra un insumo nuevo a la receta.
+ *
+ * La cantidad empieza vacía a propósito. Si pusiéramos un 1 por defecto, lo
+ * más probable es que se quedara así sin que nadie lo revisara.
+ */
+export const DEFAULT_RECIPE_LINE_VALUES: Omit<ProductRecipeFormValues, "itemId"> = {
+    quantity: null,
+    isOptional: false,
+};
 
 
 const message = messages.products.create.recipe.validation;

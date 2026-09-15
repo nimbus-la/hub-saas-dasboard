@@ -17,8 +17,7 @@ import {
     ProductStepPlaceholder,
 } from "../components/form";
 import { useProductForm } from "../hooks/use-product-form";
-import { PRODUCTS_LIST_HREF } from "../libs";
-import { PRODUCT_FORM_STEPS } from "../utils";
+import { PRODUCTS_LIST_HREF, PRODUCT_FORM_STEPS } from "../libs";
 
 
 import {

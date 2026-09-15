@@ -20,9 +20,16 @@ import type {
     RecipeLine,
     RecipeRow,
 } from "../interfaces";
-import { RECIPE_SEARCH_RESULTS, RECIPE_VALIDATION } from "../utils";
-import { isRecipeQuantityInRange } from "./recipe-form.lib";
+import { RECIPE_VALIDATION, isRecipeQuantityInRange } from "./recipe-form";
 
+
+/**
+ * Cuántos resultados muestra el buscador de insumos.
+ *
+ * La lista aparece dentro del formulario y empuja el contenido hacia abajo, así
+ * que se limita a seis. Si hay más, se invita a afinar la búsqueda.
+ */
+export const RECIPE_SEARCH_RESULTS = 6;
 
 const message = messages.products.create.recipe;
 

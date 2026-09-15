@@ -8,13 +8,14 @@ en este directorio.
 
 | Documento | Qué responde |
 |---|---|
+| [`architecture.md`](./architecture.md) | Cómo se organiza el código: qué es un feature, qué significa cada carpeta y dónde va un archivo nuevo |
 | [`design-tokens.md`](./design-tokens.md) | Qué valores existen y cómo se llaman: escala, espaciado, radios, tipografía, iconos, capas, movimiento |
 | [`tailwind.md`](./tailwind.md) | Cómo está configurado Tailwind, qué tokens viven en CSS y cuáles en TypeScript, y los errores que conviene no repetir |
 | [`components.md`](./components.md) | Cómo se construye un componente con el sistema, con ejemplos del propio código |
 | [`messages.md`](./messages.md) | Dónde vive cada texto de la interfaz, cómo se interpolan datos y plurales, y qué falta para añadir un idioma |
 | [`http.md`](./http.md) | Cómo se habla con el backend: peticiones, servicios, caché, avisos y cómo integrar un endpoint nuevo |
 
-Esta página cubre lo que se necesita a diario. Los otros cinco documentos son
+Esta página cubre lo que se necesita a diario. Los otros seis documentos son
 la referencia completa.
 
 ---
