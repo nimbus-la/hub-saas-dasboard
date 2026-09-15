@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { Controller, useForm } from "react-hook-form";
 
 import {
   loginFormFieldsVariants,
@@ -11,75 +11,112 @@ import {
 import { GenericButton, TextField } from "@/components";
 import { cn } from "@/lib/utils";
 
-interface LoginFormData {
-  email: string;
-  password: string;
-  rememberMe: boolean;
-}
+import type { LoginCredentials } from "../../types/login.types";
 
 interface LoginFormProps {
-  onSubmit: (data: LoginFormData) => Promise<void>;
+  onSubmit: (data: LoginCredentials) => Promise<void>;
 }
 
 export default function LoginForm({ onSubmit }: LoginFormProps) {
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [rememberMe] = React.useState(false);
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    const data: LoginFormData = {
-      email,
-      password,
-      rememberMe,
-    };
-
-    try {
-      setIsSubmitting(true);
-
-      await onSubmit(data);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const {
+    control,
+    handleSubmit,
+    formState: { isValid, isSubmitting },
+  } = useForm<LoginCredentials>({
+    mode: "onChange",
+    defaultValues: {
+      tenantSlug: "",
+      username: "",
+      password: "",
+    },
+  });
 
   return (
-    <form onSubmit={handleSubmit} className={loginFormVariants()}>
+    <form onSubmit={handleSubmit(onSubmit)} className={loginFormVariants()}>
       {/* ── Encabezado ───────────────────────────────────────── */}
       <div className={cn("text-center", loginFormHeaderVariants())}>
-        <h1 className="text-h2 font-bold text-neutral-900">Bienvenidos</h1>
+        <h1 className="text-h2 font-bold text-neutral-900">
+          Bienvenidos
+        </h1>
 
         <p className="text-body-sm text-neutral-600">
-          Ingresa tu correo electrónico y contraseña para acceder a tu cuenta.
+          Ingresa tus datos para acceder a tu cuenta.
         </p>
       </div>
 
       {/* ── Campos ───────────────────────────────────────────── */}
-      <div className={cn("mt-8 w-full max-w-md", loginFormFieldsVariants())}>
-        <TextField
-          id="login-email"
-          label="Email"
-          type="email"
-          placeholder="Enter your email"
-          value={email}
-          onChange={setEmail}
-          size="md"
-          autoComplete="email"
-          required
+      <div
+        className={cn(
+          "mt-8 w-full max-w-md",
+          loginFormFieldsVariants()
+        )}
+      >
+        <Controller
+          name="tenantSlug"
+          control={control}
+          rules={{
+            required: true,
+          }}
+          render={({ field, fieldState }) => (
+            <TextField
+              {...field}
+              id="login-tenant"
+              label="Empresa"
+              type="text"
+              placeholder="Ingresa tu nombre de empresa"
+              size="md"
+              required
+              {...(fieldState.error?.message
+                ? { error: fieldState.error.message }
+                : {})}
+            />
+          )}
         />
 
-        <TextField
-          id="login-password"
-          label="Password"
-          type="password"
-          placeholder="Enter your password"
-          value={password}
-          onChange={setPassword}
-          size="md"
-          autoComplete="current-password"
-          required
+        <Controller
+          name="username"
+          control={control}
+          rules={{
+            required: true,
+          }}
+          render={({ field, fieldState }) => (
+            <TextField
+              {...field}
+              id="login-username"
+              label="Usuario"
+              type="text"
+              placeholder="Ingresa tu usuario"
+              size="md"
+              autoComplete="username"
+              required
+              {...(fieldState.error?.message
+                ? { error: fieldState.error.message }
+                : {})}
+            />
+          )}
+        />
+
+        <Controller
+          name="password"
+          control={control}
+          rules={{
+            required: true,
+          }}
+          render={({ field, fieldState }) => (
+            <TextField
+              {...field}
+              id="login-password"
+              label="Contraseña"
+              type="password"
+              placeholder="Ingresa tu contraseña"
+              size="md"
+              autoComplete="current-password"
+              required
+              {...(fieldState.error?.message
+                ? { error: fieldState.error.message }
+                : {})}
+            />
+          )}
         />
       </div>
 
@@ -88,11 +125,17 @@ export default function LoginForm({ onSubmit }: LoginFormProps) {
         <GenericButton
           type="submit"
           size="md"
-          label={isSubmitting ? "Iniciando sesión..." : "Iniciar sesión"}
+          label={
+            isSubmitting
+              ? "Iniciando sesión..."
+              : "Iniciar sesión"
+          }
           className="w-full"
-          disabled={isSubmitting}
+          disabled={!isValid || isSubmitting}
         >
-          {isSubmitting ? "Iniciando sesión..." : "Iniciar sesión"}
+          {isSubmitting
+            ? "Iniciando sesión..."
+            : "Iniciar sesión"}
         </GenericButton>
       </div>
     </form>

@@ -65,7 +65,6 @@ export interface ApiEnvelope<TContent = unknown> {
 };
 
 
-
 /**
  * El `content` de una respuesta paginada.
  *
