@@ -1,19 +1,21 @@
 # Documentación
 
-Todo lo escrito del proyecto vive aquí. Nada de `README.md` sueltos por
-carpetas: si hace falta explicar algo que no cabe en un comentario, va a este
-directorio.
+Todo lo escrito del proyecto vive aquí. No hay `README.md` sueltos por
+carpetas: si algo necesita explicación y no cabe en un comentario, se escribe
+en este directorio.
 
 ## Índice
 
 | Documento | Qué responde |
 |---|---|
 | [`design-tokens.md`](./design-tokens.md) | Qué valores existen y cómo se llaman: escala, espaciado, radios, tipografía, iconos, capas, movimiento |
-| [`tailwind.md`](./tailwind.md) | Cómo está montado Tailwind aquí, por qué unos tokens viven en CSS y otros en TS, y las trampas que ya costaron un rato |
-| [`components.md`](./components.md) | Cómo se construye un componente con el sistema, con ejemplos completos |
+| [`tailwind.md`](./tailwind.md) | Cómo está configurado Tailwind, qué tokens viven en CSS y cuáles en TypeScript, y los errores que conviene no repetir |
+| [`components.md`](./components.md) | Cómo se construye un componente con el sistema, con ejemplos del propio código |
 | [`messages.md`](./messages.md) | Dónde vive cada texto de la interfaz, cómo se interpolan datos y plurales, y qué falta para añadir un idioma |
+| [`http.md`](./http.md) | Cómo se habla con el backend: peticiones, servicios, caché, avisos y cómo integrar un endpoint nuevo |
 
-Empieza por esta página. Cubre el 90% del día a día en cinco minutos.
+Esta página cubre lo que se necesita a diario. Los otros cinco documentos son
+la referencia completa.
 
 ---
 
@@ -21,45 +23,45 @@ Empieza por esta página. Cubre el 90% del día a día en cinco minutos.
 
 ### Un solo vocabulario de tamaños
 
-`xs · sm · md · lg · xl · 2xl`. Significa lo mismo en todas partes: un botón
-`md` y un campo `md` puestos en la misma fila miden 40px los dos y su texto es
-el mismo. Si un componente expone `size`, sus valores salen de ahí.
+`xs`, `sm`, `md`, `lg`, `xl`, `2xl`. Cada nombre significa lo mismo en todos
+los componentes: un botón `md` y un campo `md` en la misma fila miden 40px los
+dos y su texto es idéntico. Si un componente expone la prop `size`, sus valores
+salen de esta escala.
 
-El escalón por defecto es **`md`**.
+El tamaño por defecto es **`md`**.
 
 ### Dónde vive cada cosa
 
 ```
-src/style/style.css   →  VALORES de color, tipografía, radios y sombras
-                         (Tailwind genera una utilidad por token)
+src/style/style.css   →  VALORES de color, tipografía, radios y sombras.
+                         Tailwind genera una utilidad por cada uno.
 
 src/tokens/           →  RECETAS (qué token usa cada componente),
-                         el espaciado y los números que JavaScript necesita
+                         el espaciado y los números que JavaScript necesita.
 
-src/messages/         →  TEXTOS: todo lo que la interfaz dice, por módulo
-                         y tipado para que un idioma nuevo no pueda quedarse
-                         a medias
+src/messages/         →  TEXTOS: todo lo que la interfaz dice, agrupado por
+                         módulo y tipado para que no falte ninguna clave.
 ```
 
-La regla para decidir dónde va algo nuevo: **¿lo necesita JavaScript como
-número?** Si no, va solo al CSS. Los detalles y la única excepción —el
-espaciado— están en [`tailwind.md`](./tailwind.md).
+Para decidir dónde va algo nuevo, basta una pregunta: **¿JavaScript necesita
+ese valor como número?** Si no, va solo al CSS. El detalle y la única
+excepción (el espaciado) están en [`tailwind.md`](./tailwind.md).
 
 ### Las seis reglas
 
-1. **No inventes valores.** Si algo "necesita" 18px de separación, casi siempre
-   le tocan 16 o 24. La escala está en [`design-tokens.md`](./design-tokens.md).
+1. **No inventes valores.** Si algo parece necesitar 18px de separación, casi
+   siempre le corresponden 16 o 24. La escala completa está en
+   [`design-tokens.md`](./design-tokens.md).
 2. **Los estilos van en `*.style.ts`**, no dentro del `.tsx`. Un archivo por
-   componente, con `cva`.
-3. **Las clases se escriben literales.** Tailwind escanea el código fuente y no
-   ve una clase construida con plantillas: `` `gap-${n}` `` no existe.
-4. **El tamaño se lee de la receta**, no se escribe a mano:
-   `CONTROL_SIZE.md.heightClass`, no `"h-10"`.
-5. **La tipografía es un token, no dos decisiones.** `text-body-md` fija tamaño,
-   interlineado, grosor y tracking a la vez. No los elijas por separado.
+   componente, escrito con `cva`.
+3. **Las clases se escriben literales.** Tailwind lee el código fuente y no
+   detecta una clase construida con plantillas: `` `gap-${n}` `` no genera CSS.
+4. **El tamaño se lee de la receta**: `CONTROL_SIZE.md.heightClass`, no `"h-10"`
+   escrito a mano.
+5. **La tipografía es un token, no cuatro decisiones.** `text-body-md` fija
+   tamaño, interlineado, grosor y tracking a la vez.
 6. **Los textos no se escriben en el componente.** Salen de `@/messages`, igual
-   que los tamaños salen de `@/tokens`. Los detalles están en
-   [`messages.md`](./messages.md).
+   que los tamaños salen de `@/tokens`. Ver [`messages.md`](./messages.md).
 
 ### Arranque rápido
 
@@ -96,7 +98,7 @@ Texto suelto, sin importar nada:
 <span className="text-caption text-neutral-500">Actualizado hace 5 min</span>
 ```
 
-Iconos, que se dimensionan por prop y no por clase:
+Iconos, que reciben el tamaño por prop y no por clase:
 
 ```tsx
 <ICON_TOKENS.PRODUCTS
@@ -105,56 +107,73 @@ Iconos, que se dimensionan por prop y no por clase:
 />
 ```
 
-### Qué está migrado
+---
 
-| Familia | Estado |
+## Estado del proyecto
+
+### Componentes compartidos (`src/components/`)
+
+Las familias del sistema están construidas con tokens. Ninguna tiene
+valores propios más allá de las geometrías cerradas que se documentan en su
+`*.style.ts` y se resumen en [`components.md`](./components.md).
+
+| Familia | Componentes | Notas |
+|---|---|---|
+| `alerts/` | `Alert`, `AlertToaster` | Sobre sonner. La cuenta atrás se anima en CSS |
+| `avatars/` | `Avatar` | Dos formas: `circle` y `square` |
+| `badges/` | `StatusBadge` | Escala `xs…2xl`, por defecto `sm` |
+| `buttons/` | `GenericButton`, `LinkButton` | Escala completa `xs…2xl` |
+| `cards/` | `MetricCard`, `ProductCard`, `ProductThumbnail` | Superficies fijas: `SURFACE_SIZE.xl` y `lg` |
+| `filters/` | `FilterSelect` | |
+| `inputs/` | `TextField`, `NumberField`, `InputSelector`, `TextAreaField` | Escala `sm…xl` |
+| `inputs/primitives/` | `InputGroup`, `Combobox`, `input`, `textarea` | Traducidos desde shadcn |
+| `layout/` | `AppShell`, `PageHeader` | `AppShell` monta sidebar y navbar; `PageHeader` es el encabezado de pantalla |
+| `modals/` | `Modal`, `ConfirmDialog` | Sobre Base UI, traducidos desde `dialog` y `alert-dialog` |
+| `navbar/` | `Navbar` | Armazón desde `NAVBAR` |
+| `pagination/` | `Pagination` | Todo el pie en `CONTROL_SIZE.sm` |
+| `sidebar/` | `Sidebar`, `SidebarButton`, `SidebarGroup`, `SidebarNavItem` | Armazón desde `SIDEBAR` y `Z_INDEX` |
+| `tables/` | `DataTable`, `DataTableCheckbox`, `TitleSubtitleCell` | Fila en `ROW_HEIGHT.md` |
+| `tabs/` | `FilterTabs` | Contador en `BADGE_SIZE.xs`; el alto es de pestaña, no de control |
+| `toggles/` | `Switch` | La geometría del carril es propia; el resto sale del sistema |
+
+`PageHeader` y `Modal` nacieron al aparecer la pantalla de categorías, las dos
+por el mismo motivo: eran la segunda pantalla que necesitaba lo mismo. Cuando
+algo se necesita dos veces deja de pertenecer a la pantalla donde apareció.
+
+### Pendiente: `src/components/ui/`
+
+Esta carpeta es donde el CLI de shadcn deja lo que se instala, y todavía
+conserva tres archivos:
+
+| Archivo | Estado |
 |---|---|
-| `buttons/` — `GenericButton`, `LinkButton` | Migrado (escala `xs…2xl`) |
-| `inputs/` — `TextField`, `NumberField`, `InputSelector`, `TextAreaField` | Migrado (escala `sm…xl`) |
-| `inputs/primitives/` — `InputGroup`, `Combobox` | Migrado y traducido desde shadcn |
-| `avatars/` — `Avatar` | Migrado |
-| `badges/` — `StatusBadge` | Migrado (escala `xs…2xl`, por defecto `sm`) |
-| `cards/` — `MetricCard`, `ProductCard`, `ProductThumbnail` | Migrado (superficies fijas: `SURFACE_SIZE.xl` y `lg`) |
-| `pagination/` — `Pagination` | Migrado (todo el pie en `CONTROL_SIZE.sm`) |
-| `tabs/` — `FilterTabs` | Migrado (contador en `BADGE_SIZE.xs`; el alto es de pestaña, no de control) |
-| `tables/` — `DataTable`, `DataTableCheckbox`, `TitleSubtitleCell` | Migrado (fila en `ROW_HEIGHT.md`) |
-| `toggles/` — `Switch` | Migrado (la geometría del carril es suya; el resto, del sistema) |
-| `sidebar/` — `Sidebar`, `SidebarButton`, `SidebarGroup`, `SidebarNavItem` | Migrado (armazón desde `SIDEBAR` y `Z_INDEX`) |
-| `navbar/` — `Navbar` | Migrado (armazón desde `NAVBAR`; sin clases de shadcn) |
-| `layout/` — `PageHeader` | Nace en el sistema (encabezado de pantalla: flecha, título, insignia y acciones) |
-| `modals/` — `Modal`, `ConfirmDialog` | Migrado y traducido desde shadcn (`dialog` y `alert-dialog`), sobre Base UI (`rounded-2xl`, `shadow-2xl`, capa `Z_INDEX.modal`) |
+| `input.tsx` | En uso desde `features/cashier/.../OrderSearch.tsx`. Se reemplaza por `inputs/primitives/input.tsx` cuando se migre esa pantalla |
+| `card.tsx` | Sin usar. Se puede borrar |
+| `tabs.tsx` | Sin usar. Se puede borrar |
 
-La migración está completa: no queda ninguna familia con valores propios. Lo
-que quedó fuera de los tokens a propósito —geometrías cerradas como el carril
-del `Switch` o la cadena horizontal del sidebar— va documentado en su
-`*.style.ts` y resumido en [`components.md`](./components.md).
+Lo que baja del CLI se traduce al sistema y se mueve a su familia, como se hizo
+con los campos, el avatar y los diálogos. Lo que duplica algo que ya existe se
+borra sin traducir: es lo que pasó con el `button` que acompañaba a los
+diálogos, porque `GenericButton` ya cubría su función.
 
-Fuera de `components/`, la sección de productos (`features/products/`) también
-está migrada: catálogo, alta por pasos y categorías. Queda
-`features/main-dashboard/`: sus paneles, tablas y gráficos son los que todavía
-usan `rounded-lg` donde el resto ya usa `rounded-xl`.
+### Pantallas (`src/features/`)
 
-Las dos familias nuevas salieron de la pantalla de categorías, y las dos por el
-mismo motivo: la segunda pantalla que necesitaba lo mismo. `PageHeader` era el
-encabezado del formulario de producto —`ProductFormHeader`, ya borrado— y
-`Modal` es lo que faltaba para que un diálogo no lo montara cada pantalla a
-mano. Cuando algo se necesita dos veces deja de pertenecer a la pantalla que lo
-vio nacer.
+| Módulo | Archivos | Estado |
+|---|---|---|
+| `products/` | 76 | Construido con el sistema: catálogo, alta por pasos y categorías, textos incluidos |
+| `main-dashboard/` | 19 | Pendiente. Sus paneles siguen en `rounded-lg` donde el resto usa `rounded-xl`, y sus gráficos llevan tamaños de texto arbitrarios (`text-[28px]`, `text-[26px]`) |
+| `cashier/` | 29 | Pendiente, y es el más alejado: no importa `@/tokens` ni `@/messages`, usa tipografía fuera de la rampa (`text-xl`), espaciado fuera de la escala (`space-y-5`) y sombra en superficies estáticas |
+| `login/` | 5 | Pendiente. Solo un archivo lee tokens |
 
-`modals/` entró por la sala de espera: el `dialog` y el `alert-dialog` de
-shadcn se tradujeron al sistema y se movieron aquí, y con ellos se fue el
-último `components/ui/`. El `button` que los acompañaba se borró sin traducir
-—`GenericButton` ya hacía su trabajo—, que es lo que toca cuando lo que baja el
-CLI duplica algo que el sistema ya tiene.
+El orden natural para continuar es `main-dashboard` (donde el desfase es de
+radios y tamaños sueltos) y después `cashier`, que necesita también sus textos.
 
 ### Sobre los iconos
 
-`ICON_TOKENS` nombra los iconos que representan un **concepto del producto**:
-una sección del menú, una acción, un estado. Los que solo son gramática de un
-control —el chevron de un desplegable, la equis de un campo, la palomita de un
-checkbox— se importan directos de lucide en el componente que los dibuja, y
-está bien así: registrar `CHEVRON_RIGHT` no aportaría ninguna decisión, solo un
-nivel de indirección.
+`ICON_TOKENS` registra los iconos que representan un **concepto del producto**:
+una sección del menú, una acción, un estado. Los que son solo gramática de un
+control (el chevron de un desplegable, la equis de un campo, la marca de un
+checkbox) se importan directos de lucide en el componente que los dibuja.
 
-La prueba: si cambiar ese glifo en toda la app fuera una decisión de producto,
-va al registro.
+La prueba para decidirlo: si cambiar ese icono en toda la aplicación fuera una
+decisión de producto, va al registro.

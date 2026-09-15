@@ -4,10 +4,12 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 La documentación del proyecto vive en [`docs/`](./docs):
 
-- [**Guía rápida**](./docs/README.md) — el sistema en una página. Empieza aquí.
+- [**Guía rápida**](./docs/README.md) — el sistema en una página y el estado de cada módulo. Empieza aquí.
 - [**Design tokens**](./docs/design-tokens.md) — qué valores existen y cómo se llaman.
-- [**Tailwind**](./docs/tailwind.md) — cómo está montado y las trampas conocidas.
+- [**Tailwind**](./docs/tailwind.md) — cómo está configurado y los errores que conviene no repetir.
 - [**Componentes**](./docs/components.md) — cómo construir uno con el sistema.
+- [**Textos**](./docs/messages.md) — dónde vive cada texto de la interfaz.
+- [**Peticiones y avisos**](./docs/http.md) — cómo se habla con el backend y cómo se integra un endpoint.
 
 ## Getting Started
 
