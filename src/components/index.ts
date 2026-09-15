@@ -80,6 +80,7 @@ export { default as FilterSelect } from './filters/FilterSelect';
 // ── Formularios ─────────────────────────────────────────────────────────────
 export { InputSelector } from './inputs/InputSelector';
 export { TextAreaField } from './inputs/TextAreaField';
+export { NumberField } from './inputs/NumberField';
 export { TextField } from './inputs/TextField';
 
 // ── Interruptores ───────────────────────────────────────────────────────────

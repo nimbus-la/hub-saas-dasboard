@@ -64,7 +64,9 @@ export default function DataTable<TData, TValue>({
     enableRowSelection = false,
     getRowId,
     onSelectedRowsChange,
+    enableSorting = true,
     initialSorting = [],
+    getRowClassName,
     renderRowActions,
     emptyMessage = DEFAULT_EMPTY_MESSAGE,
     className,
@@ -99,6 +101,7 @@ export default function DataTable<TData, TValue>({
         onSortingChange: setSorting,
         onRowSelectionChange: setRowSelection,
         enableRowSelection,
+        enableSorting,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         ...(getRowId && { getRowId: (row: TData) => getRowId(row) }),
@@ -174,7 +177,7 @@ export default function DataTable<TData, TValue>({
                         <tr
                             key={row.id}
                             data-selected={row.getIsSelected()}
-                            className={dataTableRowVariants()}
+                            className={cn(dataTableRowVariants(), getRowClassName?.(row.original))}
                         >
                             {row.getVisibleCells().map((cell) => {
                                 const { align = DEFAULT_COLUMN_ALIGN, cellClassName } =

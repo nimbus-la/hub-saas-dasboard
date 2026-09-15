@@ -110,7 +110,7 @@ Iconos, que se dimensionan por prop y no por clase:
 | Familia | Estado |
 |---|---|
 | `buttons/` — `GenericButton`, `LinkButton` | Migrado (escala `xs…2xl`) |
-| `inputs/` — `TextField`, `InputSelector`, `TextAreaField` | Migrado (escala `sm…xl`) |
+| `inputs/` — `TextField`, `NumberField`, `InputSelector`, `TextAreaField` | Migrado (escala `sm…xl`) |
 | `inputs/primitives/` — `InputGroup`, `Combobox` | Migrado y traducido desde shadcn |
 | `avatars/` — `Avatar` | Migrado |
 | `badges/` — `StatusBadge` | Migrado (escala `xs…2xl`, por defecto `sm`) |

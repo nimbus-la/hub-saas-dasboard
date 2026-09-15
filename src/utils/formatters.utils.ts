@@ -17,3 +17,15 @@ export function getInitials(fullName: string, maxInitials = 2): string {
         .map((namePart) => namePart.charAt(0).toUpperCase())
         .join("");
 }
+
+/**
+ * Pasa el texto a minúsculas y le quita las tildes, así "Café" queda como
+ * "cafe". Sirve para que las búsquedas encuentren lo mismo sin importar cómo
+ * lo escriba la persona.
+ */
+export function normalizeText(value: string): string {
+    return value
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/\p{Diacritic}/gu, "");
+}

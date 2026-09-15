@@ -350,17 +350,29 @@ del control al que acompaña para que no parezca pulsable.
 
 ### `AVATAR_SIZE` — avatares y miniaturas
 
-| Token | Lado | Clase | Iniciales |
-|---|---|---|---|
-| `xs` | 24 | `size-6` | `text-label-xs` |
-| `sm` | 32 | `size-8` | `text-label-sm` |
-| `md` | 40 | `size-10` | `text-label-md` |
-| `lg` | 48 | `size-12` | `text-label-md` |
-| `xl` | 64 | `size-16` | `text-label-lg` |
-| `2xl` | 80 | `size-20` | `text-label-xl` |
+| Token | Lado | Clase | Iniciales | Radio cuadrado |
+|---|---|---|---|---|
+| `xs` | 24 | `size-6` | `text-label-xs` | `rounded-sm` |
+| `sm` | 32 | `size-8` | `text-label-sm` | `rounded-sm` |
+| `md` | 40 | `size-10` | `text-label-md` | `rounded-md` |
+| `lg` | 48 | `size-12` | `text-label-md` | `rounded-md` |
+| `xl` | 64 | `size-16` | `text-label-lg` | `rounded-lg` |
+| `2xl` | 80 | `size-20` | `text-label-xl` | `rounded-lg` |
 
 `AVATAR_SIZE.md.size` conserva el número porque lo piden `width` y `height` de
 `next/image`.
+
+El `Avatar` tiene dos formas con la prop `shape`. `circle`, la de siempre, es
+para personas. `square` es para cosas, como la miniatura de un producto o de
+un insumo, y usa el radio de la última columna. La forma solo se pone en la
+raíz; la imagen, las iniciales y el borde la copian con la utilidad propia
+`rounded-inherit`.
+
+```tsx
+<Avatar size="md" shape="square">
+    <AvatarFallback>QC</AvatarFallback>
+</Avatar>
+```
 
 ### `SURFACE_SIZE` — tarjetas, paneles, popovers
 

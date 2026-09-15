@@ -183,6 +183,29 @@ control con entrada de texto lo lleva.
 **Los `data-slot` son contrato.** Los estilos llegan al control, a los adornos y
 a los botones a través de ellos. Renombrarlos rompe los campos en silencio.
 
+### Campos de número: `NumberField`
+
+Para cantidades, precios o cualquier número se usa `NumberField` y no un
+`TextField` con `type="number"`. Pone los puntos de miles mientras se escribe,
+así `12.000` no se confunde con `120`, y por fuera trabaja con `number | null`.
+El formato y el cursor los maneja `react-number-format`; el marco, la etiqueta
+y el error son los mismos de `TextField`.
+
+```tsx
+<NumberField label="Cantidad" value={quantity} onChange={setQuantity} suffix="g" />
+<NumberField label="Precio" value={price} onChange={setPrice} maxDecimals={0} prefix="$" />
+```
+
+Dos decisiones que conviene conocer antes de tocarlo:
+
+- **Solo la coma es decimal.** Si alguien escribe los puntos de miles por
+  costumbre, se ignoran y el número queda bien. El costo es que en un teclado
+  en inglés `1.5` queda `15`, pero se ve en el momento.
+- **Lo que se pega se interpreta aparte**, con `parsePastedNumber` de
+  `lib/format.ts`. Sin eso, `1234.56` copiado de una hoja de cálculo en inglés
+  se guardaría como `123.456`. Los separadores salen de `NUMBER_SEPARATORS`,
+  que los lee del idioma de la interfaz.
+
 ---
 
 ## Dónde van los tipos

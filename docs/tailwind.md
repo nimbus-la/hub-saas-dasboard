@@ -136,7 +136,9 @@ los cinco segundos del aviso.
 **Una utilidad que Tailwind no trae:** `@utility nombre { … }` a nivel raíz de
 `style.css`. Admite variantes como cualquier otra
 (`data-paused:animation-paused`), y es lo que evita escribirla como propiedad
-arbitraria en cada componente.
+arbitraria en cada componente. Hoy hay dos: `animation-paused` y
+`rounded-inherit`, que copia el radio del padre y es la que usa el avatar para
+cambiar de forma sin tocar sus piezas internas.
 
 **Un tamaño de componente:** añade la fila a la receta correspondiente de
 `components.tokens.ts`. El tipo `SizeMap<T>` no compila si te dejas un escalón.

@@ -11,9 +11,18 @@ import type { SizeToken } from "@/tokens";
 export type AvatarSize = SizeToken;
 
 
+/**
+ * Forma del avatar. `circle` es para personas y `square` para cosas, como la
+ * miniatura de un producto o de un insumo.
+ */
+export type AvatarShape = "circle" | "square";
+
+
 export interface AvatarProps extends AvatarPrimitive.Root.Props {
     /** Lado del avatar y, con él, el tamaño de las iniciales y del punto. */
     size?: AvatarSize;
+    /** Por defecto es `circle`. */
+    shape?: AvatarShape;
 };
 
 
