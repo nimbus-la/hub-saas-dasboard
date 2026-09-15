@@ -1,32 +1,51 @@
-import { useState } from "react";
-import { LoginCredentials, LoginResponse } from "../types/login.types";
-import { login } from "../services/login.service";
+"use client";
+
+import React from "react";
+
+import { useHttpClient } from "@/context";
+import { notify } from "@/components";
+
+import {
+  LoginCredentials,
+  LoginResponse,
+  LoginService,
+} from "../types/login.types";
+
+import { createLoginService } from "../services/login.service";
+import { HttpError } from "@/lib/http";
 
 export function useLogin() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const http = useHttpClient();
 
-  const handleLogin = async (
-    credentials: LoginCredentials,
+  const service = React.useMemo<LoginService>(
+    () => createLoginService(http),
+    [http]
+  );
+
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  const login = async (
+    credentials: LoginCredentials
   ): Promise<LoginResponse> => {
     setIsLoading(true);
-    setError(null);
 
     try {
-      return await login(credentials);
+      return await service.login(credentials);
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Error al iniciar sesión";
+      if (error instanceof HttpError) {
+        notify.error(
+          error.api?.apiMessage ?? error.message
+        );
+      }
 
-      setError(message);
       throw error;
     } finally {
       setIsLoading(false);
     }
   };
+
   return {
-    login: handleLogin,
+    login,
     isLoading,
-    error,
   };
-};
+}

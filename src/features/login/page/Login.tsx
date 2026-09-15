@@ -6,15 +6,31 @@ import Image from "next/image";
 import { ICON_TOKENS } from "@/tokens";
 import { useLogin } from "../hooks/use-login";
 import { useRouter } from "next/navigation";
-import { Alert } from "@/components";
 import { useAuthStore } from "@/store/auth/auth.store";
+import { useEffect } from "react";
 
 const LOGO_SIZE = 28;
 
 export default function Login() {
-  const { login, isLoading, error } = useLogin();
+  const { login, isLoading } = useLogin();
+
   const router = useRouter();
-  const setUser = useAuthStore((state) => state.setUser);
+
+  const setSession = useAuthStore((state) => state.setSession);
+
+  const user = useAuthStore((state) => state.user);
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+
+    if (user.rolScope === "ADMINISTRATIVE") {
+      router.replace("/dashboard");
+    } else if (user.rolScope === "OPERATIONAL") {
+      router.replace("/operational");
+    }
+  }, [user, router]);
 
   const handleLogin = async (data: {
     tenantSlug: string;
@@ -24,13 +40,19 @@ export default function Login() {
     try {
       const response = await login(data);
 
-      setUser(response.content.user);
+      setSession(
+        response.content.user,
+        response.content.expiredAt,
+        response.content.refreshExpiresAt,
+      );
 
-      console.log("Usuario guardado:", response.content.user);
-
-      router.push("/dashboard");
-    } catch (error) {
-      console.error("Error en login:", error);
+      if (response.content.user.rolScope === "ADMINISTRATIVE") {
+        router.replace("/dashboard");
+      } else if (response.content.user.rolScope === "OPERATIONAL") {
+        router.replace("/operational");
+      }
+    } catch {
+      // El error ya fue mostrado mediante notify.error().
     }
   };
 
@@ -64,17 +86,6 @@ export default function Login() {
           <section className="flex w-full items-center justify-center px-6 pb-8 pt-24 sm:px-10 sm:pb-10 sm:pt-28 lg:w-1/2 lg:px-12 lg:py-10">
             <div className="w-full">
               <LoginForm onSubmit={handleLogin} />
-
-              {error && (
-                <div className="mt-4">
-                  <Alert
-                    tone="error"
-                    title="No se pudo iniciar sesión"
-                    description={error}
-                    dismissible={false}
-                  />
-                </div>
-              )}
             </div>
           </section>
 

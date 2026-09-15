@@ -1,4 +1,4 @@
-import type { ApiEnvelopeContent, HttpRequestConfig } from "@/interfaces";
+import type { ApiEnvelope, HttpRequestConfig } from "@/interfaces";
 
 export interface LoginCredentials {
     tenantSlug: string;
@@ -29,7 +29,7 @@ export interface LoginContent {
     user: LoginUser;
 }
 
-export type LoginResponse = ApiEnvelopeContent<LoginContent>;
+export type LoginResponse = ApiEnvelope<LoginContent>;
 
 export interface LoginService {
     login(

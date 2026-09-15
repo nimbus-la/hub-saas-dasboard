@@ -1,22 +1,10 @@
 import { ENDPOINTS } from "@/utils";
-import { LoginCredentials, LoginResponse } from "../types/login.types";
+import { LoginContent, LoginCredentials, LoginService } from "../types/login.types";
+import { HttpClient, HttpRequestConfig } from "@/interfaces";
 
-const API_URL = process.env["NEXT_PUBLIC_API_URL"];
-
-export async function login(credentials: LoginCredentials): Promise<LoginResponse> {
-    const response = await fetch(`${API_URL}/${ENDPOINTS.AUTH_LOGIN}`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(credentials),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(data.message || "Error al iniciar sesión");
-    }
-
-    return data as LoginResponse;
+export function createLoginService(httpClient: HttpClient): LoginService {
+    return {
+        login: (credentials: LoginCredentials, config?: HttpRequestConfig) => 
+        httpClient.post<LoginContent>(ENDPOINTS.AUTH_LOGIN, credentials, config)
+    };
 }

@@ -64,14 +64,6 @@ export interface ApiEnvelope<TContent = unknown> {
     traceId?: string;
 };
 
-export interface ApiEnvelopeContent<TContent = unknown> {
-    status: ApiEnvelopeStatus;
-    code: string;
-    httpStatus: number;
-    message: string;
-    content: TContent;
-}
-
 
 /**
  * El `content` de una respuesta paginada.
