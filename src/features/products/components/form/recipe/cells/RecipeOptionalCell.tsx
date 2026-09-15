@@ -5,7 +5,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import { Switch } from "@/components";
 import { formatMessage, messages } from "@/messages";
 
-import type { ProductFormValues, RecipeRow } from "../../interfaces";
+import type { ProductFormValues, RecipeRow } from "../../../../interfaces";
 
 
 interface RecipeOptionalCellProps {

@@ -17,8 +17,8 @@ import {
     productStepPlaceholderTitleVariants,
     productStepPlaceholderVariants,
 } from "./product-step-placeholder.style";
-import { ProductFormStep } from "../../interfaces";
-import { formatStepPosition } from "../../libs";
+import { ProductFormStep } from "../../../interfaces";
+import { formatStepPosition } from "../../../libs";
 
 
 /** Lo que dice un paso todavía sin campos. Ver `@/messages`. */

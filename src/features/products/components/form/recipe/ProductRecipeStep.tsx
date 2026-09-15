@@ -5,8 +5,8 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { formatPlural, messages } from "@/messages";
 
-import { useRecipeLines } from "../../hooks/use-recipe-lines";
-import IngredientSearchField from "./IngredientSearchField";
+import { useRecipeLines } from "../../../hooks";
+import { IngredientSearchField } from "./ingredient-search";
 import RecipeEmptyState from "./RecipeEmptyState";
 import RecipeSummary from "./RecipeSummary";
 import RecipeTable from "./RecipeTable";

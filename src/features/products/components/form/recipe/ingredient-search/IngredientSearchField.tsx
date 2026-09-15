@@ -8,8 +8,8 @@ import { cn } from "@/lib/utils";
 import { formatMessage, formatPlural, messages } from "@/messages";
 import { ICON_TOKENS } from "@/tokens";
 
-import { useIngredientSearch } from "../../hooks/use-ingredient-search";
-import { RECIPE_VALIDATION } from "../../libs";
+import { useIngredientSearch } from "../../../../hooks";
+import { RECIPE_VALIDATION } from "../../../../libs";
 import IngredientSearchResult from "./IngredientSearchResult";
 import {
     ingredientSearchEmptyVariants,

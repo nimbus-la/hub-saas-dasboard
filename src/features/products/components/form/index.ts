@@ -1,12 +1,9 @@
-export { default as IngredientSearchField } from './IngredientSearchField';
-export { default as IngredientSearchResult } from './IngredientSearchResult';
-export { default as ProductBasicsStep } from './ProductBasicsStep';
-export { default as ProductFormStepper } from './ProductFormStepper';
-export { default as ProductImageField } from './ProductImageField';
-export { default as ProductRecipeStep } from './ProductRecipeStep';
-export { default as ProductStepPlaceholder } from './ProductStepPlaceholder';
-export { default as RecipeEmptyState } from './RecipeEmptyState';
-export { default as RecipeOptionalCell } from './RecipeOptionalCell';
-export { default as RecipeQuantityCell } from './RecipeQuantityCell';
-export { default as RecipeSummary } from './RecipeSummary';
-export { default as RecipeTable } from './RecipeTable';
+// ── Alta de producto ────────────────────────────────────────────────────────
+// La zona se parte por paso del asistente, con el mismo nombre que el `step.id`
+// de `PRODUCT_FORM_STEPS`: `stepper/` es el armazón, `basics/` el paso 1 y
+// `recipe/` el paso 2. `CreateProduct` solo monta cuatro de estas piezas; las
+// demás se exportan porque son la API pública de su carpeta, y quien componga
+// un paso nuevo las va a necesitar.
+export * from './basics';
+export * from './recipe';
+export * from './stepper';
