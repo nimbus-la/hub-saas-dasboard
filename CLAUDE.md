@@ -36,6 +36,7 @@ escribir UI. Nada de `README.md` sueltos por carpetas.
 | Documento | Qué responde |
 |---|---|
 | `docs/README.md` | El sistema en una página. Empieza aquí |
+| `docs/architecture.md` | Cómo se organiza el código: rutas, features, qué va en cada carpeta |
 | `docs/design-tokens.md` | Catálogo de valores: escala, espaciado, radios, tipografía, iconos, capas, movimiento |
 | `docs/tailwind.md` | Cómo está montado Tailwind v4 (sin config JS) y por qué unos tokens viven en CSS y otros en TS |
 | `docs/components.md` | Cómo se construye un componente con el sistema |

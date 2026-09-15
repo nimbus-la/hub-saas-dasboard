@@ -4,16 +4,16 @@ import * as React from "react";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
 
 import { GenericButton, Modal, Switch, TextAreaField, TextField } from "@/components";
+import { messages } from "@/messages";
+
+import { CategoryFormValues, CategoryList } from "../../interfaces";
 import {
     CATEGORY_ACTIVE_HINT,
     CATEGORY_FIELD_HINTS,
     CATEGORY_FORM_RULES,
     CATEGORY_MODAL_COPY,
     hasCategoryChanges,
-} from "@/features/products/libs/category-form";
-import { messages } from "@/messages";
-
-import { CategoryFormValues, CategoryList } from "../../interfaces";
+} from "../../libs";
 import { categoryFormModalToggleVariants, categoryFormModalVariants } from "./category-form-modal.style";
 
 

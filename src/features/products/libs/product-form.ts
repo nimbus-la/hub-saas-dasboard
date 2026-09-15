@@ -1,4 +1,4 @@
-// ── Dominio: alta de un producto ────────────────────────────────────────────
+// ── El alta de un producto ──────────────────────────────────────────────────
 // Los pasos del formulario, los límites de cada campo y las reglas que dicen
 // si un valor sirve. Vive fuera de la pantalla por el mismo motivo que
 // `products.ts`: cuando el alta la valide también el backend, las dos partes
@@ -8,78 +8,150 @@
 // Aquí no hay una sola clase de Tailwind ni un solo componente: es texto y
 // reglas. La pantalla decide cómo se pintan.
 
-
+import { PRODUCT_CATEGORIES } from "@/lib/products";
 import { formatMessage, messages } from "@/messages";
 
-/** Atajo al bloque del catálogo que da nombre a todo lo de este archivo. */
-const copy = messages.products.create;
+import type { ProductFieldRules, ProductFormStep, ProductFormValues } from "../interfaces";
+
+
+const message = messages.products.create;
 
 
 
-/* -------------------------------------------------------------------------- */
-/*  Imagen                                                                     */
-/* -------------------------------------------------------------------------- */
-
-/**
- * Qué se acepta como foto del producto.
- *
- * Formatos web: nada de HEIC ni TIFF, que el navegador no sabe previsualizar
- * y acabarían en una tarjeta vacía. El tope de 5 MB es holgado para una foto
- * de plato ya recortada y corta de raíz las que vienen directas de la cámara
- * sin comprimir.
- */
-export const PRODUCT_IMAGE_TYPES = [
-    "image/png",
-    "image/jpeg",
-    "image/webp",
-] as const;
-
-export const PRODUCT_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
-
-/** Valor del atributo `accept` del `<input type="file">`. */
-export const PRODUCT_IMAGE_ACCEPT = PRODUCT_IMAGE_TYPES.join(",");
-
-/** `PNG, JPG o WEBP` — la misma lista, en prosa. */
-export const PRODUCT_IMAGE_FORMATS_LABEL = copy.image.formats;
-
-/** `4,2 MB` · `860 KB` — peso del archivo elegido. */
-export function formatFileSize(bytes: number): string {
-    const megabytes = bytes / (1024 * 1024);
-
-    if (megabytes >= 1) {
-        return `${megabytes.toFixed(1).replace(".", ",")} MB`;
-    }
-
-    return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+export const DEFAULT_PRODUCT_FORM_VALUES: ProductFormValues = {
+    name: "",
+    categoryId: "",
+    description: "",
+    imageUrl: null,
+    margin: "",
+    price: "",
+    recipe: []
 }
 
-/**
- * ¿Sirve este archivo como foto del producto?
- *
- * Devuelve el motivo del rechazo, no un booleano: el mensaje tiene que decir
- * qué pasó y cómo arreglarlo, y quien llama no debería tener que redactarlo.
- *
- * Queda fuera de `PRODUCT_FORM_RULES` porque no es una regla del formulario
- * sino del archivo: se comprueba al elegirlo, y un archivo rechazado nunca
- * llega a ser el valor del campo. La foto en sí es opcional.
+
+
+export const BASICS_STEP: ProductFormStep = {
+    id: "basics",
+    title: message.steps.basics.label,
+    subtitle: message.steps.basics.hint,
+    fields: ["name", "categoryId", "description", "imageUrl"]
+}
+
+
+
+export const PRICING_STEP: ProductFormStep = {
+    id: "pricing",
+    title: message.steps.pricing.label,
+    subtitle: message.steps.pricing.hint,
+    fields: ["margin", "price"]
+}
+
+
+
+export const RECIPE_STEP: ProductFormStep = {
+    id: "recipe",
+    title: message.steps.recipe.label,
+    subtitle: message.steps.recipe.hint,
+    fields: ["recipe"]
+}
+
+
+
+export const PRODUCT_FORM_STEPS: readonly ProductFormStep[] = [
+    BASICS_STEP,
+    RECIPE_STEP,
+    PRICING_STEP,
+]
+
+
+
+export const PRODUCT_FORM_STEP_LENGTH = PRODUCT_FORM_STEPS.length;
+
+
+
+export const PRODUCT_VALIDATION = {
+    name: { min: 3, max: 60 },
+    description: { min: 0, max: 280 }
+} as const;
+
+
+
+export const PRODUCT_FORM_RULES = {
+    name: {
+        required: message.validation.nameRequired,
+        maxLength: {
+            value: PRODUCT_VALIDATION.name.max,
+            message: formatMessage(message.validation.nameMax, {
+                max: PRODUCT_VALIDATION.name.max
+            }),
+        },
+
+        validate: (value: string) =>
+            value.trim().length >= PRODUCT_VALIDATION.name.min ||
+            formatMessage(message.validation.nameMin, {
+                min: PRODUCT_VALIDATION.name.min
+            })
+    } satisfies ProductFieldRules<"name">,
+
+    category: {
+        required: message.validation.categoryRequired
+    } satisfies ProductFieldRules<"categoryId">,
+
+    description: {
+        maxLength: {
+            value: PRODUCT_VALIDATION.description.max,
+            message: formatMessage(message.validation.descriptionMax, {
+                max: PRODUCT_VALIDATION.description.max
+            }),
+        },
+    } satisfies ProductFieldRules<"description">
+} as const;
+
+
+
+export const PRODUCT_CATEGORY_OPTIONS = PRODUCT_CATEGORIES.map(category => ({
+    label: category,
+    value: category
+}))
+
+
+/* -------------------------------------------------------------------------- */
+/*  Moverse entre pasos                                                        */
+/* -------------------------------------------------------------------------- */
+
+
+
+
+/** 
+ * Devuelve el paso del formulario correspondiente a una posición.
+ * 
+ * El índice se acota al rango válido de `PRODUCT_FORM_STEPS` para evitar
+ * accesos fuera de los límites del array:
+ * - Un índice negativo devuelve el primer paso.
+ * - Un índice mayor al último devuelve el último paso.
+ * 
+ * De esta forma, quien la use recibe siempre  un `ProductFormStep` válido
+ * sin tener que comprobar previamente si el índice está dentro del rango.
+ * 
+ * @param index - Posición del paso que se quiere obtener
+ * @returns El paso correspondiente al índice, ajustado al rango válido
  */
-export function validateProductImage(file: File): string | null {
-    const isAllowedType = (PRODUCT_IMAGE_TYPES as readonly string[]).includes(
-        file.type
+export function getProductFormStep(index: number): ProductFormStep {
+    const firstIndex: number = 0;
+    const lastIndex: number = PRODUCT_FORM_STEP_LENGTH - 1;
+
+    const safeIndex = Math.min(
+        Math.max(index, firstIndex),
+        lastIndex
     );
 
-    if (!isAllowedType) {
-        return formatMessage(copy.image.invalidType, {
-            formats: PRODUCT_IMAGE_FORMATS_LABEL,
-        });
-    }
-
-    if (file.size > PRODUCT_IMAGE_MAX_BYTES) {
-        return formatMessage(copy.image.tooLarge, {
-            size: formatFileSize(file.size),
-            max: formatFileSize(PRODUCT_IMAGE_MAX_BYTES),
-        });
-    }
-
-    return null;
+    return PRODUCT_FORM_STEPS[safeIndex] ?? BASICS_STEP;
 }
+
+
+/** `Paso 1 de 3` - para el resumen accesible y las pantallas estrechas */
+export const formatStepPosition = (index: number): string =>
+    formatMessage(message.stepPosition, {
+        current: String(index + 1),
+        total: String(PRODUCT_FORM_STEP_LENGTH)
+    })

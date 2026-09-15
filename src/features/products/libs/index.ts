@@ -1,8 +1,13 @@
-export * from './categories-const.libs';
-export * from './categories-helpers.libs';
+// ── Lógica y constantes del módulo de productos ─────────────────────────────
+// Un archivo por asunto, con sus constantes y sus funciones juntas: las reglas
+// de un formulario son un objeto de mensajes y una función `validate` a la
+// vez, y separarlas por su naturaleza obligaba a buscar en dos carpetas lo que
+// siempre se lee de una vez.
+
+export * from './categories';
 export * from './category-form';
-export * from './constants.lib';
+export * from './navigation';
 export * from './product-form';
-export * from './product-helpers.lib';
-export * from './recipe-form.lib';
-export * from './recipe-helpers.lib';
+export * from './product-image';
+export * from './recipe';
+export * from './recipe-form';

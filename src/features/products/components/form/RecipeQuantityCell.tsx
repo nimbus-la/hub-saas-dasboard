@@ -6,9 +6,13 @@ import { NumberField } from "@/components";
 import { getUnitAbbreviation, getUnitName } from "@/lib/ingredients";
 import { formatMessage, messages } from "@/messages";
 
-import type { ProductFormValues, RecipeQuantityCellProps } from "../../interfaces";
-import { getRecipeQuantityRules } from "../../libs";
-import { RECIPE_VALIDATION } from "../../utils";
+import type { ProductFormValues, RecipeRow } from "../../interfaces";
+import { RECIPE_VALIDATION, getRecipeQuantityRules } from "../../libs";
+
+
+interface RecipeQuantityCellProps {
+    row: RecipeRow;
+}
 
 
 const recipeMessages = messages.products.create.recipe.list;

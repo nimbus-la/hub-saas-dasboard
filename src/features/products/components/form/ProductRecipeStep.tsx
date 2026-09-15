@@ -5,7 +5,6 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { formatPlural, messages } from "@/messages";
 
-import type { ProductRecipeStepProps } from "../../interfaces";
 import { useRecipeLines } from "../../hooks/use-recipe-lines";
 import IngredientSearchField from "./IngredientSearchField";
 import RecipeEmptyState from "./RecipeEmptyState";
@@ -18,6 +17,11 @@ import {
     productRecipeListVariants,
     productRecipeStepVariants,
 } from "./product-recipe-step.style";
+
+
+interface ProductRecipeStepProps {
+    className?: string;
+}
 
 
 const recipeMessages = messages.products.create.recipe;

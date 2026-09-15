@@ -9,8 +9,7 @@ import { formatMessage, formatPlural, messages } from "@/messages";
 import { ICON_TOKENS } from "@/tokens";
 
 import { useIngredientSearch } from "../../hooks/use-ingredient-search";
-import type { IngredientSearchFieldProps } from "../../interfaces";
-import { RECIPE_VALIDATION } from "../../utils";
+import { RECIPE_VALIDATION } from "../../libs";
 import IngredientSearchResult from "./IngredientSearchResult";
 import {
     ingredientSearchEmptyVariants,
@@ -19,6 +18,18 @@ import {
     ingredientSearchResultsVariants,
     ingredientSearchVariants,
 } from "./ingredient-search-field.style";
+
+
+interface IngredientSearchFieldProps {
+    /** Ids de los insumos que ya están en la receta, para no volver a ofrecerlos. */
+    selectedIds: readonly string[];
+    onAdd: (ingredient: Ingredient) => void;
+    /** Error de la receta completa. Se muestra debajo del campo en lugar de la ayuda. */
+    error?: string | undefined;
+    /** Llega al campo de búsqueda, para poder devolverle el foco desde afuera. */
+    ref?: React.Ref<HTMLInputElement>;
+    className?: string;
+}
 
 
 const searchMessages = messages.products.create.recipe.search;

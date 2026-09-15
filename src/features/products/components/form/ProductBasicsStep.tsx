@@ -13,7 +13,7 @@ import {
     productBasicsStepVariants,
 } from "./product-basics-step.style";
 import { ProductFormValues } from "../../interfaces";
-import { PRODUCT_CATEGORY_OPTIONS, PRODUCT_FORM_RULES, PRODUCT_VALIDATION } from "../../utils";
+import { PRODUCT_CATEGORY_OPTIONS, PRODUCT_FORM_RULES, PRODUCT_VALIDATION } from "../../libs";
 
 
 /**

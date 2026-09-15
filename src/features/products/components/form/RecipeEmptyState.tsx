@@ -2,7 +2,6 @@ import { cn } from "@/lib/utils";
 import { messages } from "@/messages";
 import { ICON_SIZE, ICON_STROKE_BY_SIZE, ICON_TOKENS } from "@/tokens";
 
-import type { RecipeEmptyStateProps } from "../../interfaces";
 import {
     recipeEmptyStateIconVariants,
     recipeEmptyStateMessageVariants,
@@ -10,6 +9,11 @@ import {
     recipeEmptyStateTitleVariants,
     recipeEmptyStateVariants,
 } from "./recipe-empty-state.style";
+
+
+interface RecipeEmptyStateProps {
+    className?: string;
+}
 
 
 const emptyMessages = messages.products.create.recipe.list.empty;

@@ -19,7 +19,7 @@ import { getProductInitials } from "@/lib/products";
 import { formatMessage, messages } from "@/messages";
 import { ICON_TOKENS } from "@/tokens";
 
-import type { RecipeRow, RecipeTableProps } from "../../interfaces";
+import type { RecipeRow } from "../../interfaces";
 import RecipeOptionalCell from "./RecipeOptionalCell";
 import RecipeQuantityCell from "./RecipeQuantityCell";
 import {
@@ -32,6 +32,14 @@ import {
     recipeStockVariants,
     recipeTableRowVariants,
 } from "./recipe-table.style";
+
+
+interface RecipeTableProps {
+    rows: RecipeRow[];
+    /** Recibe la posición de la línea dentro de la receta del formulario. */
+    onRemove: (index: number) => void;
+    className?: string;
+}
 
 
 const recipeMessages = messages.products.create.recipe.list;
