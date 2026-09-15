@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { messages } from "@/messages";
 import { ICON_SIZE, ICON_STROKE } from "@/tokens";
 
-import { ProductFormStep } from "../../interfaces";
+import { ProductFormStep } from "../../../interfaces";
 
 import {
     stepperConnectorVariants,
@@ -16,7 +16,7 @@ import {
     stepperTextVariants,
     stepperVariants,
 } from "./product-form-stepper.style";
-import { formatStepPosition } from "../../libs";
+import { formatStepPosition } from "../../../libs";
 
 
 /**

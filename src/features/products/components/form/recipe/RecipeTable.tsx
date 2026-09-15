@@ -19,9 +19,8 @@ import { getProductInitials } from "@/lib/products";
 import { formatMessage, messages } from "@/messages";
 import { ICON_TOKENS } from "@/tokens";
 
-import type { RecipeRow } from "../../interfaces";
-import RecipeOptionalCell from "./RecipeOptionalCell";
-import RecipeQuantityCell from "./RecipeQuantityCell";
+import type { RecipeRow } from "../../../interfaces";
+import { RecipeOptionalCell, RecipeQuantityCell } from "./cells";
 import {
     RECIPE_COLUMN_CLASS,
     recipeMetaVariants,

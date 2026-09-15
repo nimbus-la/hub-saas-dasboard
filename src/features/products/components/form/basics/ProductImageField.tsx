@@ -19,7 +19,7 @@ import {
     PRODUCT_IMAGE_MAX_BYTES,
     formatFileSize,
     validateProductImage,
-} from "../../libs";
+} from "../../../libs";
 
 import {
     productImageDropzoneCaptionVariants,

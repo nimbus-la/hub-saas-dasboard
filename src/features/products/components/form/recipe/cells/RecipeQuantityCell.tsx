@@ -6,8 +6,8 @@ import { NumberField } from "@/components";
 import { getUnitAbbreviation, getUnitName } from "@/lib/ingredients";
 import { formatMessage, messages } from "@/messages";
 
-import type { ProductFormValues, RecipeRow } from "../../interfaces";
-import { RECIPE_VALIDATION, getRecipeQuantityRules } from "../../libs";
+import type { ProductFormValues, RecipeRow } from "../../../../interfaces";
+import { RECIPE_VALIDATION, getRecipeQuantityRules } from "../../../../libs";
 
 
 interface RecipeQuantityCellProps {

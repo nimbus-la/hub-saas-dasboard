@@ -3,12 +3,12 @@ import { formatCurrency } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { messages } from "@/messages";
 
-import type { RecipeLine } from "../../interfaces";
+import type { RecipeLine } from "../../../interfaces";
 import {
     formatOutOfStockNotice,
     getOutOfStockIngredients,
     getRecipeCost,
-} from "../../libs";
+} from "../../../libs";
 import {
     recipeSummaryVariants,
     recipeTotalAmountVariants,

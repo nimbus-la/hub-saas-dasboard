@@ -12,8 +12,8 @@ import {
     productBasicsGridVariants,
     productBasicsStepVariants,
 } from "./product-basics-step.style";
-import { ProductFormValues } from "../../interfaces";
-import { PRODUCT_CATEGORY_OPTIONS, PRODUCT_FORM_RULES, PRODUCT_VALIDATION } from "../../libs";
+import { ProductFormValues } from "../../../interfaces";
+import { PRODUCT_CATEGORY_OPTIONS, PRODUCT_FORM_RULES, PRODUCT_VALIDATION } from "../../../libs";
 
 
 /**
