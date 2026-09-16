@@ -27,7 +27,7 @@ export const branchPricingCardVariants = cva(
 );
 
 
-/** Nombre y estado a un lado, el interruptor de personalizar al otro. */
+/** Nombre y estado a un lado, la acción que cambia el modo al otro. */
 export const branchPricingHeaderVariants = cva([
     "flex flex-wrap items-center justify-between",
     SPACING_CLASS.gap.md,
@@ -49,34 +49,68 @@ export const branchPricingNameVariants = cva([
 /**
  * Cuerpo de la tarjeta.
  *
- * Dos columnas a partir de `sm` porque son dos datos cortos —el precio y si se
- * vende— y apilados dejan la tarjeta el doble de alta sin ganar nada.
+ * Al personalizarla se separa del encabezado con una línea: lo de arriba deja
+ * de ser un resumen y pasa a ser el título de un par de campos que hay que
+ * rellenar, y la línea es lo que marca ese cambio de papel.
  */
-export const branchPricingBodyVariants = cva([
-    "grid grid-cols-1 items-start sm:grid-cols-2",
-    SPACING_CLASS.gap.lg,
-]);
-
-
-export const branchPricingFieldVariants = cva(["flex min-w-0 flex-col", SPACING_CLASS.gap.xs]);
-
-
-export const branchPricingLabelVariants = cva([
-    "text-neutral-600",
-    TYPOGRAPHY.labelSm,
-]);
-
-
-/** El valor heredado. En gris, para que no parezca algo escrito ahí. */
-export const branchPricingInheritedVariants = cva([
-    "text-neutral-800 tabular-nums",
-    TYPOGRAPHY.subtitleMd,
-]);
-
-
-export const branchPricingHintVariants = cva([TYPOGRAPHY.caption], {
+export const branchPricingBodyVariants = cva(["flex min-w-0 flex-col"], {
     variants: {
-        tone: { neutral: "text-neutral-600", off: "text-error-darker" },
+        divided: {
+            true: ["border-t border-neutral-200 pt-4", SPACING_CLASS.gap.lg],
+            false: SPACING_CLASS.gap.sm,
+        },
+    },
+    defaultVariants: { divided: false },
+});
+
+
+/**
+ * Lo que hereda la sucursal, en una sola fila.
+ *
+ * Son dos datos de tres palabras: apilados dejaban la tarjeta el doble de alta
+ * sin decir nada más, y en una rejilla de dos columnas el segundo quedaba
+ * perdido en mitad del ancho del panel.
+ */
+export const branchPricingInheritedVariants = cva([
+    "flex flex-wrap items-baseline",
+    SPACING_CLASS.gap.xl,
+]);
+
+
+export const branchPricingFieldVariants = cva([
+    "flex min-w-0 flex-col",
+    SPACING_CLASS.gap.xs,
+]);
+
+
+export const branchPricingLabelVariants = cva(["text-neutral-600", TYPOGRAPHY.labelSm]);
+
+
+/** El valor heredado. En rojo cuando la sucursal no vende el producto. */
+export const branchPricingValueVariants = cva(["tabular-nums", TYPOGRAPHY.subtitleMd], {
+    variants: {
+        tone: { neutral: "text-neutral-800", off: "text-error-darker" },
     },
     defaultVariants: { tone: "neutral" },
 });
+
+
+export const branchPricingHintVariants = cva(["text-neutral-600", TYPOGRAPHY.caption]);
+
+
+/**
+ * El campo del precio propio.
+ *
+ * Acotado, porque un importe de cinco cifras en un campo del ancho del panel
+ * se lee como si esperase una frase.
+ */
+export const branchPricingPriceVariants = cva(["w-full sm:max-w-xs"]);
+
+
+/**
+ * El interruptor de la disponibilidad.
+ *
+ * Va debajo del precio y con su propia línea porque es la otra decisión de la
+ * tarjeta, no un detalle del campo de arriba.
+ */
+export const branchPricingAvailabilityVariants = cva(["border-t border-neutral-200 pt-4"]);

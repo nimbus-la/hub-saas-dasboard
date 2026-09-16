@@ -2,13 +2,14 @@
 
 import { Controller, useFormContext } from "react-hook-form";
 
-import { NumberField, StatusBadge, Switch } from "@/components";
+import { GenericButton, NumberField, StatusBadge, Switch } from "@/components";
 import { formatCurrency, formatPercent } from "@/lib/format";
 import { formatMessage, messages } from "@/messages";
 
 import type { BranchPricingRow, ProductFormValues } from "../../../interfaces";
 import { PRICING_VALIDATION, getBranchPriceRules } from "../../../libs";
 import {
+    branchPricingAvailabilityVariants,
     branchPricingBodyVariants,
     branchPricingCardVariants,
     branchPricingFieldVariants,
@@ -18,6 +19,8 @@ import {
     branchPricingInheritedVariants,
     branchPricingLabelVariants,
     branchPricingNameVariants,
+    branchPricingPriceVariants,
+    branchPricingValueVariants,
 } from "./branch-pricing-card.style";
 
 
@@ -34,6 +37,10 @@ const branchMessages = messages.products.create.pricing.branches;
  * aparecen al personalizarla, y eso es también lo que hace que sus reglas
  * cuenten: react-hook-form ignora lo que no está montado, así que una sucursal
  * que hereda nunca deja el paso en rojo.
+ *
+ * El modo se cambia con un botón y no con un interruptor porque dentro de la
+ * tarjeta ya hay uno —la disponibilidad—, y dos carriles iguales no dejan ver
+ * cuál cambia la forma de la tarjeta y cuál es un dato del producto.
  */
 export default function BranchPricingCard({ row }: BranchPricingCardProps) {
     const { control } = useFormContext<ProductFormValues>();
@@ -56,25 +63,35 @@ export default function BranchPricingCard({ row }: BranchPricingCardProps) {
                     />
                 </span>
 
-                {/* Sin reglas: heredar o no son las dos opciones válidas. */}
+                {/* Sin reglas: heredar o no son las dos opciones válidas. El
+                nombre accesible repite la sucursal porque el botón se oye
+                fuera del contexto de su tarjeta. */}
                 <Controller
                     control={control}
                     name={`branches.${index}.isCustom`}
                     render={({ field }) => (
-                        <Switch
+                        <GenericButton
+                            type="button"
+                            variant="ghost"
                             size="sm"
-                            name={field.name}
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            aria-label={formatMessage(branchMessages.custom, {
-                                name: branch.name,
-                            })}
+                            label={
+                                field.value
+                                    ? branchMessages.actions.reset
+                                    : branchMessages.actions.customize
+                            }
+                            onClick={() => field.onChange(!field.value)}
+                            aria-label={formatMessage(
+                                field.value
+                                    ? branchMessages.actions.resetLabel
+                                    : branchMessages.actions.customizeLabel,
+                                { name: branch.name }
+                            )}
                         />
                     )}
                 />
             </header>
 
-            <div className={branchPricingBodyVariants()}>
+            <div className={branchPricingBodyVariants({ divided: isCustom })}>
                 {isCustom ? (
                     <>
                         <Controller
@@ -93,6 +110,7 @@ export default function BranchPricingCard({ row }: BranchPricingCardProps) {
                                     size="sm"
                                     maxDecimals={PRICING_VALIDATION.price.maxDecimals}
                                     prefix="$"
+                                    className={branchPricingPriceVariants()}
                                     aria-label={formatMessage(branchMessages.price.fieldLabel, {
                                         name: branch.name,
                                     })}
@@ -121,6 +139,7 @@ export default function BranchPricingCard({ row }: BranchPricingCardProps) {
                                             ? branchMessages.availability.on
                                             : branchMessages.availability.off
                                     }
+                                    className={branchPricingAvailabilityVariants()}
                                     aria-label={formatMessage(
                                         branchMessages.availability.fieldLabel,
                                         { name: branch.name }
@@ -130,49 +149,41 @@ export default function BranchPricingCard({ row }: BranchPricingCardProps) {
                         />
                     </>
                 ) : (
-                    <>
-                        <span className={branchPricingFieldVariants()}>
-                            <span className={branchPricingLabelVariants()}>
+                    // Lo heredado es una lectura, no un formulario: dos conceptos
+                    // con su valor, sin controles que inviten a escribir encima.
+                    <dl className={branchPricingInheritedVariants()}>
+                        <div className={branchPricingFieldVariants()}>
+                            <dt className={branchPricingLabelVariants()}>
                                 {branchMessages.price.label}
-                            </span>
+                            </dt>
 
                             {price === null ? (
-                                <span className={branchPricingHintVariants()}>
+                                <dd className={branchPricingHintVariants()}>
                                     {branchMessages.price.pending}
-                                </span>
+                                </dd>
                             ) : (
-                                <>
-                                    <span className={branchPricingInheritedVariants()}>
-                                        {formatCurrency(price)}
-                                    </span>
-
-                                    <span className={branchPricingHintVariants()}>
-                                        {branchMessages.price.inherited}
-                                    </span>
-                                </>
+                                <dd className={branchPricingValueVariants()}>
+                                    {formatCurrency(price)}
+                                </dd>
                             )}
-                        </span>
+                        </div>
 
-                        <span className={branchPricingFieldVariants()}>
-                            <span className={branchPricingLabelVariants()}>
+                        <div className={branchPricingFieldVariants()}>
+                            <dt className={branchPricingLabelVariants()}>
                                 {branchMessages.availability.label}
-                            </span>
+                            </dt>
 
-                            <span className={branchPricingInheritedVariants()}>
-                                {isAvailable
-                                    ? branchMessages.availability.on
-                                    : branchMessages.availability.off}
-                            </span>
-
-                            <span
-                                className={branchPricingHintVariants({
+                            <dd
+                                className={branchPricingValueVariants({
                                     tone: isAvailable ? "neutral" : "off",
                                 })}
                             >
-                                {branchMessages.availability.inherited}
-                            </span>
-                        </span>
-                    </>
+                                {isAvailable
+                                    ? branchMessages.availability.on
+                                    : branchMessages.availability.off}
+                            </dd>
+                        </div>
+                    </dl>
                 )}
             </div>
         </article>
