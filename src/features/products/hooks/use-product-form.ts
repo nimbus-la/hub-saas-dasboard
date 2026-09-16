@@ -6,14 +6,29 @@
 // lleva la librería; aquí sólo vive lo que ella no sabe: en qué paso estamos y
 // qué campos hay que dar por buenos antes de avanzar.
 
+import { useRouter } from "next/navigation";
 import * as React from "react";
 import { useForm, useFormState } from "react-hook-form";
 
+import { notify } from "@/components";
+import { formatMessage, messages } from "@/messages";
+
 import { ProductFormValues } from "../interfaces";
-import { DEFAULT_PRODUCT_FORM_VALUES, PRODUCT_FORM_STEP_LENGTH, getProductFormStep } from "../libs";
+import {
+    DEFAULT_PRODUCT_FORM_VALUES,
+    PRODUCTS_LIST_HREF,
+    PRODUCT_FORM_STEP_LENGTH,
+    findFirstInvalidStep,
+    getProductFormStep,
+} from "../libs";
+
+
+const message = messages.products.create;
 
 
 export function useProductForm() {
+    const router = useRouter();
+
     const form = useForm<ProductFormValues>({
         defaultValues: DEFAULT_PRODUCT_FORM_VALUES,
         mode: "onTouched",
@@ -49,6 +64,8 @@ export function useProductForm() {
      *
      * El botón ya está deshabilitado mientras el paso no es válido, pero se
      * vuelve a validar aquí por si el formulario se envía de otra forma.
+     *
+     * En el último paso ya no queda a dónde avanzar y lo que hace es guardar.
      */
     const submitStep = React.useCallback(
         async (event: React.SubmitEvent<HTMLFormElement>) => {
@@ -63,14 +80,34 @@ export function useProductForm() {
 
             if (!isValid) return;
 
-            // El último paso no avanza: guardará cuando exista el servicio.
-            if (isLastStep) return;
+            if (isLastStep) {
+                // Se revisa el formulario entero y no solo el paso: se pudo
+                // volver atrás a cambiar algo y dejarlo a medias, y eso no se
+                // ve desde aquí.
+                const isComplete = await form.trigger();
+
+                if (!isComplete) {
+                    setStepIndex(findFirstInvalidStep(form.formState.errors));
+                    return;
+                }
+
+                // Todavía no hay endpoint de alta. Se confirma y se vuelve al
+                // listado, que es lo que va a pasar cuando el backend responda.
+                notify.success(message.success.title, {
+                    description: formatMessage(message.success.description, {
+                        name: form.getValues("name").trim(),
+                    }),
+                });
+
+                router.push(PRODUCTS_LIST_HREF);
+                return;
+            }
 
             setStepIndex((current) =>
                 Math.min(current + 1, PRODUCT_FORM_STEP_LENGTH - 1)
             );
         },
-        [form, isLastStep, step.fields]
+        [form, isLastStep, router, step.fields]
     );
 
     return {
