@@ -401,7 +401,27 @@ export const products = {
 
             profit: {
                 label: "Ganancia por unidad",
+                hint: "Lo que queda de cada unidad vendida después de pagar los insumos.",
+                /** Reemplaza al `hint` cuando ya hay margen: dice a cuánto equivale. */
+                margin: "Equivale a un margen de {margin} sobre el costo.",
                 pending: "Indica el margen o el precio para calcular la ganancia.",
+            },
+
+            /**
+             * El desglose que cierra el paso.
+             *
+             * Las dos cifras de arriba son sumandos y el precio de venta es su
+             * total: verlos en la misma columna es lo que explica de dónde sale
+             * lo que paga el cliente.
+             */
+            summary: {
+                title: "Cómo se compone el precio",
+            },
+
+            total: {
+                label: "Precio de venta",
+                hint: "Sale de sumar el costo y la ganancia.",
+                pending: "Escribe el margen o el precio para verlo.",
             },
 
             /**
@@ -437,20 +457,32 @@ export const products = {
                     custom: "Personalizada",
                 },
 
-                /** Interruptor que saca a la sucursal de la configuración global. */
-                custom: "Personalizar {name}",
+                /**
+                 * Acciones del encabezado de la tarjeta.
+                 *
+                 * Son un botón y no un interruptor: dentro de la tarjeta ya hay
+                 * uno —la disponibilidad—, y dos carriles idénticos juntos no
+                 * dejan ver cuál cambia la forma de la tarjeta y cuál es un dato
+                 * del producto. El nombre accesible repite la sucursal porque
+                 * el botón se oye fuera de su tarjeta.
+                 */
+                actions: {
+                    customize: "Personalizar",
+                    customizeLabel: "Personalizar {name}",
+                    reset: "Usar la configuración global",
+                    resetLabel: "Usar la configuración global en {name}",
+                },
 
                 price: {
                     label: "Precio",
                     fieldLabel: "Precio en {name}",
-                    inherited: "Hereda el precio global",
                     pending: "Todavía no hay precio global",
                 },
 
                 availability: {
                     label: "Disponibilidad",
-                    fieldLabel: "Disponible en {name}",
-                    inherited: "Hereda el estado global",
+                    /** Empieza por la etiqueta que se ve, como pide WCAG 2.5.3. */
+                    fieldLabel: "Disponibilidad en {name}",
                     on: "Disponible",
                     off: "No disponible",
                 },
