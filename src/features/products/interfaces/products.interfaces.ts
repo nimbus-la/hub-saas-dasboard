@@ -15,14 +15,36 @@ export interface ProductRecipeFormValues {
 }
 
 
+/**
+ * La configuración propia de una sucursal.
+ *
+ * Hay una entrada por sucursal desde el principio, aunque no se haya tocado
+ * nada: así la tarjeta sabe a qué posición del formulario escribir sin tener
+ * que crear la línea al vuelo.
+ */
+export interface ProductBranchFormValues {
+    branchId: string;
+    /** En `false` el precio y la disponibilidad salen de la configuración global. */
+    isCustom: boolean;
+    /** Precio propio de la sucursal, o `null` mientras el campo esté vacío. */
+    price: number | null;
+    isAvailable: boolean;
+}
+
+
 export interface ProductFormValues {
     name: string;
     categoryId: string;
     description: string;
     imageUrl: File | null;
-    price: string;
-    margin: string;
+    /** Precio de venta global, en pesos enteros. */
+    price: number | null;
+    /** Margen sobre el costo de la receta, en porcentaje. */
+    margin: number | null;
+    /** Si el producto se publica en la carta. Cada sucursal puede cambiarlo. */
+    isAvailable: boolean;
     recipe: ProductRecipeFormValues[];
+    branches: ProductBranchFormValues[];
 }
 
 

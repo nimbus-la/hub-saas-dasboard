@@ -8,14 +8,38 @@
 // Aquí no hay una sola clase de Tailwind ni un solo componente: es texto y
 // reglas. La pantalla decide cómo se pintan.
 
+import type { FieldErrors } from "react-hook-form";
+
+import { BRANCHES } from "@/lib/branches";
 import { PRODUCT_CATEGORIES } from "@/lib/products";
 import { formatMessage, messages } from "@/messages";
 
-import type { ProductFieldRules, ProductFormStep, ProductFormValues } from "../interfaces";
+import type {
+    ProductBranchFormValues,
+    ProductFieldRules,
+    ProductFormStep,
+    ProductFormValues,
+} from "../interfaces";
 
 
 const message = messages.products.create;
 
+
+
+/**
+ * Una línea por sucursal, todas heredando.
+ *
+ * Se siembran desde el principio y no al marcar el interruptor porque así la
+ * tarjeta de cada sucursal escribe siempre en la misma posición del formulario,
+ * sin depender del orden en que se personalizaron.
+ */
+const buildDefaultBranchValues = (): ProductBranchFormValues[] =>
+    BRANCHES.map((branch) => ({
+        branchId: branch.id,
+        isCustom: false,
+        price: null,
+        isAvailable: true,
+    }));
 
 
 export const DEFAULT_PRODUCT_FORM_VALUES: ProductFormValues = {
@@ -23,9 +47,11 @@ export const DEFAULT_PRODUCT_FORM_VALUES: ProductFormValues = {
     categoryId: "",
     description: "",
     imageUrl: null,
-    margin: "",
-    price: "",
-    recipe: []
+    margin: null,
+    price: null,
+    isAvailable: true,
+    recipe: [],
+    branches: buildDefaultBranchValues()
 }
 
 
@@ -43,7 +69,7 @@ export const PRICING_STEP: ProductFormStep = {
     id: "pricing",
     title: message.steps.pricing.label,
     subtitle: message.steps.pricing.hint,
-    fields: ["margin", "price"]
+    fields: ["margin", "price", "isAvailable", "branches"]
 }
 
 
@@ -146,6 +172,22 @@ export function getProductFormStep(index: number): ProductFormStep {
     );
 
     return PRODUCT_FORM_STEPS[safeIndex] ?? BASICS_STEP;
+}
+
+
+/**
+ * El primer paso que tiene algún campo en error.
+ *
+ * Al guardar se revisa el formulario entero, y si algo quedó mal puede estar
+ * en un paso que ya no se ve. Devolver aquí su posición evita el callejón de
+ * un botón que no hace nada y un error escondido dos pantallas atrás.
+ */
+export function findFirstInvalidStep(errors: FieldErrors<ProductFormValues>): number {
+    const index = PRODUCT_FORM_STEPS.findIndex((step) =>
+        step.fields.some((field) => errors[field] !== undefined)
+    );
+
+    return index === -1 ? PRODUCT_FORM_STEP_LENGTH - 1 : index;
 }
 
 
