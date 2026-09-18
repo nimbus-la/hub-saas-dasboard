@@ -176,7 +176,9 @@ la primera en vez de saltarse el doble en las pruebas.
 
 Nadie más instancia un cliente. El único punto de composición es
 `src/lib/http/index.ts`; ahí se apilan los decoradores y ahí entrarían los que
-faltan (`AuthHttpClient`, `LoggingHttpClient`).
+faltan (`AuthHttpClient`, `LoggingHttpClient`). También es ahí donde se pone el
+`Authorization` de cada petición, así que ningún servicio ni pantalla toca el
+token.
 
 ### Las rutas
 
@@ -447,7 +449,7 @@ export function createCategoriesService(http: HttpClient): CategoriesService {
         list: async (params, config) => {
             const { content } = await http.get<ApiResponseWithPagination<CategoryListApiResponse[]>>(
                 ENDPOINTS.PRODUCTS_CATEGORY,
-                withTenantParam(withListParams(params, config))
+                withListParams(params, config)
             );
 
             return { ...content, rows: toCategoryList(content.rows) };
@@ -735,18 +737,19 @@ mientras no había red el dato pudo quedarse atrás sin que nadie se enterara.
 
 Cosas conocidas, para que no se descubran leyendo el código:
 
-**El inquilino está fijo.** `categories.service.ts` tiene un `TENANT_ID`
-constante. El backend lo espera en la query cuando la petición no lleva cuerpo
-y dentro del cuerpo cuando sí lo lleva, y de eso se encargan `withTenantParam` y
-`withTenantBody`. Cuando exista `useTenantId()` o su equivalente, el valor
-entrará por parámetro o por el interceptor de cabeceras y esa constante
-desaparece.
+**El token es provisional.** `createHttpClient` firma cada petición con
+`Authorization: Bearer <token>`, y el token sale de `getAccessToken`
+(`src/lib/auth/access-token.ts`), que hoy lee un JWT fijo de
+`NEXT_PUBLIC_API_ACCESS_TOKEN`. Cuando exista la sesión real se cambia esa
+función y nada más. El backend saca el inquilino del token, así que ningún
+servicio manda `tenantId`.
 
 **`detail` y `remove` no tienen consumidores.** Están implementados y tipados,
 pero ninguna pantalla los llama. El borrado de categorías tiene su diálogo
 montado y la llamada comentada en `Categories.tsx`, con el `TODO` a la vista.
 
-**Falta la capa de sesión.** `createHttpClient` está preparado para recibirla:
+**Falta reaccionar a la sesión caducada.** Poner el token ya está resuelto; lo
+que falta es qué hacer ante un 401 (renovar o sacar al usuario).
 `AuthHttpClient` iría por fuera del decorador del sobre, porque este backend
 puede anunciar un 401 dentro de un `200 OK` y una capa colocada por dentro no lo
 vería. `LoggingHttpClient` iría por fuera de todo, que es el único punto que ve

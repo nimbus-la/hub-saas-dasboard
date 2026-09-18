@@ -25,6 +25,8 @@ algo por terminado.
 
 Variables de entorno: copia `.env.exam` a `.env`. `NEXT_PUBLIC_API_URL` es el
 origen del backend; `API_INTERNAL_URL` solo servidor y solo en producción;
+`NEXT_PUBLIC_API_ACCESS_TOKEN` es el JWT provisional que firma las peticiones
+hasta que exista la sesión real (lo lee `src/lib/auth/access-token.ts`);
 `NEXT_PUBLIC_PRODUCT_IMAGES_ORIGIN` es necesario para que Next optimice las
 fotos remotas de producto (sin él, las tarjetas caen a las iniciales).
 

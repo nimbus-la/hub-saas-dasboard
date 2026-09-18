@@ -333,8 +333,6 @@ descubrir dos veces:
   `undefined` y cualquier ordenación que dependa de él fallará en silencio.
 - **El borrado de categorías está sin conectar** (`page/Categories.tsx`, con su
   `TODO`), aunque `CategoriesService.remove` ya existe y funciona.
-- **`TENANT_ID` está fijo** en `services/categories.service.ts`, esperando a que
-  exista un `useTenantId()`.
 - **El catálogo de productos no sigue este documento**: su modelo y su filtrado
   viven enteros en `@/lib/products`, y `page/Products.tsx` mantiene el estado de
   filtros y paginación dentro de la pantalla, donde categorías tiene
