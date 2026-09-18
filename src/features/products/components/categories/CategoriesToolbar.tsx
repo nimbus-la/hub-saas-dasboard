@@ -12,25 +12,26 @@ import { ICON_TOKENS } from "@/tokens";
 import {
     categoriesToolbarActionVariants,
     categoriesToolbarFilterVariants,
+    categoriesToolbarRootVariants,
     categoriesToolbarSearchVariants,
     categoriesToolbarSummaryVariants,
     categoriesToolbarVariants,
 } from "./categories-toolbar.style";
-import { CATEGORY_STATUS_OPTIONS, CategoryStatusFilter, formatCategoryCount } from "../../libs";
+import {
+    CATEGORY_STATUS_OPTIONS,
+    CategoryStatusFilter,
+    DEFAULT_CATEGORY_STATUS_FILTER,
+    formatCategoryCount,
+} from "../../libs";
 
 
-/** Lo que dice esta barra. Ver `@/messages`. */
-const COPY = messages.products.categories.toolbar;
+const toolbarMessages = messages.products.categories.toolbar;
 
 
 /**
- * Barra de filtros de la pantalla de categorías.
- *
- * Componente de presentación: no guarda nada. El estado del buscador y del
- * filtro vive en la pantalla para que el resumen, la tabla y los controles no
- * puedan contradecirse.
+ * Barra de búsqueda, filtro de estado y botón de crear. No guarda estado, lo
+ * recibe del hook de categorías a través de la pantalla.
  */
-
 interface CategoriesToolbarProps {
     query: string;
     onQueryChange: (value: string) => void;
@@ -40,14 +41,17 @@ interface CategoriesToolbarProps {
 
     onCreateCategory: () => void;
 
-    /** Categorías que quedan tras filtrar. */
+    /** Categorías que se ven en la página actual. */
     visibleCount: number;
-    /** Categorías que hay en total, sin filtros. */
+
+    /** Categorías que cumplen los filtros, sumando todas las páginas. */
     totalCount: number;
+
     onClearFilters: () => void;
 
     className?: string;
 }
+
 
 export default function CategoriesToolbar({
     query,
@@ -60,10 +64,10 @@ export default function CategoriesToolbar({
     onClearFilters,
     className,
 }: CategoriesToolbarProps) {
-    const hasFilters = query.trim().length > 0 || status !== "all";
+    const hasFilters = query.trim().length > 0 || status !== DEFAULT_CATEGORY_STATUS_FILTER;
 
     return (
-        <div className={cn("flex flex-col gap-3", className)}>
+        <div className={cn(categoriesToolbarRootVariants(), className)}>
             <div className={categoriesToolbarVariants()}>
                 <TextField
                     type="search"
@@ -72,36 +76,39 @@ export default function CategoriesToolbar({
                     onChange={onQueryChange}
                     clearable
                     leftIcon={<ICON_TOKENS.SEARCH aria-hidden="true" />}
-                    placeholder={COPY.searchPlaceholder}
-                    aria-label={COPY.searchLabel}
+                    placeholder={toolbarMessages.searchPlaceholder}
+                    aria-label={toolbarMessages.searchLabel}
                     className={categoriesToolbarSearchVariants()}
                 />
 
+                {/* Si el selector queda vacío se vuelve a Todas. */}
                 <FilterSelect
                     size="md"
                     value={status}
-                    onChange={(value) => onStatusChange((value || "all") as CategoryStatusFilter)}
+                    onChange={(value) =>
+                        onStatusChange((value || DEFAULT_CATEGORY_STATUS_FILTER) as CategoryStatusFilter)
+                    }
                     options={CATEGORY_STATUS_OPTIONS}
-                    placeholder={COPY.allStatuses}
-                    aria-label={COPY.filterLabel}
+                    placeholder={toolbarMessages.allStatuses}
+                    aria-label={toolbarMessages.filterLabel}
                     className={categoriesToolbarFilterVariants()}
                 />
 
                 <GenericButton
                     type="button"
-                    label={COPY.create}
+                    label={toolbarMessages.create}
                     startIcon={ICON_TOKENS.CREATE}
                     onClick={onCreateCategory}
                     className={categoriesToolbarActionVariants()}
                 />
             </div>
 
-            {/* El resumen se anuncia sin robar el foco: quien escribe en el
-                buscador se entera de cuántas quedan sin salir del campo. */}
+            {/* El lector de pantalla lee el resumen sin sacar a la persona del
+                buscador, así sabe cuántas categorías quedan mientras escribe. */}
             {hasFilters && (
                 <p aria-live="polite" className={categoriesToolbarSummaryVariants()}>
                     <span className="tabular-nums">
-                        {formatMessage(COPY.summary, {
+                        {formatMessage(toolbarMessages.summary, {
                             visible: formatCategoryCount(visibleCount),
                             total: totalCount,
                         })}
@@ -116,4 +123,4 @@ export default function CategoriesToolbar({
             )}
         </div>
     );
-};
+}

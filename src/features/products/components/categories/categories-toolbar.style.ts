@@ -16,6 +16,13 @@ import { SPACING_CLASS, TYPOGRAPHY } from "@/tokens";
  */
 
 
+/** Contenedor de la barra y del resumen de filtros. */
+export const categoriesToolbarRootVariants = cva([
+    "flex flex-col",
+    SPACING_CLASS.gap.md,
+]);
+
+
 /** Fila de filtros. Columna en móvil, fila a partir de `sm`. */
 export const categoriesToolbarVariants = cva([
     "flex flex-col",

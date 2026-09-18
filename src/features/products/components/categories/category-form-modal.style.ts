@@ -39,3 +39,7 @@ export const categoryFormModalToggleVariants = cva([
     SURFACE_SIZE.lg.paddingClass,
     RADIUS_SEMANTIC.surface,
 ]);
+
+
+/** Borde del botón de cancelar, para que no se pierda junto al de guardar. */
+export const categoryFormModalCancelVariants = cva(["border border-neutral-300"]);
