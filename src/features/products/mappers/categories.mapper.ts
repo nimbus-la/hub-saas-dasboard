@@ -1,4 +1,3 @@
-import { formatDate } from "@/lib/format";
 import type { CategoryFormValues, CategoryList, CategoryListApiResponse, CreateCategoryParams, UpdateCategoryParams } from "../interfaces";
 
 /**
@@ -20,7 +19,7 @@ export const toCategory = (category: CategoryListApiResponse): CategoryList => (
     // mostraría y se guardaría como si fuera la descripción real.
     description: category.description ?? "",
 
-    updatedAt: formatDate(category.updatedAt),
+    updatedAt: category.updatedAt,
     isActive: category.isActive,
 });
 

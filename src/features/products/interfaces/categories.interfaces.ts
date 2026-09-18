@@ -28,7 +28,7 @@ export interface CategoryList {
 
     isActive: boolean;
 
-    /** Fecha de la última actualización, ya formateada para mostrarse. */
+    /** Fecha de la última actualización en ISO 8601. Se formatea al mostrarla. */
     updatedAt: string;
 }
 
