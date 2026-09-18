@@ -8,19 +8,16 @@ import {
 
 
 /**
- * Estilos de CategoriesTable
- *
- * La tabla la pinta `DataTable`; aquí solo está lo que la pantalla decide: el
- * marco que la contiene y cómo se lee cada celda.
- *
- * El marco se separa del fondo con borde y no con sombra —regla del sistema
- * para superficies estáticas— y recorta el contenido con `overflow-hidden`
- * para que el scroll horizontal de la tabla no se salga por las esquinas
- * redondeadas.
+ * Estilos de la tabla de categorías. DataTable dibuja la tabla, y aquí solo
+ * están el panel que la contiene y el aspecto de cada celda.
  */
 
 
-/** Panel que contiene la tabla. */
+/**
+ * Panel que contiene la tabla. Usa borde y no sombra porque es una superficie
+ * fija. Oculta lo que sobra para que el scroll horizontal no se salga por las
+ * esquinas redondeadas.
+ */
 export const categoriesTablePanelVariants = cva([
     "w-full min-w-0 overflow-hidden",
     "border border-neutral-200 bg-white",
@@ -30,7 +27,7 @@ export const categoriesTablePanelVariants = cva([
 ]);
 
 
-/** Nombre de la categoría: el dato que se busca al recorrer la tabla. */
+/** Nombre de la categoría, que es lo primero que se busca en cada fila. */
 export const categoriesTableNameVariants = cva([
     "text-neutral-800",
     FONT_WEIGHT_CLASS.semibold,
@@ -38,29 +35,23 @@ export const categoriesTableNameVariants = cva([
 
 
 /**
- * Descripción.
- *
- * Se recorta a dos líneas. Una descripción de 160 caracteres en una sola línea
- * estiraría la columna hasta empujar al estado fuera de la pantalla; a tres
- * líneas la fila se convierte en un párrafo y se pierde el ritmo de la tabla.
+ * Descripción, cortada en dos líneas. En una sola línea estiraría la columna
+ * y con tres cada fila parecería un párrafo.
  */
 export const categoriesTableDescriptionVariants = cva([
     "line-clamp-2 text-neutral-600",
 ]);
 
 
-/** Descripción vacía: la raya, en el gris de lo deshabilitado. */
+/** Raya que se muestra cuando no hay descripción, en gris claro. */
 export const categoriesTableEmptyDescriptionVariants = cva([
     "text-neutral-400 select-none",
 ]);
 
 
 /**
- * Acciones de la fila.
- *
- * Dos botones `sm` (32px) pegados al margen derecho. `justify-end` los ancla
- * ahí aunque la columna crezca, y `whitespace-nowrap` impide que el segundo
- * caiga a una línea nueva en pantallas estrechas.
+ * Botones de editar y eliminar, alineados a la derecha. No se parten en dos
+ * líneas aunque la pantalla sea angosta.
  */
 export const categoriesTableActionsVariants = cva([
     "flex items-center justify-end whitespace-nowrap",
@@ -68,7 +59,7 @@ export const categoriesTableActionsVariants = cva([
 ]);
 
 
-/** Botón de eliminar: el rojo solo aparece al apuntarlo. */
+/** Botón de eliminar. Se pone rojo solo al pasar el cursor. */
 export const categoriesTableDeleteVariants = cva([
     "text-neutral-500 hover:text-error-dark",
 ]);

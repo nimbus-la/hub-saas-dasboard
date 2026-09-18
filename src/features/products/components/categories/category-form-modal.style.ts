@@ -4,21 +4,15 @@ import { RADIUS_SEMANTIC, SPACING_CLASS, SURFACE_SIZE } from "@/tokens";
 
 
 /**
- * Estilos de CategoryFormModal
- *
- * Casi todo lo pone el `Modal` del sistema —panel, cabecera, pie y sus
- * separaciones—; aquí solo queda la pila de campos y la caja del interruptor.
- * Si este archivo empieza a crecer, casi siempre significa que algo debería
- * estar en el `Modal` y no en la pantalla.
+ * Estilos del modal de categoría. El Modal del sistema ya pone el panel, la
+ * cabecera y el pie, así que aquí solo van los campos. Si este archivo crece,
+ * probablemente eso debería estar en el Modal.
  */
 
 
 /**
- * Pila de campos.
- *
- * `gap-4` es la separación entre campos consecutivos de un formulario
- * (`SPACING_SEMANTIC.field` en su versión de `flex`): más aire los desune y
- * menos hace que la ayuda de uno parezca la etiqueta del siguiente.
+ * Campos del formulario, uno debajo del otro. Con menos separación la ayuda
+ * de un campo parecería la etiqueta del siguiente.
  */
 export const categoryFormModalVariants = cva([
     "flex flex-col",
@@ -27,12 +21,9 @@ export const categoryFormModalVariants = cva([
 
 
 /**
- * Caja del interruptor de estado.
- *
- * El interruptor va sobre una superficie hundida y no suelto entre los campos
- * porque no es un campo: los otros dos escriben lo que dirá la carta, este
- * decide si la carta la enseña. Separarlo evita además el error de leerlo como
- * la ayuda de la descripción que tiene encima.
+ * Caja del interruptor de estado. Va en un fondo aparte porque no escribe
+ * nada, decide si la categoría se muestra, y así no se confunde con la ayuda
+ * de la descripción.
  */
 export const categoryFormModalToggleVariants = cva([
     "border border-neutral-200 bg-neutral-100",
