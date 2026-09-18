@@ -1,36 +1,34 @@
 import { ApiEnvelope, ApiResponseWithPagination, HttpRequestConfig } from "@/interfaces";
 import { CategoryList, CategoryListParams, CreateCategoryParams, UpdateCategoryParams } from "../interfaces";
 
+/**
+ * Operaciones disponibles sobre las categorías de productos. El servicio
+ * toma sus tipos de aquí, así que cualquier cambio en una firma se hace en
+ * este archivo.
+ */
 export interface CategoriesService {
     /**
-     * Una página del listado, con los filtros ya aplicados por el backend.
-     *
-     * La paginación es obligatoria y va aparte de `config`: pedir "todas las
-     * categorías" no es una opción que este servicio ofrezca, porque tampoco la
-     * ofrece el backend. Los filtros son opcionales; los que no aplican no se
-     * mandan. El contenido que devuelve trae `total` —el de los resultados, no
-     * el del catálogo—, que es de donde sale el número de páginas del pie.
+     * Devuelve una página del listado con los filtros ya aplicados. La página
+     * es obligatoria porque el backend no permite pedir todas las categorías
+     * de una vez. El total que llega es el de los resultados filtrados.
      */
     list(
         params: CategoryListParams,
         config?: HttpRequestConfig
     ): Promise<ApiResponseWithPagination<CategoryList[]>>;
 
-    /** Una categoría suelta. No pagina: su `content` es la categoría. */
-    detail(
-        id: string,
-        config?: HttpRequestConfig
-    ): Promise<CategoryList>;
-
+    /** Crea una categoría. El backend responde sin datos. */
     create(
         payload: CreateCategoryParams,
         config?: HttpRequestConfig
     ): Promise<ApiEnvelope<null>>;
 
+    /** Actualiza una categoría. El backend responde sin datos. */
     update(
         payload: UpdateCategoryParams,
         config?: HttpRequestConfig
     ): Promise<ApiEnvelope<null>>;
 
-    remove(id: string, config?: HttpRequestConfig): Promise<unknown>;
+    /** Elimina una categoría. El backend no devuelve datos al eliminar. */
+    remove(config?: HttpRequestConfig): Promise<unknown>;
 }
