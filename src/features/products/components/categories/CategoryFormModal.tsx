@@ -14,11 +14,17 @@ import {
     CATEGORY_MODAL_COPY,
     hasCategoryChanges,
 } from "../../libs";
-import { categoryFormModalToggleVariants, categoryFormModalVariants } from "./category-form-modal.style";
+import {
+    categoryFormModalCancelVariants,
+    categoryFormModalToggleVariants,
+    categoryFormModalVariants,
+} from "./category-form-modal.style";
 
 
+const formMessages = messages.products.categories.form;
 
-/** Une el `<form>` del cuerpo con su botón de envío, que vive en el pie. */
+
+/** Conecta el formulario con el botón de guardar, que está en el pie del modal. */
 const FORM_ID = "category-form";
 
 
@@ -26,25 +32,19 @@ interface CategoryFormModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
 
-    /**
-     * Categoría que se edita.
-     *
-     * Su ausencia es la que pone el modal en modo alta: no hace falta un
-     * `mode` aparte porque no existe la combinación "editar sin categoría".
-     */
+    /** Categoría que se edita. Si no llega, el modal sirve para crear una nueva. */
     category?: CategoryList | undefined;
 
     /**
-     * Recibe los valores ya validados. Cerrar el modal es cosa de quien lo abre.
-     *
-     * Puede devolver una promesa: mientras esté pendiente, react-hook-form
-     * mantiene `isSubmitting` y el botón de envío se deshabilita solo. Es lo
-     * que impide que un segundo clic cree la categoría dos veces.
+     * Recibe los valores ya validados. Si devuelve una promesa, el botón de
+     * guardar queda deshabilitado hasta que termine, así no se guarda dos
+     * veces. Cerrar el modal le toca a quien lo abrió.
      */
     onSubmit: (values: CategoryFormValues) => void | Promise<void>;
 
     className?: string;
 }
+
 
 export default function CategoryFormModal({
     open,
@@ -53,70 +53,40 @@ export default function CategoryFormModal({
     onSubmit,
     className,
 }: CategoryFormModalProps) {
-    const message = messages.products.categories.form;
     const { control, formState, handleSubmit } = useFormContext<CategoryFormValues>();
 
-
     const mode = category ? "edit" : "create";
-    const generalMessage = CATEGORY_MODAL_COPY[mode];
+    const modeMessages = CATEGORY_MODAL_COPY[mode];
 
-
-    /*
-     * Lo escrito ahora mismo, para decidir si el botón se puede pulsar.
-     *
-     * Se vigilan los tres campos por nombre —y no el formulario entero— porque
-     * `useWatch` sin `name` devuelve los valores como parciales y obligaría a
-     * un `?? ""` por campo justo donde se compara si algo cambió.
-     */
+    // Se observan los campos por nombre porque así llegan siempre con valor y
+    // se pueden comparar directo con la categoría guardada.
     const [name, description, isActive] = useWatch({
         control,
         name: ["name", "description", "isActive"],
     });
 
-
-    /*
-     * Cuándo se puede enviar.
-     *
-     * Dos condiciones, y la segunda solo al editar: el formulario tiene que ser
-     * válido —mismas reglas en los dos modos— y, si se está editando, algo
-     * tiene que haber cambiado respecto a lo guardado. Reabrir una categoría,
-     * mirarla y pulsar "Guardar cambios" mandaría una petición que no cambia
-     * nada, así que hasta que se toque un campo el botón se queda apagado.
-     *
-     * `isValid` viene de react-hook-form, que revalida el formulario entero en
-     * cada cambio; así el botón se enciende y se apaga solo, sin repetir aquí
-     * ninguna de las reglas.
-     */
+    // Al editar solo se puede guardar si algo cambió, para no enviar una
+    // petición que deja todo igual.
     const hasChanges =
         !category || hasCategoryChanges({ name, description, isActive }, category);
 
     const canSubmit = formState.isValid && hasChanges && !formState.isSubmitting;
 
-
-    /*
-     * El foco entra por el nombre.
-     *
-     * Sin esto Base UI enfoca el primer elemento tabulable, que es la equis de
-     * la cabecera: quien navega con teclado empezaría por la salida en lugar de
-     * por el primer campo. La referencia se comparte con react-hook-form —que
-     * usa la suya para llevar el foco al primer campo que falla al enviar—, de
-     * ahí que se asignen las dos en el mismo callback.
-     */
+    // El modal abre con el foco en el nombre y no en el botón de cerrar, que
+    // es lo primero que encontraría el teclado.
     const nameFieldRef = React.useRef<HTMLInputElement>(null);
-
 
     return (
         <Modal
             open={open}
             onOpenChange={onOpenChange}
-            title={generalMessage.title}
-            description={generalMessage.description}
+            title={modeMessages.title}
+            description={modeMessages.description}
             size="lg"
             initialFocus={nameFieldRef}
-            closeLabel={message.close}
-            // Con cambios sin guardar, un clic fuera tira el trabajo. `Escape`,
-            // la equis y "Cancelar" siguen cerrando: quitar también esas tres
-            // dejaría el modal sin salida por teclado.
+            closeLabel={formMessages.close}
+            // Con cambios sin guardar, un clic fuera del modal no lo cierra.
+            // Escape, la equis y cancelar sí lo cierran.
             disableDismiss={formState.isDirty}
             className={className}
             footer={
@@ -126,17 +96,15 @@ export default function CategoryFormModal({
                         variant="ghost"
                         label={messages.common.actions.cancel}
                         onClick={() => onOpenChange(false)}
-                        className="border border-neutral-300"
+                        className={categoryFormModalCancelVariants()}
                     />
 
-                    {/* El botón vive en el pie del modal, fuera del `<form>`,
-                        así que lo enlaza por `form=`: es lo que permite que el
-                        pie mantenga su geometría sin envolver todo el panel en
-                        el formulario. */}
+                    {/* Está fuera del formulario, así que se conecta con él
+                        por su id. */}
                     <GenericButton
                         type="submit"
                         form={FORM_ID}
-                        label={generalMessage.submit}
+                        label={modeMessages.submit}
                         disabled={!canSubmit}
                     />
                 </>
@@ -155,14 +123,17 @@ export default function CategoryFormModal({
                     render={({ field, fieldState }) => (
                         <TextField
                             {...field}
+                            // La referencia la usan react-hook-form, para
+                            // enfocar el campo con error, y el modal, para el
+                            // foco inicial.
                             ref={(node) => {
                                 field.ref(node);
                                 nameFieldRef.current = node;
                             }}
-                            label={message.name.label}
+                            label={formMessages.name.label}
                             required
                             error={fieldState.error?.message ?? false}
-                            placeholder={message.name.placeholder}
+                            placeholder={formMessages.name.placeholder}
                             helperText={CATEGORY_FIELD_HINTS.name}
                             autoComplete="off"
                         />
@@ -176,18 +147,17 @@ export default function CategoryFormModal({
                     render={({ field, fieldState }) => (
                         <TextAreaField
                             {...field}
-                            label={message.description.label}
+                            label={formMessages.description.label}
                             error={fieldState.error?.message ?? false}
-                            placeholder={message.description.placeholder}
+                            placeholder={formMessages.description.placeholder}
                             helperText={CATEGORY_FIELD_HINTS.description}
                             rows={3}
                         />
                     )}
                 />
 
-                {/* Solo al editar: una categoría nueva nace activa —nadie da de
-                    alta algo que no piensa ofrecer— y ofrecer el interruptor en
-                    el alta solo añade una decisión que no toca tomar todavía. */}
+                {/* El estado solo se muestra al editar, porque toda categoría
+                    nueva se crea activa. */}
                 {mode === "edit" && (
                     <Controller
                         control={control}
@@ -198,7 +168,7 @@ export default function CategoryFormModal({
                                     checked={field.value}
                                     onCheckedChange={field.onChange}
                                     name={field.name}
-                                    label={message.activeLabel}
+                                    label={formMessages.activeLabel}
                                     description={
                                         field.value
                                             ? CATEGORY_ACTIVE_HINT.on
@@ -212,4 +182,4 @@ export default function CategoryFormModal({
             </form>
         </Modal>
     );
-};
+}

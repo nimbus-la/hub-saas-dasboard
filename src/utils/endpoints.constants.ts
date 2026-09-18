@@ -42,5 +42,6 @@ export const ENDPOINTS = {
      * la query o en el cuerpo según el verbo, y de eso se encarga el servicio.
      */
     PRODUCTS_CATEGORY: "products/categories",
+    PRODUCTS_CATEGORY_UPDATE: "products/categories/update",
 
 } as const;

@@ -595,7 +595,7 @@ están resueltas dentro:
 const categories = useProductsCategories();
 const { filters, pagination } = categories;
 
-await categories.update.mutateAsync({ id, params: toUpdateCategoryParams(values, target) });
+await categories.update.mutateAsync({ params: toUpdateCategoryParams(values, target) });
 ```
 
 Conviene que el envío sea `async` y que la pantalla lo espere: eso mantiene el
