@@ -50,6 +50,15 @@ export const categoriesTableEmptyDescriptionVariants = cva([
 
 
 /**
+ * Fecha de actualización. Se mantiene en una sola línea para que la fecha y
+ * la hora no se separen, y los números ocupan el mismo ancho en cada fila.
+ */
+export const categoriesTableDateVariants = cva([
+    "tabular-nums whitespace-nowrap",
+]);
+
+
+/**
  * Botones de editar y eliminar, alineados a la derecha. No se parten en dos
  * líneas aunque la pantalla sea angosta.
  */

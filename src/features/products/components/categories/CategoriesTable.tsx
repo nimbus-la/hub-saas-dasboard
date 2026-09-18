@@ -15,6 +15,7 @@ import { CategoryList } from "../../interfaces";
 import { EMPTY_DESCRIPTION, formatCategoryStatus, getCategoryStatusTone } from "../../libs";
 import {
     categoriesTableActionsVariants,
+    categoriesTableDateVariants,
     categoriesTableDeleteVariants,
     categoriesTableDescriptionVariants,
     categoriesTableEmptyDescriptionVariants,
@@ -91,12 +92,13 @@ const categoryColumns: ColumnDef<CategoryList>[] = [
         // fecha formateada empieza por el día y se ordenaría mal.
         accessorKey: "updatedAt",
         header: message.updatedAt,
-        meta: { headerClassName: "w-32", cellClassName: "w-32" },
+        // La fecha incluye la hora, así que necesita más ancho que el estado.
+        meta: { headerClassName: "w-48", cellClassName: "w-48" },
         cell: ({ row }) => {
             const { updatedAt } = row.original;
 
             return (
-                <time dateTime={updatedAt} className="tabular-nums">
+                <time dateTime={updatedAt} className={categoriesTableDateVariants()}>
                     {formatDate(updatedAt)}
                 </time>
             );
