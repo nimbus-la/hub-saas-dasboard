@@ -97,9 +97,7 @@ export default function Categories() {
                 // porque el backend crea toda categoría activa; la edición sí,
                 // que es cuando alguien decide sobre el interruptor.
                 if (formTarget) {
-                    await categories.update.mutateAsync({
-                        params: toUpdateCategoryParams(values, formTarget),
-                    });
+                    await categories.update.mutateAsync(toUpdateCategoryParams(values, formTarget));
                 } else {
                     await categories.create.mutateAsync(toCreateCategoryParams(values));
                 }
