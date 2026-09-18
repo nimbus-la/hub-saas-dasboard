@@ -98,7 +98,6 @@ export default function Categories() {
                 // que es cuando alguien decide sobre el interruptor.
                 if (formTarget) {
                     await categories.update.mutateAsync({
-                        id: formTarget.id,
                         params: toUpdateCategoryParams(values, formTarget),
                     });
                 } else {

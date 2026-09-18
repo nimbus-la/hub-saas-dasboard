@@ -122,12 +122,11 @@ export function createCategoriesService(http: HttpClient): CategoriesService {
             ),
 
         update: async (
-            id: string,
             payload: UpdateCategoryParams,
             config: HttpRequestConfig | undefined
         ): Promise<ApiEnvelope<null>> =>
             http.patch<null>(
-                categoryPath(id),
+                ENDPOINTS.PRODUCTS_CATEGORY_UPDATE,
                 payload,
                 config
             ),

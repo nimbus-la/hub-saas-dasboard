@@ -28,7 +28,6 @@ export interface CategoriesService {
     ): Promise<ApiEnvelope<null>>;
 
     update(
-        id: string,
         payload: UpdateCategoryParams,
         config?: HttpRequestConfig
     ): Promise<ApiEnvelope<null>>;

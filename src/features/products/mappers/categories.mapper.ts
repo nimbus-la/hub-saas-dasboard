@@ -96,6 +96,10 @@ export const toUpdateCategoryParams = (
 ): UpdateCategoryParams => ({
     ...toCreateCategoryParams(values),
 
+    // El backend lee a quién editar del cuerpo y no de la ruta, así que el id
+    // sale de la categoría abierta en el modal y no de lo que se escribió.
+    categoryId: current.id,
+
     // Ausente cuando no cambio.
     ...(values.isActive !== current.isActive ? { isActive: values.isActive } : {}),
 });

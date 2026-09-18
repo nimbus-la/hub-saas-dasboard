@@ -115,8 +115,8 @@ export function useProductsCategories() {
 
 
     const updateCategory = useMutation({
-        mutationFn: ({ id, params }: { id: string, params: UpdateCategoryParams }) =>
-            service.update(id, params),
+        mutationFn: ({ params }: { params: UpdateCategoryParams }) =>
+            service.update(params),
 
         onSuccess: invalidate,
         meta: { alertOnSuccess: true }

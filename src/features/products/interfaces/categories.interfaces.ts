@@ -74,6 +74,7 @@ export interface CreateCategoryParams {
  * se guardaría perdiendo su estado.
  */
 export type UpdateCategoryParams = CreateCategoryParams & {
+    categoryId: string;
     isActive?: boolean;
 };
 
