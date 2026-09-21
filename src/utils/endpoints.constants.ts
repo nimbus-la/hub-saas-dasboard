@@ -35,6 +35,9 @@ export const ENDPOINTS = {
 
     // ── Productos ───────────────────────────────────────────────────────────
 
+    /** Catálogo de productos. Pagina y filtra por texto, categoría y estado. */
+    PRODUCTS: "products",
+
     /**
      * Categorías de producto.
      *

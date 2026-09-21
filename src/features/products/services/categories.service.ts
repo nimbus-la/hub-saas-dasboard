@@ -1,5 +1,5 @@
 import type { ApiResponseWithPagination, HttpClient, PaginationParams } from "@/interfaces";
-import { DEFAULT_PAGE_SIZE, FIRST_PAGE } from "@/lib/pagination";
+import { DEFAULT_PAGE_SIZE, FIRST_PAGE, emptyPage } from "@/lib/pagination";
 import { ENDPOINTS } from "@/utils";
 import type { CategoriesService, CategoryListApiResponse, CategoryListParams } from "../interfaces";
 import { toCategoryList } from "../mappers";
@@ -49,7 +49,7 @@ export const categoryKeys = {
 export function createCategoriesService(http: HttpClient): CategoriesService {
     return {
         list: async (params, config) => {
-            const { content } = await http.get<ApiResponseWithPagination<CategoryListApiResponse[]>>(
+            const { content } = await http.get<ApiResponseWithPagination<CategoryListApiResponse[]> | null>(
                 ENDPOINTS.PRODUCTS_CATEGORY,
                 {
                     ...config,
@@ -57,9 +57,12 @@ export function createCategoriesService(http: HttpClient): CategoriesService {
                 }
             );
 
+            // Sin resultados el backend no manda página.
+            const page = content ?? emptyPage(params);
+
             // Solo se convierten las filas. El total se deja igual porque la
             // tabla lo usa para saber cuántas páginas hay.
-            return { ...content, rows: toCategoryList(content.rows) };
+            return { ...page, rows: toCategoryList(page.rows) };
         },
 
         create: (payload, config) =>

@@ -85,6 +85,9 @@ export const products = {
         other: "{count} ingredientes",
     } satisfies Plural,
 
+    /** Aviso de la tarjeta cuando faltan insumos obligatorios: `Sin Camarón y Limón`. */
+    missingIngredients: "Sin {ingredients}",
+
     /**
      * Unidades de medida del inventario.
      *
@@ -112,7 +115,7 @@ export const products = {
             "Gestiona la carta de tus sucursales y avisa al equipo cuando falte un insumo.",
         createProduct: "Crear producto",
 
-        searchPlaceholder: "Buscar por nombre o categoría",
+        searchPlaceholder: "Buscar por nombre o SKU",
         searchLabel: "Buscar productos",
 
         tabsLabel: "Categorías de productos",

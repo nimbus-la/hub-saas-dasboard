@@ -15,6 +15,8 @@
  * el pie —que es cliente— y la precarga del servidor pueden importarlo igual.
  */
 
+import type { ApiResponseWithPagination, PaginationParams } from "@/interfaces";
+
 
 /**
  * La primera página es la 1.
@@ -75,3 +77,17 @@ export function getTotalPages(total: number, pageSize: number): number {
 export function clampPage(page: number, totalPages: number): number {
     return Math.min(Math.max(page, FIRST_PAGE), totalPages);
 }
+
+
+/**
+ * La página que se usa cuando el backend no encuentra nada. En ese caso
+ * responde con el código de "sin resultados" y `content: null`, no con una
+ * página vacía, así que el servicio la arma aquí para que la pantalla siempre
+ * reciba filas y total.
+ */
+export const emptyPage = ({ pageNumber, pageSize }: PaginationParams): ApiResponseWithPagination<never[]> => ({
+    rows: [],
+    pageNumber,
+    pageSize,
+    total: 0,
+});

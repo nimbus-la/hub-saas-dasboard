@@ -1,6 +1,6 @@
-// ── Datos: catálogo de productos ────────────────────────────────────────────
-// Módulo de datos desacoplado de la vista. Reemplaza `getProducts` por tu
-// servicio cuando esté listo (puede volverse async y devolver el mismo shape).
+// ── Dominio: productos ──────────────────────────────────────────────────────
+// El producto tal como lo pinta la interfaz, sus estados y los textos que lo
+// acompañan. Los datos llegan del servicio de `features/products`.
 //
 // `image` es la URL que devuelve el backend: Next la descarga y la optimiza.
 // Es opcional a propósito — un producto recién creado puede no tener foto — y
@@ -10,7 +10,6 @@
 
 import { formatPlural, messages } from "@/messages";
 import type { BadgeTone } from "@/interfaces";
-import { normalizeText } from "@/utils/formatters.utils";
 
 /**
  * Estado operativo del producto.
@@ -72,69 +71,8 @@ export const PRODUCT_STATUS_TONES: Record<ProductStatus, BadgeTone> = {
 export const isProductUnavailable = (status: ProductStatus): boolean =>
     status === "no-disponible" || status === "inactivo";
 
-/** Orden de las pestañas: el estado nunca las reordena, la categoría sí. */
-export const PRODUCT_CATEGORIES = [
-    "Platos fuertes",
-    "Antojitos",
-    "Entradas",
-    "Ensaladas",
-    "Bebidas",
-    "Postres",
-] as const;
-
-export type ProductCategory = (typeof PRODUCT_CATEGORIES)[number];
-
 /** Valor de la pestaña que no filtra por categoría. */
 export const ALL_CATEGORIES = "todas";
-
-/** Opciones del selector de tamaño de página. */
-export const PRODUCT_PAGE_SIZES = [8, 12, 24] as const;
-
-export const DEFAULT_PRODUCT_PAGE_SIZE = 12;
-
-// Catálogo de ejemplo: ninguno trae `image` todavía, así que la rejilla se ve
-// tal y como se verá en producción cuando el backend aún no tenga la foto —
-// con las iniciales del nombre.
-const PRODUCTS: Product[] = [
-    // ── Platos fuertes ──────────────────────────────────────────────────────
-    { id: "p01", name: "Hamburguesa Clásica", category: "Platos fuertes", price: 28000, status: "disponible", ingredientsCount: 9 },
-    { id: "p02", name: "Hamburguesa Doble BBQ", category: "Platos fuertes", price: 38000, status: "no-disponible", ingredientsCount: 11, alert: "Sin carne de res molida" },
-    { id: "p03", name: "Hamburguesa de Pollo Crispy", category: "Platos fuertes", price: 32000, status: "disponible", ingredientsCount: 10 },
-    { id: "p04", name: "Pizza Margherita", category: "Platos fuertes", price: 42000, status: "disponible", ingredientsCount: 6 },
-    { id: "p05", name: "Pizza Pepperoni", category: "Platos fuertes", price: 46000, status: "stock-bajo", ingredientsCount: 7, alert: "Quedan 2 paquetes de pepperoni" },
-    { id: "p06", name: "Pizza Cuatro Quesos", category: "Platos fuertes", price: 48000, status: "inactivo", ingredientsCount: 8 },
-
-    // ── Antojitos ───────────────────────────────────────────────────────────
-    { id: "p07", name: "Tacos al Pastor", category: "Antojitos", price: 22000, status: "disponible", ingredientsCount: 8 },
-    { id: "p08", name: "Tacos de Bistec", category: "Antojitos", price: 24000, status: "stock-bajo", ingredientsCount: 7, alert: "Quedan 3 kg de bistec" },
-    { id: "p09", name: "Quesadillas de Chorizo", category: "Antojitos", price: 19000, status: "disponible", ingredientsCount: 5 },
-    { id: "p10", name: "Gringas de Pastor", category: "Antojitos", price: 23000, status: "disponible", ingredientsCount: 6 },
-
-    // ── Entradas ────────────────────────────────────────────────────────────
-    { id: "p11", name: "Alitas BBQ", category: "Entradas", price: 30000, status: "disponible", ingredientsCount: 5 },
-    { id: "p12", name: "Alitas Búfalo", category: "Entradas", price: 30000, status: "disponible", ingredientsCount: 6 },
-    { id: "p13", name: "Dedos de Queso", category: "Entradas", price: 24000, status: "no-disponible", ingredientsCount: 4, alert: "Sin queso mozzarella en barra" },
-
-    // ── Ensaladas ───────────────────────────────────────────────────────────
-    { id: "p14", name: "Ensalada César", category: "Ensaladas", price: 26000, status: "disponible", ingredientsCount: 7 },
-    { id: "p15", name: "Ensalada Griega", category: "Ensaladas", price: 28000, status: "stock-bajo", ingredientsCount: 8, alert: "Queso feta para 2 días" },
-
-    // ── Bebidas ─────────────────────────────────────────────────────────────
-    { id: "p16", name: "Limonada Natural", category: "Bebidas", price: 9000, status: "disponible", ingredientsCount: 3 },
-    { id: "p17", name: "Agua de Horchata", category: "Bebidas", price: 9000, status: "disponible", ingredientsCount: 5 },
-    { id: "p18", name: "Café Americano", category: "Bebidas", price: 6000, status: "disponible", ingredientsCount: 2 },
-    { id: "p19", name: "Capuchino", category: "Bebidas", price: 9500, status: "stock-bajo", ingredientsCount: 4, alert: "Leche deslactosada por agotarse" },
-
-    // ── Postres ─────────────────────────────────────────────────────────────
-    { id: "p20", name: "Helado Artesanal", category: "Postres", price: 12000, status: "disponible", ingredientsCount: 4 },
-    { id: "p21", name: "Pay de Queso", category: "Postres", price: 14000, status: "inactivo", ingredientsCount: 9 },
-    { id: "p22", name: "Brownie con Helado", category: "Postres", price: 18000, status: "disponible", ingredientsCount: 8 },
-];
-
-/** Catálogo completo, en el orden en que se muestra en la carta. */
-export function getProducts(): Product[] {
-    return PRODUCTS;
-}
 
 // ── Etiquetas del dominio ───────────────────────────────────────────────────
 // Solo el texto que acompaña a la cifra: el formato del número lo pone
@@ -184,39 +122,3 @@ export function getProductInitials(name: string): string {
 /** `Sin ingredientes` · `1 ingrediente` · `9 ingredientes` */
 export const formatIngredients = (count: number): string =>
     formatPlural(messages.products.ingredients, count);
-
-/**
- * Filtra por nombre y categoría.
- *
- * La búsqueda ignora acentos y mayúsculas: escribir "cafe" encuentra "Café
- * Americano", que es como la gente teclea de verdad. Se busca también en la
- * categoría para que "postre" traiga toda la sección.
- */
-export function filterProducts(
-    products: Product[],
-    { query, category }: { query: string; category: string }
-): Product[] {
-    const term = normalizeText(query.trim());
-
-    return products.filter((product) => {
-        const matchesCategory =
-            category === ALL_CATEGORIES || product.category === category;
-
-        if (!matchesCategory) return false;
-        if (!term) return true;
-
-        return (
-            normalizeText(product.name).includes(term) ||
-            normalizeText(product.category).includes(term)
-        );
-    });
-}
-
-/** Cuántos productos hay por categoría dentro de una colección ya filtrada. */
-export function countByCategory(products: Product[]): Record<string, number> {
-    return products.reduce<Record<string, number>>((counts, product) => {
-        counts[product.category] = (counts[product.category] ?? 0) + 1;
-
-        return counts;
-    }, {});
-}

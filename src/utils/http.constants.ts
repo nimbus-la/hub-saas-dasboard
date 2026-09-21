@@ -58,8 +58,9 @@ export const API_SUCCESS_CODE = "0000";
 /**
  * La consulta salió bien y no hay nada que devolver.
  * 
- * El backend lo manda con `status: "INFO"`, `httpStatus: 200` y una página
- * vacía pero completa: `{ data: [], pageNumber, pageSize, total: 0 }`.
+ * El backend lo manda con `status: "INFO"`, `httpStatus: 200` y
+ * `content: null`, sin página. Los servicios que paginan lo cambian por
+ * `emptyPage` de `@/lib/pagination`.
  * 
  * Tiene código propio —y no `0000`— porque para el backend "no hay resultados"
  * es una respuesta con matiz, no un éxito raso. Para la interfaz **no es un
