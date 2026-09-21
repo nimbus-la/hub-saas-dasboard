@@ -102,7 +102,4 @@ export interface CategoriesService {
         payload: UpdateCategoryParams,
         config?: HttpRequestConfig
     ): Promise<ApiEnvelope<null>>;
-
-    /** Elimina una categoría. El backend no devuelve datos al eliminar. */
-    remove(config?: HttpRequestConfig): Promise<unknown>;
 }

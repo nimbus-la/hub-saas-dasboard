@@ -12,8 +12,9 @@ import {
     productBasicsGridVariants,
     productBasicsStepVariants,
 } from "./product-basics-step.style";
+import { useCategoryOptions } from "../../../hooks";
 import { ProductFormValues } from "../../../interfaces";
-import { PRODUCT_CATEGORY_OPTIONS, PRODUCT_FORM_RULES, PRODUCT_VALIDATION } from "../../../libs";
+import { PRODUCT_FORM_RULES, PRODUCT_VALIDATION } from "../../../libs";
 
 
 /**
@@ -37,6 +38,8 @@ export default function ProductBasicsStep({
     const stepMessaages = messages.products.create.basics;
 
     const { control } = useFormContext<ProductFormValues>();
+
+    const categories = useCategoryOptions();
 
     return (
         // El `fieldset` agrupa los campos del paso y la leyenda le pone nombre
@@ -74,7 +77,10 @@ export default function ProductBasicsStep({
                             label={stepMessaages.category.label}
                             required
                             size="md"
-                            options={PRODUCT_CATEGORY_OPTIONS}
+                            options={categories.options}
+                            // Mientras llegan las categorías el selector diría
+                            // que ninguna coincide, así que se bloquea.
+                            disabled={categories.isLoading}
                             error={fieldState.error?.message ?? false}
                             placeholder={stepMessaages.category.placeholder}
                             helperText={stepMessaages.category.helper}

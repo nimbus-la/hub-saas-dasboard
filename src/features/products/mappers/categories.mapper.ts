@@ -1,3 +1,5 @@
+import type { ApiResponseWithPagination, InputSelectorOption } from "@/interfaces";
+
 import type { CategoryFormValues, CategoryList, CategoryListApiResponse, CreateCategoryParams, UpdateCategoryParams } from "../interfaces";
 
 /**
@@ -27,6 +29,16 @@ export const toCategory = (category: CategoryListApiResponse): CategoryList => (
 /** Convierte todas las filas del listado. */
 export const toCategoryList = (categories: CategoryListApiResponse[]): CategoryList[] =>
     categories.map(toCategory);
+
+
+/**
+ * Convierte una página de categorías en opciones del selector. El valor es el
+ * id porque es lo que el alta de producto le envía al backend.
+ */
+export const toCategoryOptions = (
+    page: ApiResponseWithPagination<CategoryList[]>
+): InputSelectorOption[] =>
+    page.rows.map((category) => ({ label: category.name, value: category.id }));
 
 
 /** Llena el formulario de edición con los datos de la categoría. */

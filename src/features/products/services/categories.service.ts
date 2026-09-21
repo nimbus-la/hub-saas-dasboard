@@ -1,4 +1,4 @@
-import type { ApiResponseWithPagination, HttpClient, HttpRequestConfig, PaginationParams } from "@/interfaces";
+import type { ApiResponseWithPagination, HttpClient, PaginationParams } from "@/interfaces";
 import { DEFAULT_PAGE_SIZE, FIRST_PAGE } from "@/lib/pagination";
 import { ENDPOINTS } from "@/utils";
 import type { CategoriesService, CategoryListApiResponse, CategoryListParams } from "../interfaces";
@@ -12,25 +12,25 @@ import { toCategoryList } from "../mappers";
 
 
 /**
- * Agrega la página y los filtros a la URL. No hace falta renombrarlos porque
- * ya se llaman igual que en el backend.
- */
-const withListParams = (
-    params: CategoryListParams,
-    config?: HttpRequestConfig
-): HttpRequestConfig => ({
-    ...config,
-    params: { ...config?.params, ...params },
-});
-
-
-/**
  * Página que se pide por defecto. El servidor y el navegador deben usar la
  * misma, si no la tabla vuelve a pedir el listado al cargar.
  */
 export const DEFAULT_CATEGORIES_PAGINATION: PaginationParams = {
     pageNumber: FIRST_PAGE,
     pageSize: DEFAULT_PAGE_SIZE,
+};
+
+
+/**
+ * Lo que pide el selector de categoría del alta de producto. Solo tiene
+ * sentido ofrecer las activas, y se piden todas en una página porque el
+ * selector filtra lo escrito en el navegador. Si algún día hay más de cien
+ * categorías habrá que buscar en el backend.
+ */
+export const ACTIVE_CATEGORIES_PARAMS: CategoryListParams = {
+    pageNumber: FIRST_PAGE,
+    pageSize: 100,
+    isActive: true,
 };
 
 
@@ -51,7 +51,10 @@ export function createCategoriesService(http: HttpClient): CategoriesService {
         list: async (params, config) => {
             const { content } = await http.get<ApiResponseWithPagination<CategoryListApiResponse[]>>(
                 ENDPOINTS.PRODUCTS_CATEGORY,
-                withListParams(params, config)
+                {
+                    ...config,
+                    params: { ...config?.params, ...params }
+                }
             );
 
             // Solo se convierten las filas. El total se deja igual porque la
@@ -64,10 +67,6 @@ export function createCategoriesService(http: HttpClient): CategoriesService {
 
         update: (payload, config) =>
             http.patch(ENDPOINTS.PRODUCTS_CATEGORY_UPDATE, payload, config),
-
-        // El backend no devuelve datos al eliminar.
-        remove: (config) =>
-            http.delete("Aqui va la url del servicio de eliminar categoria", config),
     };
 }
 
