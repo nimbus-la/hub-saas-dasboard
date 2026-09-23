@@ -1,4 +1,5 @@
-import type { HttpClient, RequestInterceptor } from "@/interfaces";
+import type { HttpClient, HttpRequest, RequestInterceptor } from "@/interfaces";
+import { getAccessToken } from "@/lib/auth/access-token";
 import { EnvelopeHttpClient } from "./envelope-http-client";
 import { FetchHttpClient } from "./fetch-http-client";
 
@@ -57,7 +58,47 @@ export interface CreateHttpClientOptions {
      * sola vez al construir el cliente.
      */
     onRequest?: RequestInterceptor;
+
+    /**
+     * Resuelve el token de cada petición. Por defecto, `getAccessToken` de
+     * `@/lib/auth/access-token`.
+     *
+     * Es una función y no el token en sí porque un token de sesión caduca y se
+     * renueva: se consulta en cada petición en vez de quedar congelado al
+     * construir el cliente.
+     */
+    getAccessToken?: () => string | undefined | Promise<string | undefined>;
 }
+
+
+
+/**
+ * Pone `Authorization: Bearer <token>` si hay token.
+ *
+ * Respeta un `Authorization` que ya traiga la petición, venga de la llamada o
+ * del interceptor del llamante, para que un caso puntual pueda autenticarse con
+ * otra credencial. La comparación ignora mayúsculas porque las cabeceras de la
+ * petición son un objeto plano y nadie garantiza cómo se escribió la clave.
+ */
+const withAuthorization = async (
+    request: HttpRequest,
+    resolveToken: () => string | undefined | Promise<string | undefined>
+): Promise<HttpRequest> => {
+    const hasOwnAuthorization = Object.keys(request.headers ?? {}).some(
+        (key) => key.toLowerCase() === "authorization"
+    );
+
+    if (hasOwnAuthorization) return request;
+
+    const token = await resolveToken();
+
+    if (!token) return request;
+
+    return {
+        ...request,
+        headers: { ...request.headers, Authorization: `Bearer ${token}` },
+    };
+};
 
 
 
@@ -73,19 +114,28 @@ export interface CreateHttpClientOptions {
  * Existe como función y no sólo como constante para que el banco de pruebas
  * pueda apuntar a otro origen sin tocar variables de entorno.
  *
+ * El token entra por el interceptor del transporte y no por `headers`, que se
+ * evalúan una sola vez. Corre después del `onRequest` del llamante para que
+ * éste pueda fijar su propio `Authorization` si lo necesita.
+ *
  * Aquí es donde entran las capas que faltan, sin tocar nada más:
  *
  *   · `LoggingHttpClient` — **por fuera de todo**, porque es el único punto que
  *     ve tanto los fallos de red como los que lanza el decorador del sobre.
  *   · `AuthHttpClient` — por fuera del sobre, porque este backend puede anunciar
  *     un 401 dentro de un `200 OK` y una capa colocada por dentro no lo vería.
+ *     Poner el token ya está resuelto; esa capa haría falta para reaccionar al
+ *     401 (renovar la sesión o sacar al usuario).
  */
 export function createHttpClient(options: CreateHttpClientOptions = {}): HttpClient {
+    const { onRequest, getAccessToken: resolveToken = getAccessToken } = options;
+
     const transport = new FetchHttpClient({
         baseUrl: options.baseUrl ?? DEFAULT_BASE_URL,
         headers: { Accept: "application/json" },
         credentials: "include",
-        ...(options.onRequest ? { onRequest: options.onRequest } : {}),
+        onRequest: async (request) =>
+            withAuthorization(onRequest ? await onRequest(request) : request, resolveToken),
     });
 
     return new EnvelopeHttpClient(transport);

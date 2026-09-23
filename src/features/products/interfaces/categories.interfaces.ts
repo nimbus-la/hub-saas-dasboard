@@ -1,112 +1,108 @@
-import type { PaginationParams } from "@/interfaces";
+import type { ApiEnvelope, ApiResponseWithPagination, HttpRequestConfig, PaginationParams } from "@/interfaces";
 
 
+/** Categoría tal como la envía el backend. */
 export interface CategoryListApiResponse {
-    /** Identificador que publica el backend. Se muestra tal cual. */
     id: string;
     name: string;
-    /**
-     * Descripción para la carta.
-     *
-     * Opcional a propósito: la mayoría de las categorías se explican solas y
-     * obligar a escribir una frase produce descripciones que repiten el
-     * nombre.
-     */
+
+    /** Es opcional porque muchas categorías no necesitan descripción. */
     description?: string;
-    /** ¿Se ofrece hoy en la carta? */
+
+    /** Indica si la categoría se ofrece hoy en la carta. */
     isActive: boolean;
-    /**
-     * Fecha de la última actualización, en ISO 8601.
-     *
-     * Opcional porque el backend todavía no la publica. Declararla obligatoria
-     * sería mentirle al compilador: el tipo diría que siempre llega y en
-     * ejecución llegaría `undefined`, que es justo el caso que el mapper tiene
-     * que resolver.
-     */
+
+    /** Fechas en formato ISO 8601. */
     updatedAt: string;
     createdAt: string;
 }
 
 
-// respuesta mapeada
+/** Categoría ya convertida, que es la que usa la aplicación. */
 export interface CategoryList {
-    /** Identificador que publica el backend. Se muestra tal cual. */
     id: string;
     name: string;
-    /**
-     * Descripción para la carta.
-     *
-     * Opcional a propósito: la mayoría de las categorías se explican solas y
-     * obligar a escribir una frase produce descripciones que repiten el
-     * nombre.
-     */
+
+    /** Queda vacía cuando la categoría no tiene descripción. */
     description: string;
-    /** ¿Se ofrece hoy en la carta? */
+
     isActive: boolean;
-    updatedAt: string; // ISO 8601
+
+    /** Fecha de la última actualización en ISO 8601. Se formatea al mostrarla. */
+    updatedAt: string;
 }
 
 
 /**
- * Lo que se manda al crear una categoría.
- *
- * Sin `isActive`: el backend da de alta toda categoría como activa, y mandarlo
- * desde aquí sería duplicar esa regla en dos sitios que pueden discrepar. Que
- * el tipo ni siquiera admita el campo es más fuerte que acordarse de no
- * ponerlo — mandarlo pasa a ser un error de compilación.
- *
- * `id` y `placedAt` tampoco están: los pone el servidor.
+ * Datos para crear una categoría. No incluye el estado porque el backend crea
+ * todas las categorías activas.
  */
 export interface CreateCategoryParams {
     name: string;
-    /** Se omite cuando está vacía: `""` significaría "guarda una vacía". */
+
+    /** No se envía si está vacía. */
     description?: string;
 }
 
 
 /**
- * Lo que se manda al **editar**: lo mismo, más el estado.
- *
- * Aquí `isActive` sí es obligatorio, y por eso son dos tipos y no uno con el
- * campo opcional. El interruptor del modal solo aparece al editar, así que este
- * es el único momento en que alguien decide sobre él; con un `isActive?`
- * compartido, olvidarlo en la llamada compilaría sin protestar y la categoría
- * se guardaría perdiendo su estado.
+ * Datos para editar una categoría. El backend espera el id en el cuerpo, y el
+ * estado solo se envía si cambió.
  */
 export type UpdateCategoryParams = CreateCategoryParams & {
+    categoryId: string;
     isActive?: boolean;
 };
 
-/* -------------------------------------------------------------------------- */
-/*  Consulta del listado                                                       */
-/* -------------------------------------------------------------------------- */
 
 /**
- * Filtros que entiende el backend.
- *
- * Los nombres son los suyos: `text` para el texto libre —que él busca en el
- * nombre **y** en la descripción, por eso es uno y no dos— e `isActive` para el
- * estado.
- *
- * Los dos son opcionales y se construyen **por omisión**: un filtro sin elegir
- * no se manda vacío. `?text=` o `?isActive=` no significan "sin filtro" para el
- * backend, significan "filtra por cadena vacía", y devolverían cero resultados.
- * De traducir la pantalla a esta forma se encarga `toCategoryFilters`.
+ * Filtros del listado, con los mismos nombres que usa el backend. El texto se
+ * busca en el nombre y en la descripción. Un filtro sin elegir no se envía,
+ * porque el backend lo tomaría como un filtro vacío y no devolvería nada.
  */
 export interface CategoryFilters {
-    /** Texto libre. Ya recortado; si no hay nada que buscar, no está la clave. */
     text?: string;
 
-    /** `true` sólo activas, `false` sólo inactivas, ausente ambas. */
+    /** Si es true trae solo activas, si es false solo inactivas, y si falta trae todas. */
     isActive?: boolean;
 }
 
 
 /**
- * Todo lo que define una página del listado: qué trozo y de qué resultados.
- *
- * Van juntos en un solo objeto porque juntos son la identidad de la respuesta,
- * y es exactamente lo que tiene que entrar en la clave de caché: la página 2 de
- * "café" no tiene nada que ver con la página 2 sin filtros.
+ * Página y filtros juntos. Se usan como clave de caché, porque cada
+ * combinación es una respuesta distinta del backend.
  */
 export type CategoryListParams = PaginationParams & CategoryFilters;
+
+
+/**
+ * Operaciones disponibles sobre las categorías de productos. El servicio
+ * toma sus tipos de aquí, así que cualquier cambio en una firma se hace en
+ * este archivo.
+ */
+export interface CategoriesService {
+    /**
+     * Devuelve una página del listado con los filtros ya aplicados. La página
+     * es obligatoria porque el backend no permite pedir todas las categorías
+     * de una vez. El total que llega es el de los resultados filtrados.
+     */
+    list(
+        params: CategoryListParams,
+        config?: HttpRequestConfig
+    ): Promise<ApiResponseWithPagination<CategoryList[]>>;
+
+    /** Crea una categoría. El backend responde sin datos. */
+    create(
+        payload: CreateCategoryParams,
+        config?: HttpRequestConfig
+    ): Promise<ApiEnvelope<null>>;
+
+    /** Actualiza una categoría. El backend responde sin datos. */
+    update(
+        payload: UpdateCategoryParams,
+        config?: HttpRequestConfig
+    ): Promise<ApiEnvelope<null>>;
+
+    /** Elimina una categoría. El backend no devuelve datos al eliminar. */
+    remove(config?: HttpRequestConfig): Promise<unknown>;
+}

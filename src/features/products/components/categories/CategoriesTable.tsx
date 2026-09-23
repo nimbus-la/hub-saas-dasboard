@@ -5,6 +5,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import StatusBadge from "@/components/badges/StatusBadge";
 import GenericButton from "@/components/buttons/GenericButton";
 import DataTable from "@/components/tables/DataTable";
+import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { formatMessage, messages } from "@/messages";
 
@@ -14,6 +15,7 @@ import { CategoryList } from "../../interfaces";
 import { EMPTY_DESCRIPTION, formatCategoryStatus, getCategoryStatusTone } from "../../libs";
 import {
     categoriesTableActionsVariants,
+    categoriesTableDateVariants,
     categoriesTableDeleteVariants,
     categoriesTableDescriptionVariants,
     categoriesTableEmptyDescriptionVariants,
@@ -22,23 +24,16 @@ import {
 } from "./categories-table.style";
 
 
-/** Lo que dice esta tabla. Ver `@/messages`. */
 const message = messages.products.categories.table;
 
-
 /**
- * Tabla de categorías.
- *
- * Envuelve al `DataTable` del sistema con las columnas del dominio. No guarda
- * estado: recibe la lista ya filtrada y devuelve la intención —editar,
- * eliminar— hacia arriba. Confirmar el borrado no es cosa suya: la fila solo
- * avisa de que alguien lo pidió.
+ * Tabla de categorías. No guarda estado, solo muestra la lista que recibe y
+ * avisa a la pantalla cuando alguien quiere editar o eliminar una fila.
  */
 
 
-// ── Columnas ────────────────────────────────────────────────────────────────
-// Constante de módulo: la referencia es estable entre renders, así el DataTable
-// no recalcula su modelo de columnas innecesariamente.
+// Las columnas se definen fuera del componente para que la tabla no las
+// recalcule en cada render.
 const categoryColumns: ColumnDef<CategoryList>[] = [
     {
         accessorKey: "name",
@@ -53,8 +48,7 @@ const categoryColumns: ColumnDef<CategoryList>[] = [
     {
         accessorKey: "description",
         header: message.description,
-        // Sin ordenamiento: ordenar alfabéticamente un texto libre no responde
-        // a ninguna pregunta que alguien se haga delante de esta tabla.
+        // No se ordena porque ordenar descripciones por letra no le sirve a nadie.
         enableSorting: false,
         cell: ({ row }) => {
             const { description } = row.original;
@@ -70,9 +64,8 @@ const categoryColumns: ColumnDef<CategoryList>[] = [
                 );
             }
 
-            // El texto completo queda en el `title` para lo que se recorta:
-            // dos líneas cubren casi todas las descripciones, y quien necesite
-            // el resto no tiene que abrir el modal de edición para leerlo.
+            // La descripción se corta en dos líneas, y el texto completo se ve
+            // al pasar el cursor por encima.
             return (
                 <span
                     title={description}
@@ -95,15 +88,18 @@ const categoryColumns: ColumnDef<CategoryList>[] = [
         ),
     },
     {
-        accessorKey: "placedAt",
+        // Se ordena por la fecha ISO, que sí queda en orden cronológico. La
+        // fecha formateada empieza por el día y se ordenaría mal.
+        accessorKey: "updatedAt",
         header: message.updatedAt,
-        meta: { headerClassName: "w-32", cellClassName: "w-32" },
+        // La fecha incluye la hora, así que necesita más ancho que el estado.
+        meta: { headerClassName: "w-48", cellClassName: "w-48" },
         cell: ({ row }) => {
             const { updatedAt } = row.original;
 
             return (
-                <time dateTime={updatedAt} className="tabular-nums">
-                    {updatedAt}
+                <time dateTime={updatedAt} className={categoriesTableDateVariants()}>
+                    {formatDate(updatedAt)}
                 </time>
             );
         },
@@ -115,7 +111,7 @@ interface CategoriesTableProps {
     categories: CategoryList[];
     onEditCategory: (category: CategoryList) => void;
     onDeleteCategory: (category: CategoryList) => void;
-    /** Qué decir cuando no hay filas. Cambia según haya filtros puestos. */
+    /** Texto que se muestra cuando no hay filas. Cambia si hay filtros activos. */
     emptyMessage: string;
     className?: string;
 }
@@ -137,10 +133,8 @@ export default function CategoriesTable({
                 emptyMessage={emptyMessage}
                 renderRowActions={(category) => (
                     <div className={categoriesTableActionsVariants()}>
-                        {/* La etiqueta nombra la categoría y no solo la acción:
-                            con ocho filas iguales, ocho botones que dicen
-                            "Editar" no se distinguen entre sí al navegar por
-                            la lista de controles de un lector de pantalla. */}
+                        {/* La etiqueta incluye el nombre de la categoría para que
+                            un lector de pantalla distinga los botones de cada fila. */}
                         <GenericButton
                             type="button"
                             variant="ghost"
@@ -170,4 +164,4 @@ export default function CategoriesTable({
             />
         </div>
     );
-};
+}

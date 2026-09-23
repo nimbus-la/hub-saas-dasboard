@@ -2,17 +2,16 @@
 // Módulo de datos DESACOPLADO del componente. Hoy devuelve un mock determinista;
 // cuando existan los servicios, reemplaza `getBranchSales` por tu fetch a la API
 // (puede volverse async y devolver el mismo shape `BranchSalesData`).
+//
+// El catálogo de sucursales se mudó a `branches.ts` cuando el alta de producto
+// empezó a necesitarlo. Se reexporta desde aquí para no romper a quien ya lo
+// importaba de este archivo.
+
+import { ALL_BRANCHES, BRANCHES, type Branch } from "./branches";
+
+export { ALL_BRANCHES, BRANCHES, type Branch };
 
 export type PeriodKey = "dias" | "semanas" | "meses";
-
-/** Id que representa "todas las sucursales" en los filtros. */
-export const ALL_BRANCHES = "todas";
-
-export interface Branch {
-    id: string;
-    name: string;
-    color: string; // hex del token correspondiente en style.css
-}
 
 export interface SalesSeries extends Branch {
     data: number[];
@@ -23,14 +22,6 @@ export interface BranchSalesData {
     labels: string[];
     series: SalesSeries[];
 }
-
-// ── Sucursales (color = valor del token; mantener en sync con style.css) ─────
-export const BRANCHES: Branch[] = [
-    { id: "centro", name: "Sucursal Centro", color: "#22C55E" }, // success-main
-    { id: "norte", name: "Sucursal Norte", color: "#FFAB00" }, // warning-main
-    { id: "sur", name: "Sucursal Sur", color: "#00B8D9" }, // info-main
-    { id: "plaza", name: "Sucursal Plaza", color: "#8E33FF" }, // secondary-main
-];
 
 // ── Periodos y etiquetas de eje ─────────────────────────────────────────────
 export interface Period {

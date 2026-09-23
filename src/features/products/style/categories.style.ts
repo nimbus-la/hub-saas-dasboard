@@ -4,23 +4,20 @@ import { SPACING_CLASS } from "@/tokens";
 
 
 /**
- * Estilos de la pantalla de categorías
- *
- * Mismo esqueleto que la lista de productos: `gap-6` entre el encabezado y el
- * cuerpo —son dos bloques distintos— y `gap-4` dentro del cuerpo, donde
- * filtros y tabla son partes de una misma herramienta. Que el interior vaya
- * más apretado que el exterior es lo que hace que se lean como un grupo.
+ * Estilos de la pantalla de categorías. Sigue la misma estructura que la
+ * lista de productos. Hay más espacio entre el encabezado y el cuerpo que
+ * dentro del cuerpo, para que la barra y la tabla se lean como un grupo.
  */
 
 
-/** Pila de la pantalla. */
+/** Contenedor de toda la pantalla. */
 export const categoriesPageVariants = cva([
     "flex w-full flex-col",
     SPACING_CLASS.gap.xl,
 ]);
 
 
-/** Cuerpo: filtros y tabla. */
+/** Cuerpo de la pantalla, con la barra y la tabla. */
 export const categoriesPageBodyVariants = cva([
     "flex min-w-0 flex-col",
     SPACING_CLASS.gap.lg,
@@ -28,11 +25,8 @@ export const categoriesPageBodyVariants = cva([
 
 
 /**
- * Pie de paginación.
- *
- * La línea de arriba lo separa de la tabla: el pie no es otra fila, es lo que
- * dice qué parte de la colección se está viendo. Mismo tratamiento que en la
- * rejilla de productos, para que las dos pantallas se paginen igual.
+ * Paginación. La línea de arriba la separa de la tabla para que no parezca
+ * otra fila. Se ve igual que en la lista de productos.
  */
 export const categoriesPagePaginationVariants = cva([
     "border-t border-neutral-200 pt-4",

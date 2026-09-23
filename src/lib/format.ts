@@ -163,11 +163,10 @@ export const formatCurrencyCompact = (amount: number): string => {
 // ── Fechas ──────────────────────────────────────────────────────────────────
 
 /**
- * Fecha corta: `28/07/2026`.
+ * Fecha con hora, por ejemplo 16/09/2026, 4:34 p. m.
  *
- * Se formatea en UTC a propósito para que servidor y cliente coincidan: con la
- * zona horaria del navegador, una fecha guardada a medianoche se renderiza un
- * día distinto en cada lado y React reporta un fallo de hidratación.
+ * Siempre se usa la hora de Colombia y no la del navegador, así el servidor y
+ * el cliente muestran lo mismo y React no reporta un fallo de hidratación.
  */
 const dateFormatter = new Intl.DateTimeFormat(LOCALE, {
     day: "2-digit",

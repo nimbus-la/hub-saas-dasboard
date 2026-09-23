@@ -6,8 +6,7 @@ import { useFieldArray, useFormContext, useFormState, useWatch } from "react-hoo
 import type { Ingredient } from "@/lib/ingredients";
 
 import type { ProductFormValues, ProductRecipeFormValues, RecipeLine } from "../interfaces";
-import { RECIPE_RULES, resolveRecipeLines, resolveRecipeRows } from "../libs";
-import { DEFAULT_RECIPE_LINE_VALUES } from "../utils";
+import { DEFAULT_RECIPE_LINE_VALUES, RECIPE_RULES, resolveRecipeLines, resolveRecipeRows } from "../libs";
 
 
 /**

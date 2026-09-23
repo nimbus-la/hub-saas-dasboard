@@ -2,7 +2,7 @@ import type { RegisterOptions, UseFieldArrayProps } from "react-hook-form";
 
 import type { Ingredient } from "@/lib/ingredients";
 
-import type { ProductFormValues } from "./products.interface";
+import type { ProductFormValues } from "./products.interfaces";
 
 
 /* -------------------------------------------------------------------------- */

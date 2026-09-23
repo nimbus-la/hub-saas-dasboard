@@ -1,58 +1,35 @@
-import { formatDate } from "@/lib/format";
 import type { CategoryFormValues, CategoryList, CategoryListApiResponse, CreateCategoryParams, UpdateCategoryParams } from "../interfaces";
 
-
 /**
- * Traductores entre el backend y el dominio
- *
- * Frontera de una sola dirección: lo que entra tiene la forma que decidió el
- * backend, lo que sale tiene la forma con la que quiere trabajar la aplicación.
- * Todo lo que hay más adentro —caché, pantallas, tabla, formulario— ve
- * `Category` y sólo `Category`.
- *
- * El trabajo concreto es **normalizar ausencias**: convertir los campos que
- * pueden no venir en valores que siempre existen. Eso es lo que quita los `??`
- * repartidos por el JSX, que era el objetivo.
- *
- * Lo que aquí NO se decide es cómo se ve una ausencia. Que una descripción
- * vacía se pinte con una raya es cosa de la tabla, no del dominio: el mismo
- * dato aparece en el formulario de edición, donde una raya sería un texto que
- * nadie escribió y que se guardaría como si sí.
+ * Conversiones entre lo que manda el backend y lo que usa la aplicación. Aquí
+ * se rellenan los campos que pueden faltar, para que las pantallas no tengan
+ * que revisarlos. Cómo se muestra un campo vacío lo decide cada pantalla.
  */
 
 
 /**
- * Una categoría del backend a una del dominio.
- *
- * Está separado del de la lista porque `POST`, `PUT` y el detalle devuelven un
- * único objeto, y también tienen que pasar por aquí: si sólo se mapeara el
- * listado, la categoría recién creada entraría en la caché con la forma cruda
- * y sería la única fila de la tabla que no cumple el contrato.
+ * Convierte una categoría del backend al formato de la aplicación. Toda
+ * categoría que llegue del backend pasa por aquí antes de guardarse en caché.
  */
 export const toCategory = (category: CategoryListApiResponse): CategoryList => ({
     id: category.id,
     name: category.name,
 
-    // Cadena vacía y no la raya de "sin descripción": `""` es falsy, así que
-    // la tabla sigue distinguiendo el hueco y pintando su marca de posición,
-    // y el formulario de edición abre el campo vacío en vez de con un `-`
-    // dentro que se guardaría como descripción de verdad.
+    // Se deja vacía y no con una raya, porque el formulario de edición la
+    // mostraría y se guardaría como si fuera la descripción real.
     description: category.description ?? "",
 
-    updatedAt: formatDate(category.updatedAt),
+    updatedAt: category.updatedAt,
     isActive: category.isActive,
 });
 
 
-
-/** El listado completo. */
+/** Convierte todas las filas del listado. */
 export const toCategoryList = (categories: CategoryListApiResponse[]): CategoryList[] =>
     categories.map(toCategory);
 
 
-
-
-/** Convierte una categoría guardada en los valores que edita el formulario. */
+/** Llena el formulario de edición con los datos de la categoría. */
 export const toCategoryFormValues = (category: CategoryList): CategoryFormValues => ({
     name: category.name,
     description: category.description,
@@ -60,16 +37,11 @@ export const toCategoryFormValues = (category: CategoryList): CategoryFormValues
 });
 
 
-
 /**
- * El camino de vuelta: de lo que se escribió a lo que se manda al **crear**.
- *
- * Recorta los extremos —un nombre con espacios delante se ordena antes que
- * todos los demás en la tabla y nadie entiende por qué— y, si la descripción
- * queda vacía, **la propiedad desaparece** en lugar de viajar como `""`: son
- * dos cosas distintas para el backend, "no tiene" y "tiene una vacía".
- *
- * `isActive` no se incluye: al crear lo decide el servidor.
+ * Prepara los datos del formulario para crear una categoría. Quita los
+ * espacios de los extremos y no envía la descripción si quedó vacía, porque
+ * para el backend no es lo mismo no tener descripción que tener una vacía. El
+ * estado no se envía porque al crear lo decide el servidor.
  */
 export const toCreateCategoryParams = (
     values: CategoryFormValues
@@ -84,11 +56,8 @@ export const toCreateCategoryParams = (
 
 
 /**
- * Lo mismo, más el estado, para la **edición**.
- *
- * Reutiliza el de creación en lugar de repetir el recorte del nombre y la
- * omisión de la descripción. Así la diferencia entre los dos queda en una sola
- * línea, que es exactamente lo que se diferencian.
+ * Prepara los datos del formulario para editar una categoría. Usa lo mismo
+ * que la creación y le suma el id y el estado.
  */
 export const toUpdateCategoryParams = (
     values: CategoryFormValues,
@@ -96,6 +65,10 @@ export const toUpdateCategoryParams = (
 ): UpdateCategoryParams => ({
     ...toCreateCategoryParams(values),
 
-    // Ausente cuando no cambio.
+    // El backend espera el id en el cuerpo, así que se toma de la categoría
+    // que se está editando.
+    categoryId: current.id,
+
+    // El estado solo se envía si cambió.
     ...(values.isActive !== current.isActive ? { isActive: values.isActive } : {}),
 });
