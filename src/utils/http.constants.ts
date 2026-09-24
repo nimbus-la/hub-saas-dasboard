@@ -83,7 +83,3 @@ export const API_NON_FAILURE_CODES: readonly string[] = [
     API_SUCCESS_CODE,
     API_EMPTY_RESULT_CODE,
 ];
-
-
-/** El único `httpStatus` cuyo `message` se le enseña al usuario. */
-export const API_PRESENTABLE_STATUS = 200;

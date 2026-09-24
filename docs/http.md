@@ -294,16 +294,21 @@ explicarse**:
 
 | Situación | Texto |
 |---|---|
-| Sobre con `httpStatus` 200, HTTP 200 y `message` no vacío | El `message` del backend |
+| Sobre con `message` no vacío y estado menor que 500 | El `message` del backend |
+| Estado 5xx | `errors.unexpected` |
 | `kind: "network"` | `errors.http.network` |
 | `kind: "timeout"` | `errors.http.timeout` |
 | `kind: "aborted"` | Ninguno: no se avisa de lo que se canceló |
 | Cualquier otro caso | `errors.unexpected` |
 
-El `message` de un 500 no se le enseña a nadie: queda en el error para quien
-mire el registro. Solo se muestra el de una respuesta que el backend declara
-presentable (`API_PRESENTABLE_STATUS`), y el tono sale de su `status` con
-`ALERT_TONE_BY_API_STATUS`.
+El estado que se mira es `effectiveStatus`: el `httpStatus` del sobre si llegó,
+y si no, el que vio el navegador. Manda el del sobre porque el backend puede
+responder 200 y declarar el fallo dentro.
+
+Un 400 o un 404 enseñan su `message` porque el backend ya lo redactó para el
+usuario. El de un 5xx no se le enseña a nadie: suele ser el texto de una
+excepción interna y queda en el error para quien mire el registro. El tono sale
+del `status` del sobre con `ALERT_TONE_BY_API_STATUS`.
 
 Cuando solo hace falta el texto, por ejemplo para avisar desde un `catch`:
 
@@ -689,7 +694,6 @@ se habla con el backend y el otro **cuándo** se vuelve a preguntar.
 | `HTTP_RETRYABLE_STATUSES` | 408, 425, 429 | Los 4xx que se resuelven repitiendo |
 | `API_SUCCESS_CODE` | `"0000"` | Éxito |
 | `API_EMPTY_RESULT_CODE` | `"0001"` | Sin resultados, que no es un fallo |
-| `API_PRESENTABLE_STATUS` | 200 | El único `httpStatus` cuyo `message` se muestra |
 
 `src/utils/query.constants.ts`
 
