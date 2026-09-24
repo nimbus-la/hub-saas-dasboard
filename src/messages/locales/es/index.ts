@@ -14,6 +14,7 @@
 
 import { common } from "./common.messages";
 import { components } from "./components.messages";
+import { employees } from "./employees.messages";
 import { errors } from "./errors.messages";
 import { navigation } from "./navigation.messages";
 import { products } from "./products.messages";
@@ -34,4 +35,7 @@ export const es = {
 
     /** Módulo de productos: catálogo, alta y categorías. */
     products,
+
+    /** Módulo de empleados: equipo de trabajo y su acceso. */
+    employees,
 } as const;

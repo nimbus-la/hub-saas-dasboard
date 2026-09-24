@@ -86,7 +86,7 @@ export const DATA_MENU: MenuStructurePrimary[] = [
                 title: items.employees,
                 type: 'secondary',
                 icon: 'EMPLEOYES',
-                url: '/empleoyes',
+                url: '/employees',
                 active: true,
             }
         ]
