@@ -21,7 +21,10 @@ export class EnvelopeHttpClient extends BaseHttpClient {
             // Un 400 o un 500 de verdad también traen sobre. Se le adjuntan sus
             // campos aquí, y no en el transporte, porque el transporte no sabe
             // qué es un sobre y no debe aprenderlo.
-            throw this.enrichError(error);
+            const enriched = this.enrichError(error);
+
+            this.warnOnStatusMismatch(enriched);
+            throw enriched;
         }
 
         if (!isApiEnvelope(response.data)) {
@@ -42,7 +45,7 @@ export class EnvelopeHttpClient extends BaseHttpClient {
         // HTTP 200 y una página vacía válida dentro. Tratarlo como error haría
         // perder unos datos que el backend sí mandó. Ver `API_NON_FAILURE_CODES`.
         if (!API_NON_FAILURE_CODES.includes(envelope.code)) {
-            throw new HttpError({
+            const failure = new HttpError({
                 kind: "response",
                 status: response.status,
                 api: toApiErrorFields(envelope, response.status),
@@ -51,6 +54,9 @@ export class EnvelopeHttpClient extends BaseHttpClient {
                 method: request.method,
                 url: request.url
             });
+
+            this.warnOnStatusMismatch(failure);
+            throw failure;
         }
 
         return { ...response, data: envelope as TData };
@@ -71,5 +77,24 @@ export class EnvelopeHttpClient extends BaseHttpClient {
             cause: error.cause,
             ...(error.status !== null ? { status: error.status } : {})
         });
+    }
+
+
+    /**
+     * Avisa en consola cuando el navegador y el sobre no dicen el mismo estado.
+     *
+     * No cambia nada de cara al usuario, porque el aviso se decide con el
+     * estado del sobre. Sirve para que quien desarrolla vea el desajuste y se
+     * lo pueda llevar al backend con la petición exacta. En producción no se
+     * escribe nada.
+     */
+    private warnOnStatusMismatch(error: unknown): void {
+        if (process.env.NODE_ENV !== "development") return;
+        if (!isHttpError(error) || !error.hasStatusMismatch) return;
+
+        console.warn(
+            `[http] ${error.method} ${error.url} llegó con HTTP ${error.status} ` +
+            `pero el sobre declara ${error.api?.httpStatus} (código ${error.code})`
+        );
     }
 }
