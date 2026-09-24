@@ -13,12 +13,11 @@ import { ICON_TOKENS } from "@/tokens";
 import {
     ProductBasicsStep,
     ProductFormStepper,
+    ProductPricingStep,
     ProductRecipeStep,
-    ProductStepPlaceholder,
 } from "../components/form";
 import { useProductForm } from "../hooks/use-product-form";
-import { PRODUCTS_LIST_HREF } from "../libs";
-import { PRODUCT_FORM_STEPS } from "../utils";
+import { PRODUCTS_LIST_HREF, PRODUCT_FORM_STEPS } from "../libs";
 
 
 import {
@@ -69,21 +68,6 @@ export default function CreateProduct() {
         bodyRef.current?.focus();
     }, [stepIndex]);
 
-    /**
-     * Nota del pie.
-     *
-     * Cambia con el paso porque lo que hay que advertir cambia: qué es
-     * obligatorio mientras hay campos que rellenar, y por qué no se puede
-     * guardar cuando ya no queda a dónde avanzar. En los pasos sin campos no
-     * dice nada — una advertencia sobre asteriscos en una pantalla sin
-     * asteriscos es ruido.
-     */
-    const footerNote = isLastStep
-        ? productMessage.cannotSaveYet
-        : step.fields.length > 0
-            ? messages.common.forms.requiredFields
-            : null;
-
     return (
         <FormProvider {...form}>
             <div className={createProductPageVariants()}>
@@ -115,18 +99,15 @@ export default function CreateProduct() {
                     >
                         {step.id === "basics" && (<ProductBasicsStep />)}
                         {step.id === "recipe" && (<ProductRecipeStep />)}
-
-                        {step.id === "pricing" && (
-                            <ProductStepPlaceholder step={step} index={stepIndex} />
-                        )}
+                        {step.id === "pricing" && (<ProductPricingStep />)}
                     </div>
 
                     <footer className={createProductFooterVariants()}>
-                        {footerNote && (
-                            <p className={createProductFooterNoteVariants()}>
-                                {footerNote}
-                            </p>
-                        )}
+                        {/* Los tres pasos tienen campos obligatorios, así que
+                        la nota acompaña a todo el asistente. */}
+                        <p className={createProductFooterNoteVariants()}>
+                            {messages.common.forms.requiredFields}
+                        </p>
 
                         <div className={createProductActionsVariants()}>
                             {isFirstStep ? (
@@ -147,10 +128,9 @@ export default function CreateProduct() {
                             )}
 
                             {/* En el último paso el botón cambia de papel: ya no
-                            queda a dónde avanzar, y guardar todavía no es
-                            posible. La nota del pie explica por qué. En los
-                            demás pasos se habilita solo cuando todos los campos
-                            del paso están completos y sin errores. */}
+                            queda a dónde avanzar, así que guarda. En todos se
+                            habilita solo cuando los campos del paso están
+                            completos y sin errores. */}
                             <GenericButton
                                 type="submit"
                                 variant="primary"
@@ -159,7 +139,7 @@ export default function CreateProduct() {
                                         ? productMessage.submit
                                         : messages.common.actions.continue
                                 }
-                                disabled={isLastStep || !isStepValid}
+                                disabled={!isStepValid}
                                 {...(!isLastStep && { endIcon: ICON_TOKENS.NEXT })}
                             />
                         </div>

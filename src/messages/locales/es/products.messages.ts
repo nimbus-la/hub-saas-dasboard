@@ -164,9 +164,12 @@ export const products = {
         backLabel: "Volver a la lista de productos",
 
         submit: "Guardar producto",
-        /** Por qué el botón de guardar está apagado en el último paso. */
-        cannotSaveYet:
-            "Podrás guardar el producto cuando los tres pasos estén disponibles.",
+
+        /** Lo que se anuncia al terminar el alta. */
+        success: {
+            title: "Producto creado",
+            description: "«{name}» ya está en el catálogo.",
+        },
 
         /* ── Indicador de pasos ─────────────────────────────────────────── */
 
@@ -194,13 +197,6 @@ export const products = {
                 label: "Receta e insumos",
                 hint: "Ingredientes que componen el plato",
             },
-        },
-
-        /** Pasos definidos pero todavía sin campos. */
-        placeholder: {
-            title: "{position} · {label}",
-            message:
-                "Aquí se pedirá: {hint}. Estamos construyendo este paso; mientras tanto, lo que escribiste en los anteriores se conserva.",
         },
 
         /* ── Paso 1: datos básicos ──────────────────────────────────────── */
@@ -374,6 +370,140 @@ export const products = {
                 recipeRequired: "Añade al menos un insumo del inventario para continuar.",
                 recipeMax: "La receta admite hasta {max} insumos. Quita los que sobren para continuar.",
                 ingredientDuplicated: "Hay insumos repetidos en la receta. Deja una sola línea por insumo.",
+            },
+        },
+
+        /* ── Paso 3: precio y disponibilidad ────────────────────────────── */
+
+        pricing: {
+            /** Nombre del grupo de campos. No se ve: en pantalla lo da el indicador. */
+            legend: "Precio y disponibilidad del producto",
+
+            /** Lo que costó preparar una unidad, traído del paso de la receta. */
+            cost: {
+                label: "Costo de la receta",
+                hint: "Lo que cuesta preparar una unidad con los insumos del paso anterior.",
+            },
+
+            margin: {
+                label: "Margen de ganancia",
+                placeholder: "Ej. 45",
+                helper: "Lo que se gana sobre el costo. Al escribirlo se calcula el precio de venta.",
+                /** Sin receta no hay costo sobre el que calcular nada. */
+                missingCost: "Vuelve al paso anterior y completa la receta para poder calcularlo.",
+            },
+
+            price: {
+                label: "Precio de venta",
+                placeholder: "Ej. 12.000",
+                helper: "Lo que paga el cliente. Al escribirlo se recalcula el margen.",
+            },
+
+            profit: {
+                label: "Ganancia por unidad",
+                hint: "Lo que queda de cada unidad vendida después de pagar los insumos.",
+                /** Reemplaza al `hint` cuando ya hay margen: dice a cuánto equivale. */
+                margin: "Equivale a un margen de {margin} sobre el costo.",
+                pending: "Indica el margen o el precio para calcular la ganancia.",
+            },
+
+            /**
+             * El desglose que cierra el paso.
+             *
+             * Las dos cifras de arriba son sumandos y el precio de venta es su
+             * total: verlos en la misma columna es lo que explica de dónde sale
+             * lo que paga el cliente.
+             */
+            summary: {
+                title: "Cómo se compone el precio",
+            },
+
+            total: {
+                label: "Precio de venta",
+                hint: "Sale de sumar el costo y la ganancia.",
+                pending: "Escribe el margen o el precio para verlo.",
+            },
+
+            /**
+             * Vender por debajo del costo avisa pero no bloquea: un plato
+             * gancho o una promoción son decisiones legítimas.
+             */
+            belowCostNotice: {
+                title: "El precio está por debajo del costo",
+                description:
+                    "Cada unidad vendida pierde {amount}. Si es a propósito puedes continuar.",
+            },
+
+            availability: {
+                label: "Disponible en la carta",
+                on: "Se publica en la carta al guardar el producto.",
+                off: "Se guarda, pero no se vende hasta que lo actives.",
+            },
+
+            /* ── Configuración por sucursal ─────────────────────────────── */
+
+            branches: {
+                title: "Precios por sucursal",
+                hint: "Cada sucursal usa el precio y la disponibilidad de arriba. Personaliza solo las que se salgan de ahí.",
+
+                count: {
+                    zero: "Todas heredan la configuración global",
+                    one: "{count} sucursal personalizada",
+                    other: "{count} sucursales personalizadas",
+                } satisfies Plural,
+
+                badge: {
+                    inherited: "Hereda",
+                    custom: "Personalizada",
+                },
+
+                /**
+                 * Acciones del encabezado de la tarjeta.
+                 *
+                 * Son un botón y no un interruptor: dentro de la tarjeta ya hay
+                 * uno —la disponibilidad—, y dos carriles idénticos juntos no
+                 * dejan ver cuál cambia la forma de la tarjeta y cuál es un dato
+                 * del producto. El nombre accesible repite la sucursal porque
+                 * el botón se oye fuera de su tarjeta.
+                 */
+                actions: {
+                    customize: "Personalizar",
+                    customizeLabel: "Personalizar {name}",
+                    reset: "Usar la configuración global",
+                    resetLabel: "Usar la configuración global en {name}",
+                },
+
+                price: {
+                    label: "Precio",
+                    fieldLabel: "Precio en {name}",
+                    pending: "Todavía no hay precio global",
+                },
+
+                availability: {
+                    label: "Disponibilidad",
+                    /** Empieza por la etiqueta que se ve, como pide WCAG 2.5.3. */
+                    fieldLabel: "Disponibilidad en {name}",
+                    on: "Disponible",
+                    off: "No disponible",
+                },
+
+                /** `Margen 45,0 %` — debajo del precio de la sucursal. */
+                margin: "Margen {margin}",
+            },
+
+            /* ── Validación ─────────────────────────────────────────────── */
+
+            validation: {
+                priceRequired: "Indica a qué precio se vende el producto.",
+                priceMin: "El precio tiene que ser mayor que 0.",
+                priceMax: "El precio no puede pasar de {max}.",
+
+                marginMin: "El margen no puede bajar de {min} %.",
+                marginMax: "El margen no puede pasar de {max} %.",
+
+                branchPriceRequired: "Indica el precio de {name} o deja que herede el global.",
+                branchPriceMin: "El precio de {name} tiene que ser mayor que 0.",
+                branchPriceMax: "El precio de {name} no puede pasar de {max}.",
             },
         },
 
