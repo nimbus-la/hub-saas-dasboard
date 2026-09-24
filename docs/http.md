@@ -299,6 +299,7 @@ explicarse**:
 | `kind: "network"` | `errors.http.network` |
 | `kind: "timeout"` | `errors.http.timeout` |
 | `kind: "aborted"` | Ninguno: no se avisa de lo que se canceló |
+| Estado en `HTTP_SILENT_STATUSES` (401) o código en `API_SILENT_CODES` | Ninguno: ver `isSilentError` |
 | Cualquier otro caso | `errors.unexpected` |
 
 El estado que se mira es `effectiveStatus`: el `httpStatus` del sobre si llegó,
@@ -694,6 +695,8 @@ se habla con el backend y el otro **cuándo** se vuelve a preguntar.
 | `HTTP_RETRYABLE_STATUSES` | 408, 425, 429 | Los 4xx que se resuelven repitiendo |
 | `API_SUCCESS_CODE` | `"0000"` | Éxito |
 | `API_EMPTY_RESULT_CODE` | `"0001"` | Sin resultados, que no es un fallo |
+| `HTTP_SILENT_STATUSES` | 401 | Estados que nunca muestran aviso |
+| `API_SILENT_CODES` | vacía | Códigos de negocio que nunca muestran aviso |
 
 `src/utils/query.constants.ts`
 
