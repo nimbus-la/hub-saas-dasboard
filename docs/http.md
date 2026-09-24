@@ -219,6 +219,7 @@ import { isHttpError } from "@/lib/http";
 if (isHttpError(error)) {
     error.kind      // qué falló
     error.status    // código HTTP real, o null
+    error.effectiveStatus  // el httpStatus del sobre, o el real si no hubo sobre
     error.code      // código de negocio del backend, o null
     error.apiMessage
     error.isUnauthorized
@@ -226,6 +227,43 @@ if (isHttpError(error)) {
     error.hasStatusMismatch  // el sobre dice un código y la respuesta otro
 }
 ```
+
+### Dos estados en el mismo error
+
+Una respuesta de este backend trae dos números que no siempre coinciden: el
+estado HTTP que vio el navegador (`status`) y el `httpStatus` que el backend
+declara dentro del sobre. Puede responder `200 OK` con un 401 dentro, o un 400
+cuyo sobre dice 200.
+
+| Navegador | Sobre | Qué es | Qué se hace |
+|---|---|---|---|
+| 200 | 200 y `code` de fallo | Fallo de negocio | Se avisa con el `message` |
+| 400 | 400 | Error corriente | Se avisa con el `message` |
+| 200 | 401 | El fallo va dentro de un 200 | Se clasifica como 401 y se calla |
+| 400 | 200 | Los dos dicen cosas distintas | Se avisa con el `message` y se escribe en consola |
+| 502 | Sin sobre | La página HTML de un proxy | `errors.unexpected` |
+
+El criterio es que **manda el sobre**. Todo lo que decide qué aviso ve el
+usuario, si se calla o qué texto lleva, pregunta a `effectiveStatus`, que es el
+`httpStatus` del sobre y solo cae al del navegador cuando no llegó sobre.
+
+Los reintentos son la excepción y siguen mirando `status`. Un 503 que llegó de
+verdad es un servidor saturado; un 503 escrito dentro de un 200 es el backend
+contestando, y repetir la petición no lo cambia.
+
+Cuando los dos números no coinciden, `EnvelopeHttpClient` lo escribe en consola
+(solo en desarrollo) con el método, la URL, los dos estados y el código:
+
+```
+[http] POST /categories llegó con HTTP 200 pero el sobre declara 400 (código 1923)
+```
+
+Es para llevárselo al backend con la petición exacta; al usuario no le cambia
+nada.
+
+Un 4xx o 5xx que sale del backend **sin cabeceras CORS** llega como `network`:
+el navegador no deja leer el cuerpo, así que no hay sobre ni mensaje que
+enseñar. Eso se arregla en el backend, no aquí.
 
 Los cinco `kind`:
 
@@ -287,6 +325,14 @@ inventadas.
 
 Para silenciar un aviso se usa `meta`, no un try/catch en la pantalla.
 
+Lo que se calla en **toda** la aplicación no va en `meta` sino en dos listas de
+`utils/http.constants.ts`, que consulta `isSilentError`:
+
+- `HTTP_SILENT_STATUSES`, con el 401. Una sesión caducada no se arregla leyendo
+  un aviso, y con la sesión caída fallan a la vez todas las consultas de la
+  pantalla, cada una con su aviso repetido.
+- `API_SILENT_CODES`, para códigos de negocio que la aplicación resuelve sola.
+
 ### Qué texto se muestra
 
 Lo decide `resolveApiAlert`, y la regla es que **el backend gana cuando puede
@@ -311,18 +357,26 @@ usuario. El de un 5xx no se le enseña a nadie: suele ser el texto de una
 excepción interna y queda en el error para quien mire el registro. El tono sale
 del `status` del sobre con `ALERT_TONE_BY_API_STATUS`.
 
-Cuando solo hace falta el texto, por ejemplo para avisar desde un `catch`:
+Cuando solo hace falta el texto, por ejemplo para avisar desde un `catch` de
+una operación que no pasa por la caché:
 
 ```ts
-import { getApiErrorMessage } from "@/lib/http";
+import { getApiErrorMessage, isHttpError, isSilentError } from "@/lib/http";
 
 catch (error: unknown) {
+    if (isHttpError(error) && isSilentError(error)) return;
+
     notify.error(getApiErrorMessage(error));
 }
 ```
 
-Es lo que hace la pantalla de categorías al guardar: el modal se queda abierto
-con lo que se escribió y el motivo encima, en vez de obligar a reescribirlo.
+La pregunta a `isSilentError` va primero porque `getApiErrorMessage` siempre
+devuelve un texto: con un error silenciado daría `errors.unexpected`.
+
+Con una mutación no hace falta nada de esto. La pantalla de categorías hace
+`mutateAsync` dentro de un `try` y deja el `catch` vacío: el aviso ya lo pone
+la caché, y el `catch` solo sirve para que el modal se quede abierto con lo que
+se escribió.
 
 ### Avisar a mano: `notify`
 
@@ -755,8 +809,9 @@ servicio manda `tenantId`.
 pero ninguna pantalla los llama. El borrado de categorías tiene su diálogo
 montado y la llamada comentada en `Categories.tsx`, con el `TODO` a la vista.
 
-**Falta reaccionar a la sesión caducada.** Poner el token ya está resuelto; lo
-que falta es qué hacer ante un 401 (renovar o sacar al usuario).
+**Falta reaccionar a la sesión caducada.** Poner el token ya está resuelto, y
+el 401 ya no saca aviso (`HTTP_SILENT_STATUSES`); lo que falta es qué hacer
+ante él (renovar o sacar al usuario). Hasta entonces, un 401 no enseña nada.
 `AuthHttpClient` iría por fuera del decorador del sobre, porque este backend
 puede anunciar un 401 dentro de un `200 OK` y una capa colocada por dentro no lo
 vería. `LoggingHttpClient` iría por fuera de todo, que es el único punto que ve
