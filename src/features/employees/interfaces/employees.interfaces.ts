@@ -93,7 +93,7 @@ export interface EmployeeList {
     rolName: string;
     rolScope: string;
     isActive: boolean;
-    /** Fecha de la última actualización, ya formateada para mostrarse. */
+    /** Fecha de la última actualización en ISO 8601, sin formatear: la tabla la ordena y la muestra. */
     updatedAt: string;
 }
 

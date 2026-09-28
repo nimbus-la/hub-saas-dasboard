@@ -59,7 +59,7 @@ export default function EmployeeFormModal({
     onSubmit,
     className,
 }: EmployeeFormModalProps) {
-    const message = messages.employees.form;
+    const employeeFormCopy = messages.employees.form;
     const { control, formState, handleSubmit } = useFormContext<EmployeeFormValues>();
 
 
@@ -146,7 +146,7 @@ export default function EmployeeFormModal({
             description={generalMessage.description}
             size="lg"
             initialFocus={userNameFieldRef}
-            closeLabel={message.close}
+            closeLabel={employeeFormCopy.close}
             // Con cambios sin guardar, un clic fuera tira el trabajo. `Escape`,
             // la equis y "Cancelar" siguen cerrando: quitar también esas tres
             // dejaría el modal sin salida por teclado.
@@ -192,10 +192,10 @@ export default function EmployeeFormModal({
                                 field.ref(node);
                                 userNameFieldRef.current = node;
                             }}
-                            label={message.userName.label}
+                            label={employeeFormCopy.userName.label}
                             required
                             error={fieldState.error?.message ?? false}
-                            placeholder={message.userName.placeholder}
+                            placeholder={employeeFormCopy.userName.placeholder}
                             helperText={EMPLOYEE_FIELD_HINTS.userName}
                             autoComplete="off"
                         />
@@ -212,11 +212,11 @@ export default function EmployeeFormModal({
                     render={({ field, fieldState }) => (
                         <InputSelector
                             {...field}
-                            label={message.role.label}
+                            label={employeeFormCopy.role.label}
                             required
                             error={fieldState.error?.message ?? false}
-                            placeholder={message.role.placeholder}
-                            helperText={message.role.helper}
+                            placeholder={employeeFormCopy.role.placeholder}
+                            helperText={employeeFormCopy.role.helper}
                             options={EMPLOYEE_ROLE_OPTIONS}
                             clearable={false}
                         />
@@ -231,10 +231,10 @@ export default function EmployeeFormModal({
                         render={({ field, fieldState }) => (
                             <TextField
                                 {...field}
-                                label={message.firstName.label}
+                                label={employeeFormCopy.firstName.label}
                                 required
                                 error={fieldState.error?.message ?? false}
-                                placeholder={message.firstName.placeholder}
+                                placeholder={employeeFormCopy.firstName.placeholder}
                                 helperText={EMPLOYEE_FIELD_HINTS.firstName}
                                 autoComplete="off"
                             />
@@ -248,9 +248,9 @@ export default function EmployeeFormModal({
                         render={({ field, fieldState }) => (
                             <TextField
                                 {...field}
-                                label={message.secondName.label}
+                                label={employeeFormCopy.secondName.label}
                                 error={fieldState.error?.message ?? false}
-                                placeholder={message.secondName.placeholder}
+                                placeholder={employeeFormCopy.secondName.placeholder}
                                 helperText={EMPLOYEE_FIELD_HINTS.secondName}
                                 autoComplete="off"
                             />
@@ -264,10 +264,10 @@ export default function EmployeeFormModal({
                         render={({ field, fieldState }) => (
                             <TextField
                                 {...field}
-                                label={message.firstLastName.label}
+                                label={employeeFormCopy.firstLastName.label}
                                 required
                                 error={fieldState.error?.message ?? false}
-                                placeholder={message.firstLastName.placeholder}
+                                placeholder={employeeFormCopy.firstLastName.placeholder}
                                 helperText={EMPLOYEE_FIELD_HINTS.firstLastName}
                                 autoComplete="off"
                             />
@@ -281,9 +281,9 @@ export default function EmployeeFormModal({
                         render={({ field, fieldState }) => (
                             <TextField
                                 {...field}
-                                label={message.secondLastName.label}
+                                label={employeeFormCopy.secondLastName.label}
                                 error={fieldState.error?.message ?? false}
-                                placeholder={message.secondLastName.placeholder}
+                                placeholder={employeeFormCopy.secondLastName.placeholder}
                                 helperText={EMPLOYEE_FIELD_HINTS.secondLastName}
                                 autoComplete="off"
                             />
@@ -298,11 +298,11 @@ export default function EmployeeFormModal({
                             <TextField
                                 {...field}
                                 type="date"
-                                label={message.birthDate.label}
+                                label={employeeFormCopy.birthDate.label}
                                 required
                                 error={fieldState.error?.message ?? false}
-                                placeholder={message.birthDate.placeholder}
-                                helperText={message.birthDate.helper}
+                                placeholder={employeeFormCopy.birthDate.placeholder}
+                                helperText={employeeFormCopy.birthDate.helper}
                                 autoComplete="off"
                             />
                         )}
@@ -315,11 +315,11 @@ export default function EmployeeFormModal({
                         render={({ field, fieldState }) => (
                             <InputSelector
                                 {...field}
-                                label={message.sex.label}
+                                label={employeeFormCopy.sex.label}
                                 required
                                 error={fieldState.error?.message ?? false}
-                                placeholder={message.sex.placeholder}
-                                helperText={message.sex.helper}
+                                placeholder={employeeFormCopy.sex.placeholder}
+                                helperText={employeeFormCopy.sex.helper}
                                 options={EMPLOYEE_SEX_OPTIONS}
                                 clearable={false}
                             />
@@ -334,9 +334,9 @@ export default function EmployeeFormModal({
                             <TextField
                                 {...field}
                                 type="email"
-                                label={message.email.label}
+                                label={employeeFormCopy.email.label}
                                 error={fieldState.error?.message ?? false}
-                                placeholder={message.email.placeholder}
+                                placeholder={employeeFormCopy.email.placeholder}
                                 helperText={EMPLOYEE_FIELD_HINTS.email}
                                 autoComplete="email"
                             />
@@ -351,9 +351,9 @@ export default function EmployeeFormModal({
                             <TextField
                                 {...field}
                                 type="tel"
-                                label={message.phone.label}
+                                label={employeeFormCopy.phone.label}
                                 error={fieldState.error?.message ?? false}
-                                placeholder={message.phone.placeholder}
+                                placeholder={employeeFormCopy.phone.placeholder}
                                 helperText={EMPLOYEE_FIELD_HINTS.phone}
                                 autoComplete="tel"
                             />
@@ -374,7 +374,7 @@ export default function EmployeeFormModal({
                                     checked={field.value}
                                     onCheckedChange={field.onChange}
                                     name={field.name}
-                                    label={message.activeLabel}
+                                    label={employeeFormCopy.activeLabel}
                                     description={
                                         field.value
                                             ? EMPLOYEE_ACTIVE_HINT.on

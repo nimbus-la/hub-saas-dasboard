@@ -6,6 +6,7 @@ import StatusBadge from "@/components/badges/StatusBadge";
 import GenericButton from "@/components/buttons/GenericButton";
 import DataTable from "@/components/tables/DataTable";
 import { cn } from "@/lib/utils";
+import { formatDate } from "@/lib/format";
 import { formatMessage, messages } from "@/messages";
 
 import { ICON_TOKENS } from "@/tokens";
@@ -27,8 +28,8 @@ import {
 } from "./employees-table.style";
 
 
-/** Lo que dice esta tabla. Ver `@/messages`. */
-const message = messages.employees.table;
+/** Rótulos de la tabla. Con nombre propio para no confundirlos con los del formulario. Ver `@/messages`. */
+const EMPLOYEE_TABLE_COPY = messages.employees.table;
 
 
 /**
@@ -47,7 +48,7 @@ const message = messages.employees.table;
 const employeeColumns: ColumnDef<EmployeeList>[] = [
     {
         accessorKey: "userName",
-        header: message.userName,
+        header: EMPLOYEE_TABLE_COPY.userName,
         meta: { headerClassName: "w-40", cellClassName: "w-40" },
         cell: ({ row }) => (
             <span className={employeesTableUserNameVariants()}>
@@ -57,7 +58,7 @@ const employeeColumns: ColumnDef<EmployeeList>[] = [
     },
     {
         accessorKey: "firstName",
-        header: message.fullName,
+        header: EMPLOYEE_TABLE_COPY.fullName,
         meta: { headerClassName: "w-56", cellClassName: "w-56" },
         // El orden alfabético del nombre compuesto lo decide el backend; aquí
         // las dos columnas del nombre viven juntas en una sola celda.
@@ -69,7 +70,7 @@ const employeeColumns: ColumnDef<EmployeeList>[] = [
     },
     {
         accessorKey: "email",
-        header: message.email,
+        header: EMPLOYEE_TABLE_COPY.email,
         enableSorting: false,
         cell: ({ row }) => {
             const { email } = row.original;
@@ -78,7 +79,7 @@ const employeeColumns: ColumnDef<EmployeeList>[] = [
                 return (
                     <span
                         className={employeesTableEmptyValueVariants()}
-                        aria-label={message.noEmail}
+                        aria-label={EMPLOYEE_TABLE_COPY.noEmail}
                     >
                         {EMPTY_VALUE}
                     </span>
@@ -94,7 +95,7 @@ const employeeColumns: ColumnDef<EmployeeList>[] = [
     },
     {
         accessorKey: "rolName",
-        header: message.role,
+        header: EMPLOYEE_TABLE_COPY.role,
         meta: { headerClassName: "w-32", cellClassName: "w-32" },
         enableSorting: false,
         cell: ({ row }) => (
@@ -103,7 +104,7 @@ const employeeColumns: ColumnDef<EmployeeList>[] = [
     },
     {
         accessorKey: "isActive",
-        header: message.status,
+        header: EMPLOYEE_TABLE_COPY.status,
         meta: { headerClassName: "w-32", cellClassName: "w-32" },
         cell: ({ row }) => (
             <StatusBadge
@@ -114,14 +115,15 @@ const employeeColumns: ColumnDef<EmployeeList>[] = [
     },
     {
         accessorKey: "updatedAt",
-        header: message.updatedAt,
+        header: EMPLOYEE_TABLE_COPY.updatedAt,
         meta: { headerClassName: "w-32", cellClassName: "w-32" },
         cell: ({ row }) => {
             const { updatedAt } = row.original;
 
             return (
+                // `dateTime` conserva el ISO para la máquina; el texto, el formato hecho.
                 <time dateTime={updatedAt} className="tabular-nums">
-                    {updatedAt}
+                    {formatDate(updatedAt)}
                 </time>
             );
         },
@@ -165,10 +167,10 @@ export default function EmployeesTable({
                             variant="ghost"
                             size="sm"
                             icon={ICON_TOKENS.EDIT}
-                            aria-label={formatMessage(message.editEmployee, {
+                            aria-label={formatMessage(EMPLOYEE_TABLE_COPY.editEmployee, {
                                 name: formatEmployeeFullName(employee) || employee.userName,
                             })}
-                            title={message.edit}
+                            title={EMPLOYEE_TABLE_COPY.edit}
                             onClick={() => onEditEmployee(employee)}
                         />
 
@@ -177,10 +179,10 @@ export default function EmployeesTable({
                             variant="danger"
                             size="sm"
                             icon={ICON_TOKENS.DELETE}
-                            aria-label={formatMessage(message.deleteEmployee, {
+                            aria-label={formatMessage(EMPLOYEE_TABLE_COPY.deleteEmployee, {
                                 name: formatEmployeeFullName(employee) || employee.userName,
                             })}
-                            title={message.delete}
+                            title={EMPLOYEE_TABLE_COPY.delete}
                             onClick={() => onDeleteEmployee(employee)}
                             className={employeesTableDeleteVariants()}
                         />

@@ -1,4 +1,3 @@
-import { formatDate } from "@/lib/format";
 import type {
     CreateEmployeeParams,
     EmployeeFormValues,
@@ -64,8 +63,9 @@ export const toEmployee = (employee: EmployeeListApiResponse): EmployeeList => (
     rolScope: employee.rolScope,
     isActive: employee.isActive,
 
-    // Ésta sí se formatea: es dato de la tabla y de nada más.
-    updatedAt: formatDate(employee.updatedAt),
+    // Sin formatear, como `birthDate`: esta columna ordena, y un texto con
+    // formato se ordenaría por día ("01/01/2026" antes que "31/12/2025").
+    updatedAt: employee.updatedAt,
 });
 
 

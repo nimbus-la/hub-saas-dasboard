@@ -117,10 +117,10 @@ export function getEmployeeEmptyMessage({
     query: string;
     status: EmployeeStatusFilter;
 }): string {
-    const message = messages.employees;
+    const employeeCopy = messages.employees;
 
-    if (isPending) return message.loading;
-    if (isError) return message.loadError;
+    if (isPending) return employeeCopy.loading;
+    if (isError) return employeeCopy.loadError;
 
     const term = query.trim();
 
@@ -132,22 +132,22 @@ export function getEmployeeEmptyMessage({
             : EMPLOYEE_STATUS_PLURAL_LABELS[status];
 
     if (term.length > 0 && statusLabel !== null) {
-        return formatMessage(message.emptyFiltered.withBoth, {
+        return formatMessage(employeeCopy.emptyFiltered.withBoth, {
             query: term,
             status: statusLabel,
         });
     }
 
     if (term.length > 0) {
-        return formatMessage(message.emptyFiltered.withQuery, { query: term });
+        return formatMessage(employeeCopy.emptyFiltered.withQuery, { query: term });
     }
 
     if (statusLabel !== null) {
-        return formatMessage(message.emptyFiltered.withStatus, {
+        return formatMessage(employeeCopy.emptyFiltered.withStatus, {
             status: statusLabel,
         });
     }
 
     // Sin filtros y sin filas: no es que no se encuentre, es que no hay.
-    return message.emptyCatalog;
+    return employeeCopy.emptyCatalog;
 }

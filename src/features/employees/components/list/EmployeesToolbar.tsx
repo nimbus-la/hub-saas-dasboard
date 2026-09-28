@@ -20,7 +20,7 @@ import { EMPLOYEE_STATUS_OPTIONS, EmployeeStatusFilter, formatEmployeeCount } fr
 
 
 /** Lo que dice esta barra. Ver `@/messages`. */
-const COPY = messages.employees.toolbar;
+const EMPLOYEE_TOOLBAR_COPY = messages.employees.toolbar;
 
 
 /**
@@ -72,8 +72,8 @@ export default function EmployeesToolbar({
                     onChange={onQueryChange}
                     clearable
                     leftIcon={<ICON_TOKENS.SEARCH aria-hidden="true" />}
-                    placeholder={COPY.searchPlaceholder}
-                    aria-label={COPY.searchLabel}
+                    placeholder={EMPLOYEE_TOOLBAR_COPY.searchPlaceholder}
+                    aria-label={EMPLOYEE_TOOLBAR_COPY.searchLabel}
                     className={employeesToolbarSearchVariants()}
                 />
 
@@ -82,14 +82,14 @@ export default function EmployeesToolbar({
                     value={status}
                     onChange={(value) => onStatusChange((value || "all") as EmployeeStatusFilter)}
                     options={EMPLOYEE_STATUS_OPTIONS}
-                    placeholder={COPY.allStatuses}
-                    aria-label={COPY.filterLabel}
+                    placeholder={EMPLOYEE_TOOLBAR_COPY.allStatuses}
+                    aria-label={EMPLOYEE_TOOLBAR_COPY.filterLabel}
                     className={employeesToolbarFilterVariants()}
                 />
 
                 <GenericButton
                     type="button"
-                    label={COPY.create}
+                    label={EMPLOYEE_TOOLBAR_COPY.create}
                     startIcon={ICON_TOKENS.CREATE}
                     onClick={onCreateEmployee}
                     className={employeesToolbarActionVariants()}
@@ -101,7 +101,7 @@ export default function EmployeesToolbar({
             {hasFilters && (
                 <p aria-live="polite" className={employeesToolbarSummaryVariants()}>
                     <span className="tabular-nums">
-                        {formatMessage(COPY.summary, {
+                        {formatMessage(EMPLOYEE_TOOLBAR_COPY.summary, {
                             visible: formatEmployeeCount(visibleCount),
                             total: totalCount,
                         })}

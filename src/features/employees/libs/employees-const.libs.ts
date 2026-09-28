@@ -3,7 +3,8 @@ import { messages } from "@/messages";
 
 import { EmployeeFormValues, EmployeeRole, EmployeeSex } from "../interfaces";
 
-const copy = messages.employees;
+/** Textos del módulo de empleados. Con nombre propio: `copy` a secas no dice de dónde sale cada rótulo. Ver `@/messages`. */
+const EMPLOYEE_COPY = messages.employees;
 
 
 /**
@@ -29,7 +30,7 @@ export const EMPTY_VALUE = "-";
 export const EMPLOYEE_SEX_VALUES = ["FEMALE", "MALE"] as const satisfies readonly EmployeeSex[];
 
 /** Rótulos legibles de cada valor, en el orden en que se leen. */
-export const EMPLOYEE_SEX_LABELS: Record<EmployeeSex, string> = copy.sexLabels;
+export const EMPLOYEE_SEX_LABELS: Record<EmployeeSex, string> = EMPLOYEE_COPY.sexLabels;
 
 /**
  * Opciones del selector.
@@ -68,7 +69,7 @@ export const EMPLOYEE_ROLE_VALUES = [
 ] as const satisfies readonly EmployeeRole[];
 
 /** Rótulos legibles de cada rol, en el mismo orden que se leen. */
-export const EMPLOYEE_ROLE_LABELS: Record<EmployeeRole, string> = copy.roles;
+export const EMPLOYEE_ROLE_LABELS: Record<EmployeeRole, string> = EMPLOYEE_COPY.roles;
 
 /**
  * Opciones del selector.
@@ -131,10 +132,10 @@ export const EMPLOYEE_STATUS_TO_IS_ACTIVE: Record<
 // El rótulo y el tono se resuelven aquí y no en la tabla para que cualquier
 // vista que muestre un empleado lo pinte igual.
 
-export const EMPLOYEE_STATUS_LABELS = copy.status;
+export const EMPLOYEE_STATUS_LABELS = EMPLOYEE_COPY.status;
 
 /** Los mismos estados en plural y minúscula, para meterlos dentro de una frase. */
-export const EMPLOYEE_STATUS_PLURAL_LABELS = copy.statusPlural;
+export const EMPLOYEE_STATUS_PLURAL_LABELS = EMPLOYEE_COPY.statusPlural;
 
 export const EMPLOYEE_STATUS_TONES: Record<
     keyof typeof EMPLOYEE_STATUS_LABELS,
@@ -152,7 +153,7 @@ export const EMPLOYEE_STATUS_OPTIONS: {
     value: EmployeeStatusFilter;
     label: string;
 }[] = [
-        { value: "all", label: copy.toolbar.allStatuses },
+        { value: "all", label: EMPLOYEE_COPY.toolbar.allStatuses },
         { value: "active", label: EMPLOYEE_STATUS_LABELS.active },
         { value: "inactive", label: EMPLOYEE_STATUS_LABELS.inactive },
     ];

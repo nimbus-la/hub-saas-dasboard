@@ -48,7 +48,7 @@ export default function Employees() {
     });
 
 
-    const message = messages.employees;
+    const employeePageCopy = messages.employees;
 
 
     // ── Formulario ──────────────────────────────────────────────────────────
@@ -154,8 +154,8 @@ export default function Employees() {
         <FormProvider {...form}>
             <div className={employeesPageVariants()}>
                 <PageHeader
-                    title={message.title}
-                    subtitle={message.subtitle}
+                    title={employeePageCopy.title}
+                    subtitle={employeePageCopy.subtitle}
                     badge={
                         <StatusBadge
                             size="xs"
@@ -205,7 +205,7 @@ export default function Employees() {
                             totalItems={employees.total}
                             onPageChange={pagination.goToPage}
                             onPageSizeChange={pagination.changePageSize}
-                            itemLabel={message.itemLabel}
+                            itemLabel={employeePageCopy.itemLabel}
                             className={employeesPagePaginationVariants()}
                         />
                     )}
@@ -225,13 +225,13 @@ export default function Employees() {
                     <ConfirmDialog
                         open={isDeleteOpen}
                         onOpenChange={setIsDeleteOpen}
-                        title={message.delete.title}
-                        description={formatMessage(message.delete.description, {
+                        title={employeePageCopy.delete.title}
+                        description={formatMessage(employeePageCopy.delete.description, {
                             name:
                                 formatEmployeeFullName(deleteTarget) || deleteTarget.userName,
                         })}
-                        confirmLabel={message.delete.confirm}
-                        cancelLabel={message.delete.cancel}
+                        confirmLabel={employeePageCopy.delete.confirm}
+                        cancelLabel={employeePageCopy.delete.cancel}
                         onConfirm={handleDeleteConfirm}
                         loading={employees.delete.isPending}
                     />

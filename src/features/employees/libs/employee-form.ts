@@ -13,8 +13,8 @@ import { formatMessage, messages } from "@/messages";
 
 import { EmployeeFormValues, EmployeeList } from "../interfaces";
 
-/** Atajo al bloque del catálogo que da nombre a todo lo de este archivo. */
-const copy = messages.employees;
+/** Textos del módulo de empleados. Con nombre propio: `copy` a secas no dice de dónde sale cada rótulo. Ver `@/messages`. */
+const EMPLOYEE_COPY = messages.employees;
 
 /* -------------------------------------------------------------------------- */
 /*  Reglas de validación                                                       */
@@ -83,10 +83,10 @@ type FieldRules<K extends keyof EmployeeFormValues> = RegisterOptions<
  */
 export const EMPLOYEE_FORM_RULES = {
     userName: {
-        required: copy.validation.userNameRequired,
+        required: EMPLOYEE_COPY.validation.userNameRequired,
         maxLength: {
             value: EMPLOYEE_USERNAME_LIMITS.max,
-            message: formatMessage(copy.validation.userNameMax, {
+            message: formatMessage(EMPLOYEE_COPY.validation.userNameMax, {
                 max: EMPLOYEE_USERNAME_LIMITS.max,
             }),
         },
@@ -97,21 +97,21 @@ export const EMPLOYEE_FORM_RULES = {
         validate: {
             length: (value: string) =>
                 value.trim().length >= EMPLOYEE_USERNAME_LIMITS.min ||
-                formatMessage(copy.validation.userNameMin, {
+                formatMessage(EMPLOYEE_COPY.validation.userNameMin, {
                     min: EMPLOYEE_USERNAME_LIMITS.min,
                 }),
 
             charset: (value: string) =>
                 value.trim().length === 0 ||
                 USERNAME_ALLOWED_CHARS.test(value.trim()) ||
-                copy.validation.userNameChars,
+                EMPLOYEE_COPY.validation.userNameChars,
         },
     } satisfies FieldRules<"userName">,
 
     email: {
         maxLength: {
             value: EMPLOYEE_EMAIL_LIMITS.max,
-            message: formatMessage(copy.validation.emailMax, {
+            message: formatMessage(EMPLOYEE_COPY.validation.emailMax, {
                 max: EMPLOYEE_EMAIL_LIMITS.max,
             }),
         },
@@ -121,15 +121,15 @@ export const EMPLOYEE_FORM_RULES = {
             format: (value: string) =>
                 value.trim().length === 0 ||
                 EMAIL_PATTERN.test(value.trim()) ||
-                copy.validation.emailFormat,
+                EMPLOYEE_COPY.validation.emailFormat,
         },
     } satisfies FieldRules<"email">,
 
     firstName: {
-        required: copy.validation.firstNameRequired,
+        required: EMPLOYEE_COPY.validation.firstNameRequired,
         maxLength: {
             value: EMPLOYEE_NAME_LIMITS.max,
-            message: formatMessage(copy.validation.nameMax, {
+            message: formatMessage(EMPLOYEE_COPY.validation.nameMax, {
                 max: EMPLOYEE_NAME_LIMITS.max,
             }),
         },
@@ -137,21 +137,21 @@ export const EMPLOYEE_FORM_RULES = {
         validate: {
             length: (value: string) =>
                 value.trim().length >= EMPLOYEE_NAME_LIMITS.min ||
-                formatMessage(copy.validation.nameMin, {
+                formatMessage(EMPLOYEE_COPY.validation.nameMin, {
                     min: EMPLOYEE_NAME_LIMITS.min,
                 }),
 
             charset: (value: string) =>
                 value.trim().length === 0 ||
                 NAME_ALLOWED_CHARS.test(value.trim()) ||
-                copy.validation.nameChars,
+                EMPLOYEE_COPY.validation.nameChars,
         },
     } satisfies FieldRules<"firstName">,
 
     secondName: {
         maxLength: {
             value: EMPLOYEE_NAME_LIMITS.max,
-            message: formatMessage(copy.validation.nameMax, {
+            message: formatMessage(EMPLOYEE_COPY.validation.nameMax, {
                 max: EMPLOYEE_NAME_LIMITS.max,
             }),
         },
@@ -160,22 +160,22 @@ export const EMPLOYEE_FORM_RULES = {
             length: (value: string) =>
                 value.trim().length === 0 ||
                 value.trim().length >= EMPLOYEE_NAME_LIMITS.min ||
-                formatMessage(copy.validation.nameOptionalMin, {
+                formatMessage(EMPLOYEE_COPY.validation.nameOptionalMin, {
                     min: EMPLOYEE_NAME_LIMITS.min,
                 }),
 
             charset: (value: string) =>
                 value.trim().length === 0 ||
                 NAME_ALLOWED_CHARS.test(value.trim()) ||
-                copy.validation.nameChars,
+                EMPLOYEE_COPY.validation.nameChars,
         },
     } satisfies FieldRules<"secondName">,
 
     firstLastName: {
-        required: copy.validation.firstLastNameRequired,
+        required: EMPLOYEE_COPY.validation.firstLastNameRequired,
         maxLength: {
             value: EMPLOYEE_NAME_LIMITS.max,
-            message: formatMessage(copy.validation.nameMax, {
+            message: formatMessage(EMPLOYEE_COPY.validation.nameMax, {
                 max: EMPLOYEE_NAME_LIMITS.max,
             }),
         },
@@ -183,21 +183,21 @@ export const EMPLOYEE_FORM_RULES = {
         validate: {
             length: (value: string) =>
                 value.trim().length >= EMPLOYEE_NAME_LIMITS.min ||
-                formatMessage(copy.validation.nameMin, {
+                formatMessage(EMPLOYEE_COPY.validation.nameMin, {
                     min: EMPLOYEE_NAME_LIMITS.min,
                 }),
 
             charset: (value: string) =>
                 value.trim().length === 0 ||
                 NAME_ALLOWED_CHARS.test(value.trim()) ||
-                copy.validation.nameChars,
+                EMPLOYEE_COPY.validation.nameChars,
         },
     } satisfies FieldRules<"firstLastName">,
 
     secondLastName: {
         maxLength: {
             value: EMPLOYEE_NAME_LIMITS.max,
-            message: formatMessage(copy.validation.nameMax, {
+            message: formatMessage(EMPLOYEE_COPY.validation.nameMax, {
                 max: EMPLOYEE_NAME_LIMITS.max,
             }),
         },
@@ -206,46 +206,46 @@ export const EMPLOYEE_FORM_RULES = {
             length: (value: string) =>
                 value.trim().length === 0 ||
                 value.trim().length >= EMPLOYEE_NAME_LIMITS.min ||
-                formatMessage(copy.validation.nameOptionalMin, {
+                formatMessage(EMPLOYEE_COPY.validation.nameOptionalMin, {
                     min: EMPLOYEE_NAME_LIMITS.min,
                 }),
 
             charset: (value: string) =>
                 value.trim().length === 0 ||
                 NAME_ALLOWED_CHARS.test(value.trim()) ||
-                copy.validation.nameChars,
+                EMPLOYEE_COPY.validation.nameChars,
         },
     } satisfies FieldRules<"secondLastName">,
 
     birthDate: {
-        required: copy.validation.birthDateRequired,
-        maxLength: { value: 10, message: copy.validation.birthDateFormat },
+        required: EMPLOYEE_COPY.validation.birthDateRequired,
+        maxLength: { value: 10, message: EMPLOYEE_COPY.validation.birthDateFormat },
 
         validate: {
             format: (value: string) =>
                 value.trim().length === 0 ||
                 /^\d{4}-\d{2}-\d{2}$/.test(value.trim()) ||
-                copy.validation.birthDateFormat,
+                EMPLOYEE_COPY.validation.birthDateFormat,
 
             notFuture: (value: string) =>
                 value.trim().length === 0 ||
                 value.trim() <= todayISO() ||
-                copy.validation.birthDateFuture,
+                EMPLOYEE_COPY.validation.birthDateFuture,
         },
     } satisfies FieldRules<"birthDate">,
 
     sex: {
-        required: copy.validation.sexRequired,
+        required: EMPLOYEE_COPY.validation.sexRequired,
     } satisfies FieldRules<"sex">,
 
     role: {
-        required: copy.validation.roleRequired,
+        required: EMPLOYEE_COPY.validation.roleRequired,
     } satisfies FieldRules<"role">,
 
     phone: {
         maxLength: {
             value: EMPLOYEE_PHONE_LIMITS.max,
-            message: formatMessage(copy.validation.phoneMax, {
+            message: formatMessage(EMPLOYEE_COPY.validation.phoneMax, {
                 max: EMPLOYEE_PHONE_LIMITS.max,
             }),
         },
@@ -254,14 +254,14 @@ export const EMPLOYEE_FORM_RULES = {
             length: (value: string) =>
                 value.trim().length === 0 ||
                 value.trim().length >= EMPLOYEE_PHONE_LIMITS.min ||
-                formatMessage(copy.validation.phoneMin, {
+                formatMessage(EMPLOYEE_COPY.validation.phoneMin, {
                     min: EMPLOYEE_PHONE_LIMITS.min,
                 }),
 
             charset: (value: string) =>
                 value.trim().length === 0 ||
                 PHONE_ALLOWED_CHARS.test(value.trim()) ||
-                copy.validation.phoneChars,
+                EMPLOYEE_COPY.validation.phoneChars,
         },
     } satisfies FieldRules<"phone">,
 } as const;
@@ -313,8 +313,8 @@ export function hasEmployeeChanges(
  * repetido cinco veces dentro del JSX.
  */
 export const EMPLOYEE_MODAL_COPY = {
-    create: copy.form.create,
-    edit: copy.form.edit,
+    create: EMPLOYEE_COPY.form.create,
+    edit: EMPLOYEE_COPY.form.edit,
 } as const;
 
 export type EmployeeModalMode = keyof typeof EMPLOYEE_MODAL_COPY;
@@ -329,34 +329,34 @@ export type EmployeeModalMode = keyof typeof EMPLOYEE_MODAL_COPY;
  * arriba, así que el texto y la regla no pueden discrepar.
  */
 export const EMPLOYEE_FIELD_HINTS = {
-    userName: formatMessage(copy.form.userName.helper, {
+    userName: formatMessage(EMPLOYEE_COPY.form.userName.helper, {
         min: EMPLOYEE_USERNAME_LIMITS.min,
         max: EMPLOYEE_USERNAME_LIMITS.max,
     }),
-    email: formatMessage(copy.form.email.helper, {
+    email: formatMessage(EMPLOYEE_COPY.form.email.helper, {
         max: EMPLOYEE_EMAIL_LIMITS.max,
     }),
-    firstName: formatMessage(copy.form.firstName.helper, {
+    firstName: formatMessage(EMPLOYEE_COPY.form.firstName.helper, {
         min: EMPLOYEE_NAME_LIMITS.min,
         max: EMPLOYEE_NAME_LIMITS.max,
     }),
-    secondName: formatMessage(copy.form.secondName.helper, {
+    secondName: formatMessage(EMPLOYEE_COPY.form.secondName.helper, {
         min: EMPLOYEE_NAME_LIMITS.min,
         max: EMPLOYEE_NAME_LIMITS.max,
     }),
-    firstLastName: formatMessage(copy.form.firstLastName.helper, {
+    firstLastName: formatMessage(EMPLOYEE_COPY.form.firstLastName.helper, {
         min: EMPLOYEE_NAME_LIMITS.min,
         max: EMPLOYEE_NAME_LIMITS.max,
     }),
-    secondLastName: formatMessage(copy.form.secondLastName.helper, {
+    secondLastName: formatMessage(EMPLOYEE_COPY.form.secondLastName.helper, {
         min: EMPLOYEE_NAME_LIMITS.min,
         max: EMPLOYEE_NAME_LIMITS.max,
     }),
-    phone: formatMessage(copy.form.phone.helper, {
+    phone: formatMessage(EMPLOYEE_COPY.form.phone.helper, {
         min: EMPLOYEE_PHONE_LIMITS.min,
         max: EMPLOYEE_PHONE_LIMITS.max,
     }),
 } as const;
 
 /** Aviso del interruptor. Explica qué pasa con el acceso al desactivar. */
-export const EMPLOYEE_ACTIVE_HINT = copy.form.activeHint;
+export const EMPLOYEE_ACTIVE_HINT = EMPLOYEE_COPY.form.activeHint;
