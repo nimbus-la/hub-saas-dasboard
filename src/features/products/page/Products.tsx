@@ -25,7 +25,7 @@ import {
     ProductsGrid,
     ProductsHeader,
 } from "../components/list";
-import { useCategoryOptions, useProducts } from "../hooks";
+import { useCategoryTabs, useProducts } from "../hooks";
 import {
     productsPageBodyVariants,
     productsPagePaginationVariants,
@@ -45,19 +45,17 @@ export default function Products() {
     const router = useRouter();
 
     const products = useProducts();
-    const categories = useCategoryOptions();
+    const categories = useCategoryTabs();
 
     const { pagination } = products;
 
-    // Las pestañas no llevan contador porque el backend no cuenta los
-    // productos de cada categoría.
     const categoryTabs: FilterTabItem[] = [
-        { value: ALL_CATEGORIES, label: COPY.allCategories },
-        ...categories.options.map(({ value, label }) => ({ value, label })),
+        { value: ALL_CATEGORIES, label: COPY.allCategories, count: products.catalogTotal },
+        ...categories.tabs,
     ];
 
     const categoryLabel =
-        categories.options.find((option) => option.value === products.categoryId)?.label ??
+        categories.tabs.find((tab) => tab.value === products.categoryId)?.label ??
         COPY.allCategoriesLabel;
 
     const handleCreateProduct = React.useCallback(() => {

@@ -1,4 +1,4 @@
-import type { ApiResponseWithPagination, InputSelectorOption } from "@/interfaces";
+import type { ApiResponseWithPagination, FilterTabItem, InputSelectorOption } from "@/interfaces";
 
 import type { CategoryFormValues, CategoryList, CategoryListApiResponse, CreateCategoryParams, UpdateCategoryParams } from "../interfaces";
 
@@ -21,6 +21,7 @@ export const toCategory = (category: CategoryListApiResponse): CategoryList => (
     // mostraría y se guardaría como si fuera la descripción real.
     description: category.description ?? "",
 
+    productCount: category.productCount,
     updatedAt: category.updatedAt,
     isActive: category.isActive,
 });
@@ -39,6 +40,21 @@ export const toCategoryOptions = (
     page: ApiResponseWithPagination<CategoryList[]>
 ): InputSelectorOption[] =>
     page.rows.map((category) => ({ label: category.name, value: category.id }));
+
+
+/**
+ * Convierte una página de categorías en las pestañas del listado de
+ * productos. Tiene su propio mapper y no reutiliza las opciones del selector,
+ * porque las pestañas muestran cuántos productos hay y el selector no.
+ */
+export const toCategoryTabs = (
+    page: ApiResponseWithPagination<CategoryList[]>
+): FilterTabItem[] =>
+    page.rows.map((category) => ({
+        value: category.id,
+        label: category.name,
+        count: category.productCount,
+    }));
 
 
 /** Llena el formulario de edición con los datos de la categoría. */
