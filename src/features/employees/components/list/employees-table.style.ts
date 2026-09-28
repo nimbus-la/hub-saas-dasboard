@@ -50,6 +50,15 @@ export const employeesTableEmptyValueVariants = cva([
 
 
 /**
+ * Fecha de actualización. Se mantiene en una sola línea para que la fecha y
+ * la hora no se separen, y los números ocupan el mismo ancho en cada fila.
+ */
+export const employeesTableDateVariants = cva([
+    "tabular-nums whitespace-nowrap",
+]);
+
+
+/**
  * Acciones de la fila.
  *
  * Dos botones `sm` (32px) pegados al margen derecho. `justify-end` los ancla

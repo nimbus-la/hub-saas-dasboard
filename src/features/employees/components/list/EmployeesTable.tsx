@@ -20,6 +20,7 @@ import {
 } from "../../libs";
 import {
     employeesTableActionsVariants,
+    employeesTableDateVariants,
     employeesTableDeleteVariants,
     employeesTableEmptyValueVariants,
     employeesTableNameVariants,
@@ -116,13 +117,14 @@ const employeeColumns: ColumnDef<EmployeeList>[] = [
     {
         accessorKey: "updatedAt",
         header: EMPLOYEE_TABLE_COPY.updatedAt,
-        meta: { headerClassName: "w-32", cellClassName: "w-32" },
+        // La fecha incluye la hora, así que necesita más ancho que el estado.
+        meta: { headerClassName: "w-48", cellClassName: "w-48" },
         cell: ({ row }) => {
             const { updatedAt } = row.original;
 
             return (
                 // `dateTime` conserva el ISO para la máquina; el texto, el formato hecho.
-                <time dateTime={updatedAt} className="tabular-nums">
+                <time dateTime={updatedAt} className={employeesTableDateVariants()}>
                     {formatDate(updatedAt)}
                 </time>
             );
