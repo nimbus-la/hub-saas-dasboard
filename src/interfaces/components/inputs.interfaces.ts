@@ -73,6 +73,23 @@ export interface InputSelectorProps {
     leadingIcon?: React.ReactNode;
     /** Mensaje cuando la búsqueda no arroja coincidencias. */
     emptyMessage?: string;
+
+    /**
+     * Búsqueda en el servidor. Con él, el selector deja de filtrar las
+     * opciones por su cuenta y avisa de lo que se escribe; al elegir, cerrar o
+     * limpiar recibe `""`. Hace falta cuando las opciones llegan por tandas:
+     * filtrar solo lo cargado escondería lo que aún no ha llegado.
+     */
+    onSearchChange?: (query: string) => void;
+    /**
+     * Si hay más opciones por traer y se pueden pedir ahora. Apágalo mientras
+     * llega una tanda, igual que con `useScrollEndLoad`.
+     */
+    canLoadMore?: boolean;
+    /** Se llama cuando la lista se desplaza cerca de su final. */
+    onLoadMore?: () => unknown;
+    /** Muestra un aviso bajo la lista mientras llega la siguiente tanda. */
+    isLoadingMore?: boolean;
     /** Alto, tipografía, padding y tamaño de iconos. */
     size?: InputSelectorSize;
     /** Ocupa el 100% del contenedor padre. */

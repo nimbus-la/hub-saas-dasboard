@@ -6,7 +6,6 @@
 
 import { formatList } from "@/lib/format";
 import {
-    getIngredient,
     isIngredientOutOfStock,
     searchIngredients,
     type Ingredient,
@@ -34,6 +33,23 @@ export const RECIPE_SEARCH_RESULTS = 6;
 const message = messages.products.create.recipe;
 
 
+/** Inventario indexado por id, que es como la receta busca cada insumo. */
+export type IngredientsById = ReadonlyMap<string, Ingredient>;
+
+
+/**
+ * Copia de la receta para `useWatch`.
+ *
+ * react-hook-form modifica el arreglo de la receta sin crear uno nuevo, así
+ * que si se usara tal cual React no vería el cambio. Con una copia por línea
+ * cada cambio llega como un valor nuevo, y el cálculo contra el inventario se
+ * puede hacer después, cuando el inventario también esté disponible.
+ */
+export const snapshotRecipe = (
+    recipe: readonly ProductRecipeFormValues[] | undefined
+): ProductRecipeFormValues[] => (recipe ?? []).map((line) => ({ ...line }));
+
+
 /**
  * Busca el insumo de cada línea del formulario y calcula su costo.
  *
@@ -46,10 +62,11 @@ const message = messages.products.create.recipe;
  * que está completo.
  */
 export function resolveRecipeLines(
-    recipe: readonly ProductRecipeFormValues[]
+    recipe: readonly ProductRecipeFormValues[],
+    inventory: IngredientsById
 ): RecipeLine[] {
     return recipe.flatMap((item, index) => {
-        const ingredient = getIngredient(item.itemId);
+        const ingredient = inventory.get(item.itemId);
 
         if (!ingredient) return [];
 
@@ -73,10 +90,11 @@ export function resolveRecipeLines(
  * no existe y cada fila guarda su posición original en la receta.
  */
 export function resolveRecipeRows(
-    fields: readonly (ProductRecipeFormValues & { id: string })[]
+    fields: readonly (ProductRecipeFormValues & { id: string })[],
+    inventory: IngredientsById
 ): RecipeRow[] {
     return fields.flatMap((field, index) => {
-        const ingredient = getIngredient(field.itemId);
+        const ingredient = inventory.get(field.itemId);
 
         if (!ingredient) return [];
 
@@ -141,10 +159,15 @@ export function formatOutOfStockNotice(ingredients: readonly Ingredient[]): stri
  * llegó al tope. Separa las coincidencias de las que se pueden añadir para
  * saber si el insumo no existe o si ya está en la receta, porque en cada caso
  * la persona tiene que hacer algo distinto.
+ *
+ * Mientras el inventario llega, una búsqueda con texto queda en `loading`: sin
+ * eso diría que ningún insumo coincide cuando todavía no hay con qué comparar.
  */
 export function searchRecipeIngredients(
     query: string,
-    selectedIds: readonly string[]
+    selectedIds: readonly string[],
+    ingredients: readonly Ingredient[],
+    isLoading: boolean
 ): IngredientSearchResult {
     const term = query.trim();
 
@@ -156,7 +179,11 @@ export function searchRecipeIngredients(
         return { status: "idle", results: [], hiddenCount: 0 };
     }
 
-    const matches = searchIngredients(term);
+    if (isLoading) {
+        return { status: "loading", results: [], hiddenCount: 0 };
+    }
+
+    const matches = searchIngredients(ingredients, term);
     const selected = new Set(selectedIds);
     const available = matches.filter((ingredient) => !selected.has(ingredient.id));
 

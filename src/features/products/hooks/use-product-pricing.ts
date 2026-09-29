@@ -8,11 +8,7 @@
 import * as React from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
-import type {
-    ProductFormValues,
-    ProductRecipeFormValues,
-    RecipeCost,
-} from "../interfaces";
+import type { ProductFormValues } from "../interfaces";
 import {
     countCustomBranches,
     getMarginFromPrice,
@@ -21,13 +17,9 @@ import {
     resolveBranchPricing,
     resolveGlobalPricing,
     resolveRecipeLines,
+    snapshotRecipe,
 } from "../libs";
-
-
-/** Fuera del hook para que `useWatch` reciba siempre la misma función. */
-const computeRecipeCost = (
-    recipe: ProductRecipeFormValues[] | undefined
-): RecipeCost => getRecipeCost(resolveRecipeLines(recipe ?? []));
+import { useInventory } from "./use-inventory";
 
 
 export function useProductPricing() {
@@ -36,7 +28,17 @@ export function useProductPricing() {
     // El costo se recalcula desde la receta y no se guarda en el formulario:
     // si los insumos suben de precio, el paso tiene que mostrar el costo de
     // hoy y no el del momento en que se escribió la receta.
-    const cost = useWatch({ control, name: "recipe", compute: computeRecipeCost });
+    //
+    // La receta llega copiada y el costo se calcula fuera de `useWatch`, para
+    // que también se rehaga cuando llega el inventario y no solo cuando cambia
+    // el formulario.
+    const { byId } = useInventory();
+    const recipe = useWatch({ control, name: "recipe", compute: snapshotRecipe });
+
+    const cost = React.useMemo(
+        () => getRecipeCost(resolveRecipeLines(recipe, byId)),
+        [recipe, byId]
+    );
 
     const margin = useWatch({ control, name: "margin" });
     const price = useWatch({ control, name: "price" });

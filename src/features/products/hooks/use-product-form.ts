@@ -6,28 +6,21 @@
 // lleva la librería; aquí sólo vive lo que ella no sabe: en qué paso estamos y
 // qué campos hay que dar por buenos antes de avanzar.
 
-import { useRouter } from "next/navigation";
 import * as React from "react";
 import { useForm, useFormState } from "react-hook-form";
-
-import { notify } from "@/components";
-import { formatMessage, messages } from "@/messages";
 
 import { ProductFormValues } from "../interfaces";
 import {
     DEFAULT_PRODUCT_FORM_VALUES,
-    PRODUCTS_LIST_HREF,
     PRODUCT_FORM_STEP_LENGTH,
     findFirstInvalidStep,
     getProductFormStep,
 } from "../libs";
-
-
-const message = messages.products.create;
+import { useCreateProduct } from "./use-create-product";
 
 
 export function useProductForm() {
-    const router = useRouter();
+    const createProduct = useCreateProduct();
 
     const form = useForm<ProductFormValues>({
         defaultValues: DEFAULT_PRODUCT_FORM_VALUES,
@@ -91,15 +84,10 @@ export function useProductForm() {
                     return;
                 }
 
-                // Todavía no hay endpoint de alta. Se confirma y se vuelve al
-                // listado, que es lo que va a pasar cuando el backend responda.
-                notify.success(message.success.title, {
-                    description: formatMessage(message.success.description, {
-                        name: form.getValues("name").trim(),
-                    }),
-                });
-
-                router.push(PRODUCTS_LIST_HREF);
+                // La vuelta al listado la hace la mutación al confirmarse. Si
+                // el backend rechaza el alta, la persona se queda aquí con su
+                // borrador para corregirlo.
+                createProduct.mutate(form.getValues());
                 return;
             }
 
@@ -107,7 +95,7 @@ export function useProductForm() {
                 Math.min(current + 1, PRODUCT_FORM_STEP_LENGTH - 1)
             );
         },
-        [form, isLastStep, router, step.fields]
+        [createProduct, form, isLastStep, step.fields]
     );
 
     return {
@@ -119,6 +107,8 @@ export function useProductForm() {
         isLastStep,
         /** El paso en pantalla no tiene campos vacíos, inválidos ni con error. */
         isStepValid,
+        /** El alta está en camino; el botón de guardar no debe volver a enviarla. */
+        isSubmitting: createProduct.isPending,
         submitStep,
         goToPreviousStep,
     };
