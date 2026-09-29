@@ -1,5 +1,6 @@
 export * from './use-categories';
 export * from './use-create-product';
+export * from './use-inventory';
 export * from './use-category-filters';
 export * from './use-category-options';
 export * from './use-category-tabs';

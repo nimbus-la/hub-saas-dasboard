@@ -50,4 +50,12 @@ export const ENDPOINTS = {
     PRODUCTS_CATEGORY: "products/categories",
     PRODUCTS_CATEGORY_UPDATE: "products/categories/update",
 
+    // ── Inventario ──────────────────────────────────────────────────────────
+
+    /**
+     * Insumos del inventario. Pagina hasta 100 por página, filtra por sucursal
+     * y no busca por texto.
+     */
+    INVENTORY_ITEMS: "inventory/item",
+
 } as const;

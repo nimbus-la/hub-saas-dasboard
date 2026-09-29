@@ -5,18 +5,15 @@ import { useFieldArray, useFormContext, useFormState, useWatch } from "react-hoo
 
 import type { Ingredient } from "@/lib/ingredients";
 
-import type { ProductFormValues, ProductRecipeFormValues, RecipeLine } from "../interfaces";
-import { DEFAULT_RECIPE_LINE_VALUES, RECIPE_RULES, resolveRecipeLines, resolveRecipeRows } from "../libs";
-
-
-/**
- * Convierte la receta del formulario en líneas con su costo.
- *
- * Está fuera del hook para que `useWatch` reciba siempre la misma función.
- */
-const computeRecipeLines = (
-    recipe: ProductRecipeFormValues[] | undefined
-): RecipeLine[] => resolveRecipeLines(recipe ?? []);
+import type { ProductFormValues } from "../interfaces";
+import {
+    DEFAULT_RECIPE_LINE_VALUES,
+    RECIPE_RULES,
+    resolveRecipeLines,
+    resolveRecipeRows,
+    snapshotRecipe,
+} from "../libs";
+import { useInventory } from "./use-inventory";
 
 
 /**
@@ -53,17 +50,17 @@ export function useRecipeLines() {
         register("recipe", RECIPE_RULES);
     }, [register]);
 
-    const rows = React.useMemo(() => resolveRecipeRows(fields), [fields]);
+    const { byId } = useInventory();
 
-    // Las líneas se calculan dentro de `useWatch` con `compute`. Si se
-    // calcularan después con el valor que devuelve `useWatch`, el total podría
-    // quedarse quieto, porque react-hook-form modifica ese arreglo sin crear
-    // uno nuevo y React no se entera del cambio.
-    const lines = useWatch({
-        control,
-        name: "recipe",
-        compute: computeRecipeLines,
-    });
+    const rows = React.useMemo(() => resolveRecipeRows(fields, byId), [fields, byId]);
+
+    // `useWatch` entrega una copia de la receta y las líneas se resuelven
+    // después. Si se resolvieran dentro de `compute`, al llegar el inventario
+    // no se recalcularían hasta el siguiente cambio del formulario, porque
+    // `useWatch` solo vuelve a llamar a `compute` cuando cambia un valor.
+    const recipe = useWatch({ control, name: "recipe", compute: snapshotRecipe });
+
+    const lines = React.useMemo(() => resolveRecipeLines(recipe, byId), [recipe, byId]);
 
     const { errors } = useFormState({ control, name: "recipe" });
 

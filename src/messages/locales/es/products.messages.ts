@@ -269,6 +269,8 @@ export const products = {
                  * vea— y dice dónde mirar si el insumo debería existir.
                  */
                 empty: "Ningún insumo del inventario coincide con «{query}». Revisa la escritura o dalo de alta en Inventario.",
+                /** Mientras llega el inventario, para no decir antes de tiempo que nada coincide. */
+                loading: "Cargando el inventario…",
                 /** Cuando todo lo que coincide ya está en la receta. */
                 allAdded: "Todos los insumos que coinciden con «{query}» ya están en la receta.",
 

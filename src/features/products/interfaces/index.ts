@@ -1,4 +1,5 @@
 export * from './categories.interfaces';
+export * from './inventory.interfaces';
 export * from './category-form.interfaces';
 export * from './pricing.interfaces';
 export * from './product-create.interfaces';
