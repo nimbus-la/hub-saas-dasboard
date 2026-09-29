@@ -28,23 +28,28 @@ import {
  *
  * El relleno horizontal sí es el del control, y hace doble trabajo: separa una
  * pestaña de la siguiente Y extiende su subrayado hasta tocar el de la vecina.
- * Por eso la lista no lleva `gap` — ver `filterTabsListVariants`.
+ * Por eso la lista no lleva `gap` — ver `filterTabsListVariants`. *
+ * Cuando no caben, el carril funciona como un carrusel: se desplaza en
+ * horizontal con la rueda, el trackpad o el dedo, y lleva una barra de scroll
+ * fina (`scrollbar-subtle`, en `style.css`) en vez de la del sistema.
  */
 
 
-/** Contenedor: la línea divisoria que recorre el grupo entero. */
-export const filterTabsVariants = cva(["w-full min-w-0 border-b border-neutral-200"]);
+/** Contenedor del grupo. La línea divisoria la dibuja la lista, no él. */
+export const filterTabsVariants = cva(["w-full min-w-0"]);
 
 
 /**
  * Carril con scroll.
  *
- * La línea divisoria vive fuera de él; dentro solo van las pestañas, que lo
- * arrastran en horizontal cuando no caben. El tirón de 1px hace que el
- * subrayado de la pestaña activa tape la línea en lugar de apilarse encima.
+ * La barra ocupa sitio debajo de las pestañas, así que el `pb-1` la separa de
+ * la línea divisoria para que no se lean pegadas. `overscroll-x-contain` evita
+ * que, al llegar al final con el trackpad, el gesto siga y el navegador lo
+ * tome por "atrás" en el historial.
  */
 export const filterTabsScrollerVariants = cva([
-    "-mb-px w-full min-w-0 overflow-x-auto pt-1",
+    "w-full min-w-0 overflow-x-auto overscroll-x-contain pt-1 pb-1",
+    "scrollbar-subtle",
 ]);
 
 
@@ -58,9 +63,16 @@ export const filterTabsScrollerVariants = cva([
  *
  * El único relleno que queda aquí es el que necesita el contorno del foco para
  * no recortarse contra el borde del carril.
+ *
+ * La línea divisoria vive aquí como sombra interior y no como borde del
+ * contenedor: con la barra de scroll en medio, un borde exterior quedaba
+ * separado de las pestañas y el subrayado de la activa ya no lo tapaba. La
+ * sombra se pinta debajo de los hijos, así el `border-b-2` de la activa la
+ * cubre. `min-w-full` la estira de lado a lado aunque haya pocas pestañas.
  */
 export const filterTabsListVariants = cva([
-    "flex min-w-max items-end",
+    "flex w-max min-w-full items-end",
+    "shadow-[inset_0_-1px_0_var(--color-neutral-200)]",
     SPACING_CLASS.paddingX.xs,
 ]);
 
@@ -144,3 +156,25 @@ export const filterTabCountVariants = cva(
         defaultVariants: { selected: false },
     }
 );
+
+
+/**
+ * Pestaña fantasma que ocupa el sitio de la siguiente tanda mientras llega.
+ *
+ * Lleva el mismo relleno que una pestaña real para que el carril no salte de
+ * alto; la barra interior tiene la altura del texto de `labelMd`.
+ */
+export const filterTabPlaceholderVariants = cva([
+    "inline-flex shrink-0 items-center",
+    CONTROL_SIZE.sm.paddingXClass,
+    "sm:px-4",
+    "border-b-2 border-transparent pt-1 pb-3",
+]);
+
+
+/** Barra gris de la pestaña fantasma. */
+export const filterTabPlaceholderBarVariants = cva([
+    "block h-5 w-16 bg-neutral-200",
+    RADIUS_FULL_CLASS,
+    "animate-pulse motion-reduce:animate-none",
+]);

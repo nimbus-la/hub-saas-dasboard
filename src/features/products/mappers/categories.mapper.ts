@@ -1,3 +1,5 @@
+import type { InfiniteData } from "@tanstack/react-query";
+
 import type { ApiResponseWithPagination, FilterTabItem, InputSelectorOption } from "@/interfaces";
 
 import type { CategoryFormValues, CategoryList, CategoryListApiResponse, CreateCategoryParams, UpdateCategoryParams } from "../interfaces";
@@ -43,14 +45,14 @@ export const toCategoryOptions = (
 
 
 /**
- * Convierte una página de categorías en las pestañas del listado de
+ * Convierte las tandas de categorías cargadas en las pestañas del listado de
  * productos. Tiene su propio mapper y no reutiliza las opciones del selector,
  * porque las pestañas muestran cuántos productos hay y el selector no.
  */
 export const toCategoryTabs = (
-    page: ApiResponseWithPagination<CategoryList[]>
+    data: InfiniteData<ApiResponseWithPagination<CategoryList[]>>
 ): FilterTabItem[] =>
-    page.rows.map((category) => ({
+    data.pages.flatMap((page) => page.rows).map((category) => ({
         value: category.id,
         label: category.name,
         count: category.productCount,

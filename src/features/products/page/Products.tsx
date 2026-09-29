@@ -100,6 +100,9 @@ export default function Products() {
                     onChange={products.setCategoryId}
                     label={COPY.tabsLabel}
                     panelId={GRID_PANEL_ID}
+                    canLoadMore={categories.canLoadMore}
+                    onLoadMore={categories.fetchNextPage}
+                    isLoadingMore={categories.isFetchingNextPage}
                 />
 
                 <ProductsGrid

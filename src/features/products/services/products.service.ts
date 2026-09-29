@@ -1,8 +1,7 @@
 import { infiniteQueryOptions } from "@tanstack/react-query";
 
 import type { ApiResponseWithPagination, HttpClient } from "@/interfaces";
-import { DEFAULT_PAGE_SIZE, FIRST_PAGE, emptyPage } from "@/lib/pagination";
-import type { Product } from "@/lib/products";
+import { DEFAULT_PAGE_SIZE, FIRST_PAGE, emptyPage, getNextPageNumber } from "@/lib/pagination";
 import { ENDPOINTS } from "@/utils";
 import type { ProductApiResponse, ProductFilters, ProductsService } from "../interfaces";
 import { toProductList } from "../mappers";
@@ -57,15 +56,6 @@ export function createProductsService(http: HttpClient): ProductsService {
         },
     };
 }
-
-
-/**
- * La siguiente página, o `undefined` cuando ya se trajeron todas. Se decide
- * con el total y no con una página a medias porque la última puede llegar
- * exactamente llena.
- */
-const getNextPageNumber = ({ pageNumber, pageSize, total }: ApiResponseWithPagination<Product[]>) =>
-    pageNumber * pageSize < total ? pageNumber + 1 : undefined;
 
 
 /** Configuración del listado para TanStack Query, compartida con el servidor. */

@@ -1,7 +1,9 @@
+import { infiniteQueryOptions } from "@tanstack/react-query";
+
 import type { ApiResponseWithPagination, HttpClient, PaginationParams } from "@/interfaces";
-import { DEFAULT_PAGE_SIZE, FIRST_PAGE, emptyPage } from "@/lib/pagination";
+import { DEFAULT_PAGE_SIZE, FIRST_PAGE, emptyPage, getNextPageNumber } from "@/lib/pagination";
 import { ENDPOINTS } from "@/utils";
-import type { CategoriesService, CategoryListApiResponse, CategoryListParams } from "../interfaces";
+import type { CategoriesService, CategoryFilters, CategoryListApiResponse, CategoryListParams } from "../interfaces";
 import { toCategoryList } from "../mappers";
 
 /**
@@ -35,14 +37,34 @@ export const ACTIVE_CATEGORIES_PARAMS: CategoryListParams = {
 
 
 /**
+ * Categorías por tanda en las pestañas del listado de productos. Ocho caben
+ * enteras en un escritorio, y en móvil obligan a desplazar pronto, que es
+ * cuando conviene tener lista la siguiente.
+ */
+export const CATEGORY_TABS_PAGE_SIZE = 8;
+
+
+/**
+ * Filtro de las pestañas: solo tiene sentido filtrar productos por una
+ * categoría activa. La precarga del servidor usa la misma constante para que
+ * el navegador encuentre la primera tanda en la caché.
+ */
+export const ACTIVE_CATEGORY_FILTERS: CategoryFilters = { isActive: true };
+
+
+/**
  * Claves de caché de las categorías. Están aquí porque la página del servidor
  * también las necesita. Cada combinación de página y filtros guarda su propia
  * respuesta.
+ *
+ * Las del scroll infinito cuelgan también de `lists()`: así, al crear o editar
+ * una categoría, la misma invalidación refresca la tabla y las pestañas.
  */
 export const categoryKeys = {
     all: ["products_categories"] as const,
     lists: () => [...categoryKeys.all, "products_categories_list"] as const,
     list: (params: CategoryListParams) => [...categoryKeys.lists(), params] as const,
+    infinite: (filters: CategoryFilters) => [...categoryKeys.lists(), "infinite", filters] as const,
 };
 
 
@@ -88,4 +110,23 @@ export function categoriesQueryOptions(
         queryFn: ({ signal }: { signal: AbortSignal }) =>
             service.list(params, { signal }),
     };
+}
+
+
+/**
+ * Categorías en tandas para las pestañas del listado de productos, con la
+ * misma forma que el scroll infinito de productos. Compartida con el servidor
+ * para que la precarga y el navegador usen la misma clave.
+ */
+export function categoriesInfiniteQueryOptions(
+    service: CategoriesService,
+    filters: CategoryFilters = ACTIVE_CATEGORY_FILTERS
+) {
+    return infiniteQueryOptions({
+        queryKey: categoryKeys.infinite(filters),
+        queryFn: ({ pageParam, signal }) =>
+            service.list({ ...filters, pageNumber: pageParam, pageSize: CATEGORY_TABS_PAGE_SIZE }, { signal }),
+        initialPageParam: FIRST_PAGE,
+        getNextPageParam: getNextPageNumber,
+    });
 }

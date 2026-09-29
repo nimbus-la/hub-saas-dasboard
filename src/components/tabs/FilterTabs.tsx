@@ -2,10 +2,13 @@
 
 import * as React from "react";
 
+import { useHorizontalInfiniteScroll, useHorizontalWheel } from "@/hooks";
 import type { FilterTabsProps } from "@/interfaces";
 import { cn } from "@/lib/utils";
 import {
     filterTabCountVariants,
+    filterTabPlaceholderBarVariants,
+    filterTabPlaceholderVariants,
     filterTabsListVariants,
     filterTabsScrollerVariants,
     filterTabsVariants,
@@ -22,6 +25,11 @@ import {
  * pestaña no abre una vista nueva sino que acota la que ya está en pantalla.
  * 
  * El componente no conoce el dominio: recibe las opciones y el valor activo.
+ *
+ * Cuando no caben, las pestañas forman un carrusel horizontal que también se
+ * mueve con la rueda del ratón. Si recibe `onLoadMore`, pide la siguiente
+ * tanda cuando el usuario desplaza el carril cerca de su final, o sola si todo
+ * cabe y no hay nada que desplazar — ver `useHorizontalInfiniteScroll`.
  * 
  * Uso mínimo:
  *   <FilterTabs 
@@ -40,9 +48,20 @@ export function FilterTabs({
     onChange,
     label,
     panelId,
+    canLoadMore = false,
+    onLoadMore,
+    isLoadingMore = false,
     className,
 }: FilterTabsProps) {
     const baseId = React.useId();
+
+    const scrollerRef = useHorizontalWheel<HTMLDivElement>();
+
+    useHorizontalInfiniteScroll({
+        scrollerRef,
+        enabled: canLoadMore && onLoadMore !== undefined,
+        onLoadMore: () => onLoadMore?.(),
+    });
 
     // Se guarda un nodo por pestaña para poder devolver el foco tras navegar
     // con el teclado; el índice del array no sirve porque las opciones pueden
@@ -78,21 +97,27 @@ export function FilterTabs({
             if (!nextItem) return;
 
             // Evita que las flechas desplacen el contenedor horizontal por su
-            // cuenta: el scroll lo provoca el propio `focus()`.
+            // cuenta: el scroll lo provoca el propio foco.
             event.preventDefault();
 
             onChange(nextItem.value);
-            tabRefs.current[nextItem.value]?.focus();
+
+            // `focus()` a secas centra la pestaña también en vertical y puede
+            // mover la página entera; así solo se desplaza el carril, y lo justo.
+            const nextTab = tabRefs.current[nextItem.value];
+            nextTab?.focus({ preventScroll: true });
+            nextTab?.scrollIntoView({ block: "nearest", inline: "nearest" });
         },
         [items, onChange, value]
     );
 
     return (
         <div className={cn(filterTabsVariants(), className)}>
-            <div className={filterTabsScrollerVariants()}>
+            <div ref={scrollerRef} className={filterTabsScrollerVariants()}>
                 <div
                     role="tablist"
                     aria-label={label}
+                    aria-busy={isLoadingMore}
                     onKeyDown={handleKeyDown}
                     className={filterTabsListVariants()}
                 >
@@ -141,6 +166,12 @@ export function FilterTabs({
                             </button>
                         );
                     })}
+
+                    {isLoadingMore && (
+                        <span aria-hidden="true" className={filterTabPlaceholderVariants()}>
+                            <span className={filterTabPlaceholderBarVariants()} />
+                        </span>
+                    )}
                 </div>
             </div>
         </div>

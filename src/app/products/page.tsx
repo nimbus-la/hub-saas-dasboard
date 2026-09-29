@@ -6,8 +6,8 @@ import { messages } from "@/messages";
 
 import Products from "@/features/products/page/Products";
 import {
-    ACTIVE_CATEGORIES_PARAMS,
-    categoriesQueryOptions,
+    ACTIVE_CATEGORY_FILTERS,
+    categoriesInfiniteQueryOptions,
     createCategoriesService,
     createProductsService,
     productsInfiniteQueryOptions,
@@ -31,8 +31,8 @@ export default async function ProductsPage() {
     // alguna falla, el navegador la vuelve a pedir al montar.
     await Promise.all([
         queryClient.prefetchInfiniteQuery(productsInfiniteQueryOptions(createProductsService(httpClient))),
-        queryClient.prefetchQuery(
-            categoriesQueryOptions(createCategoriesService(httpClient), ACTIVE_CATEGORIES_PARAMS)
+        queryClient.prefetchInfiniteQuery(
+            categoriesInfiniteQueryOptions(createCategoriesService(httpClient), ACTIVE_CATEGORY_FILTERS)
         ),
     ]);
 

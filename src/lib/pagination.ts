@@ -91,3 +91,13 @@ export const emptyPage = ({ pageNumber, pageSize }: PaginationParams): ApiRespon
     pageSize,
     total: 0,
 });
+
+
+/**
+ * La siguiente página de un scroll infinito, o `undefined` cuando ya se
+ * trajeron todas, que es lo que espera `getNextPageParam`. Se decide con el
+ * total y no con una página a medias porque la última puede llegar
+ * exactamente llena.
+ */
+export const getNextPageNumber = ({ pageNumber, pageSize, total }: ApiResponseWithPagination<unknown[]>) =>
+    pageNumber * pageSize < total ? pageNumber + 1 : undefined;
