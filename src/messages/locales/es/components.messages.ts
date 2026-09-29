@@ -49,6 +49,7 @@ export const components = {
     inputSelector: {
         placeholder: "Selecciona una opción",
         empty: "Sin resultados",
+        loadingMore: "Cargando más…",
     },
 
 

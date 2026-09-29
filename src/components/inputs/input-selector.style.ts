@@ -273,3 +273,24 @@ export const inputSelectorEmptyVariants = cva(
         defaultVariants: { size: "md" },
     }
 );
+
+
+/**
+ * Aviso de "cargando más" bajo la lista mientras llega la siguiente tanda.
+ * Más bajo que el mensaje vacío: acompaña a una lista que ya tiene opciones,
+ * no ocupa su lugar.
+ */
+export const inputSelectorLoadingVariants = cva(
+    "border-t border-neutral-200 text-center text-neutral-600",
+    {
+        variants: {
+            size: {
+                sm: "px-3 py-1 text-caption",
+                md: "px-3 py-2 text-caption",
+                lg: "px-4 py-2 text-body-md",
+                xl: "px-4 py-2 text-body-md",
+            },
+        },
+        defaultVariants: { size: "md" },
+    }
+);

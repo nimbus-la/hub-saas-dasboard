@@ -7,7 +7,7 @@
  */
 
 export * from "./use-debounced-value";
-export * from "./use-horizontal-infinite-scroll";
 export * from "./use-horizontal-wheel";
 export * from "./use-infinite-scroll";
 export * from "./use-pagination";
+export * from "./use-scroll-end-load";

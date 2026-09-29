@@ -3,14 +3,15 @@
 /**
  * Rueda vertical en un carril horizontal
  *
- * Devuelve una ref para un contenedor con `overflow-x`. Con ella, la rueda de
- * un ratón —que solo sabe girar en vertical— desplaza el carril hacia los
- * lados. Trackpads y pantallas táctiles ya mueven en horizontal por su cuenta
+ * Recibe un contenedor con `overflow-x` y hace que la rueda de un ratón —que
+ * solo sabe girar en vertical— desplace el carril hacia los lados. Trackpads y pantallas táctiles ya mueven en horizontal por su cuenta
  * y no se tocan.
  *
- *     const scrollerRef = useHorizontalWheel<HTMLDivElement>();
+ *     const [scroller, setScroller] = React.useState<HTMLDivElement | null>(null);
  *
- *     <div ref={scrollerRef} className="overflow-x-auto">…</div>
+ *     useHorizontalWheel(scroller);
+ *
+ *     <div ref={setScroller} className="overflow-x-auto">…</div>
  *
  * El listener se registra a mano y no con `onWheel` porque React lo añade como
  * pasivo, y sin `preventDefault` la página se desplazaría a la vez que el carril.
@@ -23,12 +24,8 @@ import * as React from "react";
 const WHEEL_LINE_HEIGHT = 16;
 
 
-export function useHorizontalWheel<TElement extends HTMLElement>() {
-    const scrollerRef = React.useRef<TElement>(null);
-
+export function useHorizontalWheel(scroller: HTMLElement | null) {
     React.useEffect(() => {
-        const scroller = scrollerRef.current;
-
         if (!scroller) return undefined;
 
         const handleWheel = (event: WheelEvent) => {
@@ -57,7 +54,5 @@ export function useHorizontalWheel<TElement extends HTMLElement>() {
         scroller.addEventListener("wheel", handleWheel, { passive: false });
 
         return () => scroller.removeEventListener("wheel", handleWheel);
-    }, []);
-
-    return scrollerRef;
+    }, [scroller]);
 }

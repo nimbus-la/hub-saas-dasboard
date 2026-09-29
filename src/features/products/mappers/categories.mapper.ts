@@ -35,13 +35,13 @@ export const toCategoryList = (categories: CategoryListApiResponse[]): CategoryL
 
 
 /**
- * Convierte una página de categorías en opciones del selector. El valor es el
- * id porque es lo que el alta de producto le envía al backend.
+ * Convierte las tandas de categorías cargadas en opciones del selector. El
+ * valor es el id porque es lo que el alta de producto le envía al backend.
  */
 export const toCategoryOptions = (
-    page: ApiResponseWithPagination<CategoryList[]>
+    data: InfiniteData<ApiResponseWithPagination<CategoryList[]>>
 ): InputSelectorOption[] =>
-    page.rows.map((category) => ({ label: category.name, value: category.id }));
+    data.pages.flatMap((page) => page.rows).map((category) => ({ label: category.name, value: category.id }));
 
 
 /**

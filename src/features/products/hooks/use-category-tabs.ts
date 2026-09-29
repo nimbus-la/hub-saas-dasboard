@@ -13,8 +13,8 @@ import { ACTIVE_CATEGORY_FILTERS, categoriesInfiniteQueryOptions, createCategori
  * Categorías activas listas para las pestañas del listado de productos, con
  * cuántos productos tiene cada una. Llegan en tandas: la siguiente se pide
  * cuando el carril de pestañas se acerca a su final, igual que la rejilla de
- * productos. Por eso ya no comparte caché con `useCategoryOptions`, que pide
- * todas de una vez para filtrar en el navegador.
+ * productos. Sin búsqueda, `useCategoryOptions` pide lo mismo, así que los dos
+ * comparten la caché y solo cambia cómo se convierte.
  */
 
 

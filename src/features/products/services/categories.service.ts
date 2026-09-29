@@ -24,30 +24,18 @@ export const DEFAULT_CATEGORIES_PAGINATION: PaginationParams = {
 
 
 /**
- * Lo que pide el selector de categoría del alta de producto. Solo tiene
- * sentido ofrecer las activas, y se piden todas en una página porque el
- * selector filtra lo escrito en el navegador. Si algún día hay más de cien
- * categorías habrá que buscar en el backend.
+ * Categorías por tanda en las pestañas del listado y en el selector del alta.
+ * Ocho caben enteras en un carril de escritorio y desbordan el panel del
+ * selector, así que en los dos casos la siguiente llega al desplazar.
  */
-export const ACTIVE_CATEGORIES_PARAMS: CategoryListParams = {
-    pageNumber: FIRST_PAGE,
-    pageSize: 100,
-    isActive: true,
-};
+export const CATEGORY_BATCH_SIZE = 8;
 
 
 /**
- * Categorías por tanda en las pestañas del listado de productos. Ocho caben
- * enteras en un escritorio, y en móvil obligan a desplazar pronto, que es
- * cuando conviene tener lista la siguiente.
- */
-export const CATEGORY_TABS_PAGE_SIZE = 8;
-
-
-/**
- * Filtro de las pestañas: solo tiene sentido filtrar productos por una
- * categoría activa. La precarga del servidor usa la misma constante para que
- * el navegador encuentre la primera tanda en la caché.
+ * Filtro de las pestañas y del selector: solo tiene sentido filtrar o crear
+ * productos con una categoría activa. Las precargas del servidor usan la misma
+ * constante para que el navegador encuentre la primera tanda en la caché, y
+ * como la clave es la misma, pestañas y selector la comparten.
  */
 export const ACTIVE_CATEGORY_FILTERS: CategoryFilters = { isActive: true };
 
@@ -114,9 +102,9 @@ export function categoriesQueryOptions(
 
 
 /**
- * Categorías en tandas para las pestañas del listado de productos, con la
- * misma forma que el scroll infinito de productos. Compartida con el servidor
- * para que la precarga y el navegador usen la misma clave.
+ * Categorías en tandas para las pestañas del listado y el selector del alta,
+ * con la misma forma que el scroll infinito de productos. Compartida con el
+ * servidor para que la precarga y el navegador usen la misma clave.
  */
 export function categoriesInfiniteQueryOptions(
     service: CategoriesService,
@@ -125,7 +113,7 @@ export function categoriesInfiniteQueryOptions(
     return infiniteQueryOptions({
         queryKey: categoryKeys.infinite(filters),
         queryFn: ({ pageParam, signal }) =>
-            service.list({ ...filters, pageNumber: pageParam, pageSize: CATEGORY_TABS_PAGE_SIZE }, { signal }),
+            service.list({ ...filters, pageNumber: pageParam, pageSize: CATEGORY_BATCH_SIZE }, { signal }),
         initialPageParam: FIRST_PAGE,
         getNextPageParam: getNextPageNumber,
     });

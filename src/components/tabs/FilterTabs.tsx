@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-import { useHorizontalInfiniteScroll, useHorizontalWheel } from "@/hooks";
+import { useHorizontalWheel, useScrollEndLoad } from "@/hooks";
 import type { FilterTabsProps } from "@/interfaces";
 import { cn } from "@/lib/utils";
 import {
@@ -29,7 +29,7 @@ import {
  * Cuando no caben, las pestañas forman un carrusel horizontal que también se
  * mueve con la rueda del ratón. Si recibe `onLoadMore`, pide la siguiente
  * tanda cuando el usuario desplaza el carril cerca de su final, o sola si todo
- * cabe y no hay nada que desplazar — ver `useHorizontalInfiniteScroll`.
+ * cabe y no hay nada que desplazar — ver `useScrollEndLoad`.
  * 
  * Uso mínimo:
  *   <FilterTabs 
@@ -55,10 +55,13 @@ export function FilterTabs({
 }: FilterTabsProps) {
     const baseId = React.useId();
 
-    const scrollerRef = useHorizontalWheel<HTMLDivElement>();
+    const [scroller, setScroller] = React.useState<HTMLDivElement | null>(null);
 
-    useHorizontalInfiniteScroll({
-        scrollerRef,
+    useHorizontalWheel(scroller);
+
+    useScrollEndLoad({
+        scroller,
+        axis: "x",
         enabled: canLoadMore && onLoadMore !== undefined,
         onLoadMore: () => onLoadMore?.(),
     });
@@ -113,7 +116,7 @@ export function FilterTabs({
 
     return (
         <div className={cn(filterTabsVariants(), className)}>
-            <div ref={scrollerRef} className={filterTabsScrollerVariants()}>
+            <div ref={setScroller} className={filterTabsScrollerVariants()}>
                 <div
                     role="tablist"
                     aria-label={label}

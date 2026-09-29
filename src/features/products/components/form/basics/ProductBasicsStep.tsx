@@ -85,6 +85,10 @@ export default function ProductBasicsStep({
                             placeholder={stepMessaages.category.placeholder}
                             helperText={stepMessaages.category.helper}
                             emptyMessage={stepMessaages.category.empty}
+                            onSearchChange={categories.setSearch}
+                            canLoadMore={categories.canLoadMore}
+                            onLoadMore={categories.fetchNextPage}
+                            isLoadingMore={categories.isFetchingNextPage}
                             clearable
                         />
                     )}
