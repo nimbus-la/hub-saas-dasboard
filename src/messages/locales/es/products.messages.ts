@@ -168,12 +168,6 @@ export const products = {
 
         submit: "Guardar producto",
 
-        /** Lo que se anuncia al terminar el alta. */
-        success: {
-            title: "Producto creado",
-            description: "«{name}» ya está en el catálogo.",
-        },
-
         /* ── Indicador de pasos ─────────────────────────────────────────── */
 
         stepperLabel: "Progreso del alta de producto",
