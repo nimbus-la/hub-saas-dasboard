@@ -54,6 +54,9 @@ export function createProductsService(http: HttpClient): ProductsService {
 
             return { ...page, rows: toProductList(page.rows) };
         },
+
+        create: (payload, config) =>
+            http.post(ENDPOINTS.PRODUCTS_CREATE, payload, config),
     };
 }
 

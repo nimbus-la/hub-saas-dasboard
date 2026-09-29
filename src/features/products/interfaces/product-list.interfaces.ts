@@ -1,5 +1,7 @@
-import type { ApiResponseWithPagination, HttpRequestConfig, PaginationParams } from "@/interfaces";
+import type { ApiEnvelope, ApiResponseWithPagination, HttpRequestConfig, PaginationParams } from "@/interfaces";
 import type { Product } from "@/lib/products";
+
+import type { CreateProductParams } from "./product-create.interfaces";
 
 
 /**
@@ -68,4 +70,10 @@ export interface ProductsService {
         params: ProductListParams,
         config?: HttpRequestConfig
     ): Promise<ApiResponseWithPagination<Product[]>>;
+
+    /** Crea un producto con su receta. El backend responde sin datos. */
+    create(
+        payload: CreateProductParams,
+        config?: HttpRequestConfig
+    ): Promise<ApiEnvelope<null>>;
 }
