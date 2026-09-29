@@ -2,7 +2,7 @@ import { formatList } from "@/lib/format";
 import type { Product, ProductStatus } from "@/lib/products";
 import { formatMessage, messages } from "@/messages";
 
-import type { ProductApiResponse } from "../interfaces";
+import type { CreateProductParams, ProductApiResponse, ProductFormValues } from "../interfaces";
 
 /**
  * Conversiones entre el producto del backend y el que usa la aplicación.
@@ -51,3 +51,31 @@ export const toProduct = (product: ProductApiResponse): Product => {
 /** Convierte todas las filas del listado. */
 export const toProductList = (products: ProductApiResponse[]): Product[] =>
     products.map(toProduct);
+
+
+/**
+ * Convierte el formulario del alta en el cuerpo que espera el backend.
+ *
+ * Solo se llama después de validar el formulario entero, así que el precio y
+ * las cantidades ya no pueden estar vacíos; el `?? 0` es solo para el tipo.
+ *
+ * La foto, la disponibilidad y las sucursales se quedan fuera: la foto porque
+ * todavía no hay dónde subir el archivo, y las otras dos porque el backend aún
+ * no las recibe.
+ */
+export const toCreateProductParams = (values: ProductFormValues): CreateProductParams => {
+    const description = values.description.trim();
+
+    return {
+        productCategoryId: values.categoryId,
+        productName: values.name.trim(),
+        ...(description && { productDescription: description }),
+        productBasePrice: String(values.price ?? 0),
+        profitMargin: values.margin ?? 0,
+        recipe: values.recipe.map((line) => ({
+            inventoryItemId: line.itemId,
+            quantity: String(line.quantity ?? 0),
+            isOptional: line.isOptional,
+        })),
+    };
+};

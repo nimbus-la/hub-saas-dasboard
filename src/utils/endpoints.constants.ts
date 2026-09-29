@@ -38,6 +38,9 @@ export const ENDPOINTS = {
     /** Catálogo de productos. Pagina y filtra por texto, categoría y estado. */
     PRODUCTS: "products",
 
+    /** Alta de un producto con su receta. */
+    PRODUCTS_CREATE: "products/create",
+
     /**
      * Categorías de producto.
      *
