@@ -133,7 +133,7 @@ export const products = {
         /** Lo que ocupa `{category}` cuando no hay filtro puesto. */
         allCategoriesLabel: "todas las categorías",
 
-        /** Cómo se llama lo que se pagina, en el pie del listado. */
+        /** Cómo se llama lo que se lista, en el pie del scroll infinito. */
         itemLabel: {
             one: "producto",
             other: "productos",

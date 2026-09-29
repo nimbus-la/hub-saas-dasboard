@@ -1,10 +1,10 @@
 "use client";
 
 // ── Pantalla de productos ───────────────────────────────────────────────────
-// Orquesta el listado: búsqueda, pestañas de categoría y paginación. El
+// Orquesta el listado: búsqueda, pestañas de categoría y scroll infinito. El
 // filtrado y la paginación los hace el backend; el estado de los tres vive en
-// `useProducts` para que el filtro, la página y el contador nunca se
-// contradigan.
+// `useProducts` para que el filtro, las páginas cargadas y el contador nunca
+// se contradigan.
 //
 // Las alertas de las tarjetas no se tocan desde aquí: vienen en el producto
 // que devuelve el servicio y son de solo lectura.
@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import * as React from "react";
 
 import { TextField } from "@/components/inputs/TextField";
-import Pagination from "@/components/pagination/Pagination";
+import LoadMore from "@/components/pagination/LoadMore";
 import { FilterTabs } from "@/components/tabs/FilterTabs";
 import type { FilterTabItem } from "@/interfaces";
 import { ALL_CATEGORIES, type Product } from "@/lib/products";
@@ -28,7 +28,6 @@ import {
 import { useCategoryTabs, useProducts } from "../hooks";
 import {
     productsPageBodyVariants,
-    productsPagePaginationVariants,
     productsPageSearchVariants,
     productsPageVariants,
 } from "../style";
@@ -46,8 +45,6 @@ export default function Products() {
 
     const products = useProducts();
     const categories = useCategoryTabs();
-
-    const { pagination } = products;
 
     const categoryTabs: FilterTabItem[] = [
         { value: ALL_CATEGORIES, label: COPY.allCategories, count: products.catalogTotal },
@@ -72,6 +69,10 @@ export default function Products() {
         // avisa de la intención, borrar es irreversible.
         void product;
     }, []);
+
+    const handleRetry = () => {
+        void products.fetchNextPage();
+    };
 
     return (
         <div className={productsPageVariants()}>
@@ -117,17 +118,17 @@ export default function Products() {
                     }
                 />
 
-                {products.total > 0 && (
-                    <Pagination
-                        page={pagination.pageNumber}
-                        pageSize={pagination.pageSize}
-                        totalItems={products.total}
-                        onPageChange={pagination.goToPage}
-                        onPageSizeChange={pagination.changePageSize}
-                        itemLabel={COPY.itemLabel}
-                        className={productsPagePaginationVariants()}
-                    />
-                )}
+                <LoadMore
+                    sentinelRef={products.sentinelRef}
+                    loadedItems={products.data.length}
+                    totalItems={products.total}
+                    hasNextPage={products.hasNextPage}
+                    isFetchingNextPage={products.isFetchingNextPage}
+                    isFetchNextPageError={products.isFetchNextPageError}
+                    onRetry={handleRetry}
+                    itemLabel={COPY.itemLabel}
+                />
+
             </section>
         </div>
     );

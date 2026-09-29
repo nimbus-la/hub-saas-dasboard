@@ -102,6 +102,20 @@ export const components = {
         } satisfies Plural,
     },
 
+    /**
+     * Pie del scroll infinito.
+     *
+     * Se anuncia en una región viva, así que quien no ve la lista crecer
+     * también se entera de que llegaron más elementos. Los nombres de lo
+     * listado se reutilizan de la paginación: son la misma palabra.
+     */
+    loadMore: {
+        /** `Mostrando 24 de 57 productos` */
+        summary: "Mostrando {loaded} de {total} {items}",
+        loading: "Cargando más…",
+        error: "No pudimos cargar más resultados.",
+    },
+
 
     /* ── Tarjetas ───────────────────────────────────────────────────────── */
 

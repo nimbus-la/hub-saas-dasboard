@@ -650,6 +650,33 @@ La última página puede desaparecer bajo los pies, al borrar el único elemento
 que quedaba en ella o al subir el tamaño de página. Este hook ajusta la página
 actual cuando llega el `total`.
 
+### Scroll infinito: `useInfiniteQuery` + `useInfiniteScroll`
+
+El catálogo de productos no lleva pie de páginas: carga tandas de 12
+(`PRODUCTS_PAGE_SIZE`) según se baja. Las piezas:
+
+- **`productsInfiniteQueryOptions`** (en el servicio) usa `infiniteQueryOptions`.
+  La clave lleva solo los filtros, no la página; `getNextPageParam` pide la
+  siguiente mientras `pageNumber * pageSize < total`. La ruta precarga la
+  primera tanda con `prefetchInfiniteQuery` y la misma constante de filtros
+  vacíos (`NO_PRODUCT_FILTERS`), por la misma razón que la paginación por
+  defecto.
+- **`useInfiniteScroll`** (`src/hooks/`) devuelve la ref de un centinela y pide
+  más cuando entra en pantalla, con 400px de adelanto. Su `enabled` tiene que
+  apagarse mientras la consulta no está en reposo (`fetchStatus !== "idle"`) y
+  tras un fallo: lo primero hace que el observador vuelva a mirar al terminar
+  (y siga cargando si la pantalla es alta), lo segundo evita un bucle de
+  peticiones fallidas. Se mira `fetchStatus` y no `isFetchingNextPage` porque
+  un reintento en pausa —pestaña oculta, sin conexión— deja este último en
+  `false`.
+- **`LoadMore`** (`@/components`) pinta el centinela y el pie: cuántos van,
+  "Cargando más…" y, tras un fallo, "Volver a intentarlo". Cuando no quedan
+  páginas el pie desaparece. Es la alternativa a `Pagination` y usa el mismo
+  `itemLabel`.
+
+Cambiar un filtro cambia la clave y la lista empieza de nuevo en la página 1
+sin reinicios manuales; no hace falta `usePagination` ni `useClampedPage`.
+
 ### `useDebouncedValue`
 
 TanStack Query no trae debounce porque su disparador es la clave, así que el

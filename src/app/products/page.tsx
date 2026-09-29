@@ -10,7 +10,7 @@ import {
     categoriesQueryOptions,
     createCategoriesService,
     createProductsService,
-    productsQueryOptions,
+    productsInfiniteQueryOptions,
 } from "@/features/products/services";
 import { httpClient } from "@/lib/http";
 import { getQueryClient } from "@/lib/query/query-client";
@@ -30,7 +30,7 @@ export default async function ProductsPage() {
     // Las dos peticiones no dependen una de otra, así que van a la vez. Si
     // alguna falla, el navegador la vuelve a pedir al montar.
     await Promise.all([
-        queryClient.prefetchQuery(productsQueryOptions(createProductsService(httpClient))),
+        queryClient.prefetchInfiniteQuery(productsInfiniteQueryOptions(createProductsService(httpClient))),
         queryClient.prefetchQuery(
             categoriesQueryOptions(createCategoriesService(httpClient), ACTIVE_CATEGORIES_PARAMS)
         ),
