@@ -1,4 +1,4 @@
-import { infiniteQueryOptions } from "@tanstack/react-query";
+import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 
 import type { ApiResponseWithPagination, HttpClient } from "@/interfaces";
 import { DEFAULT_PAGE_SIZE, FIRST_PAGE, emptyPage, getNextPageNumber } from "@/lib/pagination";
@@ -35,6 +35,8 @@ export const productKeys = {
     all: ["products"] as const,
     lists: () => [...productKeys.all, "products_list"] as const,
     list: (filters: ProductFilters) => [...productKeys.lists(), filters] as const,
+    details: () => [...productKeys.all, "products_detail"] as const,
+    detail: (productId: string) => [...productKeys.details(), productId] as const,
 };
 
 
@@ -55,9 +57,38 @@ export function createProductsService(http: HttpClient): ProductsService {
             return { ...page, rows: toProductList(page.rows) };
         },
 
+        // El backend no tiene ruta de detalle: el listado filtrado por id es
+        // la forma de pedir un solo producto, y llega dentro de una página.
+        getById: async (productId, config) => {
+            const { content } = await http.get<ApiResponseWithPagination<ProductApiResponse[]> | null>(
+                ENDPOINTS.PRODUCTS,
+                {
+                    ...config,
+                    params: { ...config?.params, productId, pageSize: 1 }
+                }
+            );
+
+            return content?.rows[0] ?? null;
+        },
+
         create: (payload, config) =>
             http.post(ENDPOINTS.PRODUCTS_CREATE, payload, config),
+
+        update: (payload, config) =>
+            http.patch(ENDPOINTS.PRODUCTS_UPDATE, payload, config),
     };
+}
+
+
+/**
+ * Un producto para el formulario de edición. La ruta lo precarga en el
+ * servidor con estas mismas opciones y la pantalla lo encuentra en la caché.
+ */
+export function productDetailQueryOptions(service: ProductsService, productId: string) {
+    return queryOptions({
+        queryKey: productKeys.detail(productId),
+        queryFn: ({ signal }) => service.getById(productId, { signal }),
+    });
 }
 
 

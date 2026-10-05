@@ -2,6 +2,7 @@ import type { ApiEnvelope, ApiResponseWithPagination, HttpRequestConfig, Paginat
 import type { Product } from "@/lib/products";
 
 import type { CreateProductParams } from "./product-create.interfaces";
+import type { UpdateProductParams } from "./product-update.interfaces";
 
 
 /**
@@ -71,9 +72,25 @@ export interface ProductsService {
         config?: HttpRequestConfig
     ): Promise<ApiResponseWithPagination<Product[]>>;
 
+    /**
+     * Un producto completo, tal como llega del backend, o `null` si no existe
+     * en el negocio. Se deja sin convertir porque quien lo pide es el
+     * formulario, y la tarjeta del listado no trae lo que este necesita.
+     */
+    getById(
+        productId: string,
+        config?: HttpRequestConfig
+    ): Promise<ProductApiResponse | null>;
+
     /** Crea un producto con su receta. El backend responde sin datos. */
     create(
         payload: CreateProductParams,
         config?: HttpRequestConfig
     ): Promise<ApiEnvelope<null>>;
+
+    /** Cambia solo lo que venga en el cuerpo y devuelve el producto como quedó. */
+    update(
+        payload: UpdateProductParams,
+        config?: HttpRequestConfig
+    ): Promise<ApiEnvelope<ProductApiResponse>>;
 }

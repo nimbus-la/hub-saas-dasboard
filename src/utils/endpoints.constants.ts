@@ -42,6 +42,12 @@ export const ENDPOINTS = {
     PRODUCTS_CREATE: "products/create",
 
     /**
+     * Edición parcial de un producto. El id viaja en el cuerpo y no en la
+     * ruta, por eso tiene su propia entrada.
+     */
+    PRODUCTS_UPDATE: "products/update",
+
+    /**
      * Categorías de producto.
      *
      * El inquilino no aparece en la ruta aunque el backend lo exija: viaja en
