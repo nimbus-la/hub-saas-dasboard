@@ -16,4 +16,4 @@ export const PRODUCT_CREATE_HREF = "/products/create";
  * no de una constante, y un carácter raro rompería la ruta en vez de dar 404.
  */
 export const getProductEditHref = (productId: string): string =>
-    `/products/${encodeURIComponent(productId)}/edit`;
+    `/products/edit/${encodeURIComponent(productId)}`;

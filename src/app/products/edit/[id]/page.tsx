@@ -18,7 +18,7 @@ import { getQueryClient } from "@/lib/query/query-client";
 export const metadata: Metadata = messages.products.metadata.edit;
 
 interface EditProductPageProps {
-    params: Promise<{ productId: string }>;
+    params: Promise<{ id: string }>;
 }
 
 /**
@@ -30,7 +30,7 @@ interface EditProductPageProps {
  * paso 1 no se quede bloqueado esperándolas.
  */
 export default async function EditProductPage({ params }: EditProductPageProps) {
-    const { productId } = await params;
+    const { id: productId } = await params;
 
     const queryClient = getQueryClient();
 
