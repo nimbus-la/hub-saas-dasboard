@@ -1,29 +1,29 @@
 "use client";
 
-// ── Formulario de alta de producto ──────────────────────────────────────────
+// ── Formulario del producto ─────────────────────────────────────────────────
 // Compone react-hook-form con la navegación entre pasos y devuelve una sola
 // API a la pantalla. El borrador, los errores y qué campo está tocado los
 // lleva la librería; aquí sólo vive lo que ella no sabe: en qué paso estamos y
 // qué campos hay que dar por buenos antes de avanzar.
+//
+// No sabe si está creando o editando. Quien lo usa le pasa con qué valores
+// empieza y qué hacer al guardar, así el alta y la edición comparten todo el
+// asistente.
 
 import * as React from "react";
 import { useForm, useFormState } from "react-hook-form";
 
-import { ProductFormValues } from "../interfaces";
+import type { ProductFormOptions, ProductFormValues } from "../interfaces";
 import {
-    DEFAULT_PRODUCT_FORM_VALUES,
     PRODUCT_FORM_STEP_LENGTH,
     findFirstInvalidStep,
     getProductFormStep,
 } from "../libs";
-import { useCreateProduct } from "./use-create-product";
 
 
-export function useProductForm() {
-    const createProduct = useCreateProduct();
-
+export function useProductForm({ defaultValues, onSave, isSaving }: ProductFormOptions) {
     const form = useForm<ProductFormValues>({
-        defaultValues: DEFAULT_PRODUCT_FORM_VALUES,
+        defaultValues,
         mode: "onTouched",
         reValidateMode: "onChange",
     });
@@ -84,10 +84,10 @@ export function useProductForm() {
                     return;
                 }
 
-                // La vuelta al listado la hace la mutación al confirmarse. Si
-                // el backend rechaza el alta, la persona se queda aquí con su
+                // La vuelta al listado la hace quien guarda, cuando el backend
+                // confirma. Si lo rechaza, la persona se queda aquí con su
                 // borrador para corregirlo.
-                createProduct.mutate(form.getValues());
+                onSave(form.getValues());
                 return;
             }
 
@@ -95,7 +95,7 @@ export function useProductForm() {
                 Math.min(current + 1, PRODUCT_FORM_STEP_LENGTH - 1)
             );
         },
-        [createProduct, form, isLastStep, step.fields]
+        [form, isLastStep, onSave, step.fields]
     );
 
     return {
@@ -107,8 +107,8 @@ export function useProductForm() {
         isLastStep,
         /** El paso en pantalla no tiene campos vacíos, inválidos ni con error. */
         isStepValid,
-        /** El alta está en camino; el botón de guardar no debe volver a enviarla. */
-        isSubmitting: createProduct.isPending,
+        /** El guardado está en camino; el botón no debe volver a enviarlo. */
+        isSubmitting: isSaving,
         submitStep,
         goToPreviousStep,
     };

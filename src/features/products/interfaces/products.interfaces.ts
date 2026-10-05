@@ -49,6 +49,39 @@ export interface ProductFormValues {
 
 
 
+/**
+ * Lo que necesita el asistente para funcionar en cualquier modo: con qué
+ * valores empieza y qué hacer al guardar. El alta lo arranca vacío y la
+ * edición con el producto cargado.
+ */
+export interface ProductFormOptions {
+    defaultValues: ProductFormValues;
+    /** Recibe el formulario entero, ya validado. */
+    onSave: (values: ProductFormValues) => void;
+    /** Mientras sea `true`, el botón de guardar se bloquea. */
+    isSaving: boolean;
+}
+
+
+/**
+ * Los mensajes que cambian entre crear y editar. Tienen la misma forma que
+ * los bloques `create` y `edit` de `messages.products`, así que la pantalla
+ * recibe el bloque tal cual.
+ */
+export interface ProductFormMessages {
+    title: string;
+    subtitle: string;
+    backLabel: string;
+    submit: string;
+}
+
+
+export interface ProductFormLayoutProps extends ProductFormOptions {
+    formMessages: ProductFormMessages;
+}
+
+
+
 /** Identificador de cada paso. */
 export type ProductFormStepId = "basics" | "pricing" | "recipe";
 
