@@ -2,7 +2,7 @@ import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 
 import type { ApiResponseWithPagination, HttpClient } from "@/interfaces";
 import { DEFAULT_PAGE_SIZE, FIRST_PAGE, emptyPage, getNextPageNumber } from "@/lib/pagination";
-import { ENDPOINTS } from "@/utils";
+import { ENDPOINTS, isUuid } from "@/utils";
 import type { ProductApiResponse, ProductFilters, ProductsService } from "../interfaces";
 import { toProductList } from "../mappers";
 
@@ -59,7 +59,13 @@ export function createProductsService(http: HttpClient): ProductsService {
 
         // El backend no tiene ruta de detalle: el listado filtrado por id es
         // la forma de pedir un solo producto, y llega dentro de una página.
+        //
+        // Un id mal escrito no se envía. El backend lo rechazaría como una
+        // petición inválida, y para quien abrió el enlace es un producto que
+        // no existe, igual que un id válido que no está en su negocio.
         getById: async (productId, config) => {
+            if (!isUuid(productId)) return null;
+
             const { content } = await http.get<ApiResponseWithPagination<ProductApiResponse[]> | null>(
                 ENDPOINTS.PRODUCTS,
                 {

@@ -40,6 +40,10 @@ export const products = {
             title: "Nuevo producto · Vorea",
             description: "Añade un producto a la carta de tus sucursales.",
         },
+        edit: {
+            title: "Editar producto · Vorea",
+            description: "Cambia los datos, la receta o el precio de un producto de la carta.",
+        },
         categories: {
             title: "Categorías · Vorea",
             description: "Secciones en las que se agrupa la carta de tus sucursales.",
@@ -542,6 +546,24 @@ export const products = {
             categoryRequired: "Elige la categoría en la que se agrupa dentro de la carta.",
             descriptionMax: "La descripción supera los {max} caracteres.",
         },
+    },
+
+
+    /* ====================================================================== */
+    /*  Edición de producto                                                   */
+    /* ====================================================================== */
+    // Usa el mismo asistente que el alta, así que aquí solo están los textos
+    // que cambian. Los rótulos de los campos y las validaciones son los de
+    // `create`.
+
+    edit: {
+        title: "Editar producto",
+        /** Nombra el producto para que quede claro cuál se está cambiando. */
+        subtitle:
+            "Cambia los datos de «{name}». Nada se guardará hasta el último paso.",
+        backLabel: "Volver a la lista de productos",
+
+        submit: "Guardar cambios",
     },
 
 
