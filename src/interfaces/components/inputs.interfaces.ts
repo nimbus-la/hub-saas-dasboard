@@ -134,7 +134,8 @@ export type TextFieldType =
     | "search"
     | "tel"
     | "url"
-    | "number";
+    | "number"
+    | "date";
 
 export interface TextFieldProps
     extends Omit<
