@@ -26,6 +26,7 @@ import {
     ProductsHeader,
 } from "../components/list";
 import { useCategoryTabs, useProducts } from "../hooks";
+import { PRODUCT_CREATE_HREF, getProductEditHref } from "../libs";
 import {
     productsPageBodyVariants,
     productsPageSearchVariants,
@@ -36,9 +37,6 @@ const GRID_PANEL_ID = "products-grid";
 
 /** Todo lo que dice esta pantalla. Ver `@/messages`. */
 const COPY = messages.products.list;
-
-/** Formulario de alta. La misma ruta que declara el menú lateral. */
-const CREATE_PRODUCT_HREF = "/products/create";
 
 export default function Products() {
     const router = useRouter();
@@ -56,13 +54,12 @@ export default function Products() {
         COPY.allCategoriesLabel;
 
     const handleCreateProduct = React.useCallback(() => {
-        router.push(CREATE_PRODUCT_HREF);
+        router.push(PRODUCT_CREATE_HREF);
     }, [router]);
 
     const handleEditProduct = React.useCallback((product: Product) => {
-        // Enlazar con el formulario de edición cuando exista su ruta.
-        void product;
-    }, []);
+        router.push(getProductEditHref(product.id));
+    }, [router]);
 
     const handleDeleteProduct = React.useCallback((product: Product) => {
         // Pedir confirmación aquí antes de llamar al servicio: la tarjeta solo

@@ -5,3 +5,15 @@
 
 /** El listado, que es a donde se vuelve desde cualquier pantalla del módulo. */
 export const PRODUCTS_LIST_HREF = "/products";
+
+
+/** El alta de producto. Es la misma ruta que declara el menú lateral. */
+export const PRODUCT_CREATE_HREF = "/products/create";
+
+
+/**
+ * La edición de un producto. El id va codificado porque llega de los datos y
+ * no de una constante, y un carácter raro rompería la ruta en vez de dar 404.
+ */
+export const getProductEditHref = (productId: string): string =>
+    `/products/${encodeURIComponent(productId)}/edit`;
