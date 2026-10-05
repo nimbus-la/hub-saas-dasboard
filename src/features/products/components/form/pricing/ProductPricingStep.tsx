@@ -9,7 +9,8 @@ import { messages } from "@/messages";
 import { useProductPricing } from "../../../hooks";
 import type { ProductFormValues } from "../../../interfaces";
 import { PRICING_RULES, PRICING_VALIDATION, hasCost } from "../../../libs";
-import BranchPricingList from "./BranchPricingList";
+// Precios por sucursal fuera del primer alcance. Ver la nota al final del paso.
+// import BranchPricingList from "./BranchPricingList";
 import PricingSummary from "./PricingSummary";
 import {
     productPricingAvailabilityVariants,
@@ -34,8 +35,9 @@ const pricingMessages = messages.products.create.pricing;
  */
 export default function ProductPricingStep({ className }: ProductPricingStepProps) {
     const { control } = useFormContext<ProductFormValues>();
-    const { global, branchRows, customCount, onMarginChange, onPriceChange } =
-        useProductPricing();
+    // `branchRows` y `customCount` vuelven aquí cuando se active la lista de
+    // sucursales.
+    const { global, onMarginChange, onPriceChange } = useProductPricing();
 
     // Sin receta con costo no hay nada sobre lo que calcular un porcentaje. El
     // precio sí se puede escribir a mano, así que solo se bloquea el margen.
@@ -123,7 +125,12 @@ export default function ProductPricingStep({ className }: ProductPricingStepProp
                 )}
             />
 
-            <BranchPricingList rows={branchRows} customCount={customCount} />
+            {/* Los precios por sucursal no entran en el primer alcance. El
+            backend ya tiene su servicio, pero el formulario todavía trabaja
+            con sucursales de prueba y ni el alta ni la edición los envían.
+            Para activarlos basta con quitar este comentario, el del import y
+            volver a leer `branchRows` y `customCount` de `useProductPricing`. */}
+            {/* <BranchPricingList rows={branchRows} customCount={customCount} /> */}
         </fieldset>
     );
 };
