@@ -2,7 +2,7 @@ import { AlertTone, ApiAlert, ApiEnvelope, ApiEnvelopeStatus } from "@/interface
 import { isApiEnvelope } from "@/lib/http/envelope";
 import { HttpError, isHttpError } from "@/lib/http/http-error";
 import { messages } from "@/messages";
-import { ALERT_TONE_BY_API_STATUS, API_PRESENTABLE_STATUS } from "@/utils";
+import { ALERT_TONE_BY_API_STATUS, API_SILENT_CODES, HTTP_SILENT_STATUSES } from "@/utils";
 
 export function resolveApiAlert(source: unknown): ApiAlert | null {
     if (isHttpError(source)) return fromError(source);
@@ -48,17 +48,33 @@ function fromError(error: HttpError): ApiAlert | null {
         return { tone: "error", message: messages.errors.http.timeout };
     }
 
+    if (isSilentError(error)) return null;
+
+    // Un 5xx suele traer el texto de una excepción interna, que al usuario no
+    // le sirve de nada. Se queda en el error para quien revise el registro.
+    const isServerFailure = (error.effectiveStatus ?? 0) >= 500;
+
     const { api } = error;
+    const message = api?.apiMessage.trim() ?? "";
 
-    const isPresentable =
-        api !== null &&
-        api.httpStatus === API_PRESENTABLE_STATUS &&
-        error.status === API_PRESENTABLE_STATUS &&
-        api.apiMessage.trim().length > 0;
-
-    if (!isPresentable) {
+    if (api === null || isServerFailure || message.length === 0) {
         return { tone: "error", message: messages.errors.unexpected };
     }
 
-    return { tone: toneOf(api.apiStatus), message: api.apiMessage.trim() };
+    // Con cualquier otro estado, un 400 o un 404, el backend ya redactó el
+    // motivo para el usuario y se enseña tal cual.
+    return { tone: toneOf(api.apiStatus), message };
+}
+
+
+/**
+ * ¿Este error se calla en toda la aplicación?
+ *
+ * Se exporta para que quien atrape un error a mano, por ejemplo un modal que
+ * guarda, pueda saltarse el aviso con el mismo criterio que la caché.
+ */
+export function isSilentError(error: HttpError): boolean {
+    if (error.code !== null && API_SILENT_CODES.includes(error.code)) return true;
+
+    return error.effectiveStatus !== null && HTTP_SILENT_STATUSES.includes(error.effectiveStatus);
 }

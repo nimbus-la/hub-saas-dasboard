@@ -1,3 +1,7 @@
+import type { InfiniteData } from "@tanstack/react-query";
+
+import type { ApiResponseWithPagination, FilterTabItem, InputSelectorOption } from "@/interfaces";
+
 import type { CategoryFormValues, CategoryList, CategoryListApiResponse, CreateCategoryParams, UpdateCategoryParams } from "../interfaces";
 
 /**
@@ -19,6 +23,7 @@ export const toCategory = (category: CategoryListApiResponse): CategoryList => (
     // mostraría y se guardaría como si fuera la descripción real.
     description: category.description ?? "",
 
+    productCount: category.productCount,
     updatedAt: category.updatedAt,
     isActive: category.isActive,
 });
@@ -27,6 +32,31 @@ export const toCategory = (category: CategoryListApiResponse): CategoryList => (
 /** Convierte todas las filas del listado. */
 export const toCategoryList = (categories: CategoryListApiResponse[]): CategoryList[] =>
     categories.map(toCategory);
+
+
+/**
+ * Convierte las tandas de categorías cargadas en opciones del selector. El
+ * valor es el id porque es lo que el alta de producto le envía al backend.
+ */
+export const toCategoryOptions = (
+    data: InfiniteData<ApiResponseWithPagination<CategoryList[]>>
+): InputSelectorOption[] =>
+    data.pages.flatMap((page) => page.rows).map((category) => ({ label: category.name, value: category.id }));
+
+
+/**
+ * Convierte las tandas de categorías cargadas en las pestañas del listado de
+ * productos. Tiene su propio mapper y no reutiliza las opciones del selector,
+ * porque las pestañas muestran cuántos productos hay y el selector no.
+ */
+export const toCategoryTabs = (
+    data: InfiniteData<ApiResponseWithPagination<CategoryList[]>>
+): FilterTabItem[] =>
+    data.pages.flatMap((page) => page.rows).map((category) => ({
+        value: category.id,
+        label: category.name,
+        count: category.productCount,
+    }));
 
 
 /** Llena el formulario de edición con los datos de la categoría. */

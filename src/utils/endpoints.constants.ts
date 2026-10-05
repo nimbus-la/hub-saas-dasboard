@@ -35,6 +35,12 @@ export const ENDPOINTS = {
 
     // ── Productos ───────────────────────────────────────────────────────────
 
+    /** Catálogo de productos. Pagina y filtra por texto, categoría y estado. */
+    PRODUCTS: "products",
+
+    /** Alta de un producto con su receta. */
+    PRODUCTS_CREATE: "products/create",
+
     /**
      * Categorías de producto.
      *
@@ -55,5 +61,12 @@ export const ENDPOINTS = {
      * único lugar que tocar.
      */
     EMPLOYEES: "employees",
+    // ── Inventario ──────────────────────────────────────────────────────────
+
+    /**
+     * Insumos del inventario. Pagina hasta 100 por página, filtra por sucursal
+     * y no busca por texto.
+     */
+    INVENTORY_ITEMS: "inventory/item",
 
 } as const;

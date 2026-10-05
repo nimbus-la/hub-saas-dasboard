@@ -183,6 +183,12 @@ export default function IngredientSearchField({
                 </div>
             )}
 
+            {status === "loading" && (
+                <p role="status" className={ingredientSearchEmptyVariants()}>
+                    {searchMessages.loading}
+                </p>
+            )}
+
             {(status === "empty" || status === "allAdded") && (
                 <p role="status" className={ingredientSearchEmptyVariants()}>
                     {formatMessage(

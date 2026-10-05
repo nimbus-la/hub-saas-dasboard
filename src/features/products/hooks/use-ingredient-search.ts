@@ -3,24 +3,25 @@
 import * as React from "react";
 
 import { searchRecipeIngredients } from "../libs";
+import { useInventory } from "./use-inventory";
 
 
 /**
  * Estado del buscador de insumos de la receta.
  *
  * Guarda lo que se escribe y calcula los resultados con
- * `searchRecipeIngredients`. Hoy busca en los datos de prueba, y cuando exista
- * el endpoint de inventario solo tiene que cambiar este hook, sin tocar el
- * componente.
+ * `searchRecipeIngredients`. La búsqueda es local porque el backend no filtra
+ * el inventario por texto: se trae entero una vez y se filtra aquí.
  *
  * Recibe los ids que ya están en la receta para no volver a ofrecerlos.
  */
 export function useIngredientSearch(selectedIds: readonly string[]) {
     const [query, setQuery] = React.useState("");
+    const { ingredients, isLoading } = useInventory();
 
     const search = React.useMemo(
-        () => searchRecipeIngredients(query, selectedIds),
-        [query, selectedIds]
+        () => searchRecipeIngredients(query, selectedIds, ingredients, isLoading),
+        [query, selectedIds, ingredients, isLoading]
     );
 
     const clear = React.useCallback(() => setQuery(""), []);

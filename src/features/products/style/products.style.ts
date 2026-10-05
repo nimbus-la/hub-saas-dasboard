@@ -8,7 +8,7 @@ import { SPACING_CLASS } from "@/tokens";
  *
  * Dos ritmos: `gap-6` entre el encabezado y el cuerpo —son dos bloques
  * distintos— y `gap-4` dentro del cuerpo, donde buscador, pestañas, rejilla y
- * paginación son partes de una misma herramienta. Que el interior vaya más
+ * pie son partes de una misma herramienta. Que el interior vaya más
  * apretado que el exterior es lo que hace que se lean como un grupo.
  */
 
@@ -36,14 +36,3 @@ export const productsPageBodyVariants = cva([
  * deja de ayudar a leer lo que se escribe.
  */
 export const productsPageSearchVariants = cva(["w-full sm:max-w-xs"]);
-
-
-/**
- * Pie de paginación.
- *
- * La línea lo separa de la rejilla; el relleno superior le da el aire que la
- * línea por sí sola no da.
- */
-export const productsPagePaginationVariants = cva([
-    "border-t border-neutral-200 pt-4",
-]);
