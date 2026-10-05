@@ -38,7 +38,11 @@ import {
  * editar son los textos, los valores con los que arranca y qué pasa al
  * guardar, y todo eso llega por props.
  */
-export default function ProductFormLayout({ formMessages, ...options }: ProductFormLayoutProps) {
+export default function ProductFormLayout({
+    formMessages,
+    currentCategory,
+    ...options
+}: ProductFormLayoutProps) {
     const {
         form,
         step,
@@ -92,7 +96,9 @@ export default function ProductFormLayout({ formMessages, ...options }: ProductF
                         aria-label={step.title}
                         className={productFormBodyVariants()}
                     >
-                        {step.id === "basics" && (<ProductBasicsStep />)}
+                        {step.id === "basics" && (
+                            <ProductBasicsStep currentCategory={currentCategory} />
+                        )}
                         {step.id === "recipe" && (<ProductRecipeStep />)}
                         {step.id === "pricing" && (<ProductPricingStep />)}
                     </div>

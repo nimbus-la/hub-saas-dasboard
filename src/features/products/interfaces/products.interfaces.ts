@@ -1,5 +1,7 @@
 import { RegisterOptions } from "react-hook-form";
 
+import type { InputSelectorOption } from "@/interfaces";
+
 /**
  * Una línea de la receta tal como la guarda el formulario.
  *
@@ -78,6 +80,12 @@ export interface ProductFormMessages {
 
 export interface ProductFormLayoutProps extends ProductFormOptions {
     formMessages: ProductFormMessages;
+
+    /**
+     * La categoría con su nombre, solo al editar. El formulario guarda el id y
+     * el selector necesita la etiqueta, que puede no estar entre las cargadas.
+     */
+    currentCategory?: InputSelectorOption | undefined;
 }
 
 

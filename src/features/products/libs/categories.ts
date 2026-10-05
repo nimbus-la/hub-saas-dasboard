@@ -1,4 +1,4 @@
-import type { BadgeTone } from "@/interfaces";
+import type { BadgeTone, InputSelectorOption } from "@/interfaces";
 import { formatMessage, formatPlural, messages } from "@/messages";
 
 import type { CategoryFilters, CategoryFormValues } from "../interfaces";
@@ -124,6 +124,24 @@ export const getCategoryFiltersKey = (
     query: string,
     status: CategoryStatusFilter
 ): string => `${query.trim()}|${status}`;
+
+
+/**
+ * Pone primero la categoría que ya tenía el producto si no está entre las
+ * opciones cargadas. El selector solo encuentra la etiqueta de un valor entre
+ * sus opciones, y la categoría de un producto puede estar en una tanda que
+ * aún no llegó o estar inactiva, que el selector no pide.
+ */
+export const withCurrentCategory = (
+    options: InputSelectorOption[],
+    current: InputSelectorOption | undefined
+): InputSelectorOption[] => {
+    if (!current || options.some((option) => option.value === current.value)) {
+        return options;
+    }
+
+    return [current, ...options];
+};
 
 
 /** Devuelve el total con su palabra, por ejemplo 1 categoría u 8 categorías. */
