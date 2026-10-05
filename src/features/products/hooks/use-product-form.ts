@@ -11,7 +11,7 @@
 // asistente.
 
 import * as React from "react";
-import { useForm, useFormState } from "react-hook-form";
+import { useForm, useFormState, useWatch } from "react-hook-form";
 
 import type { ProductFormOptions, ProductFormValues } from "../interfaces";
 import {
@@ -19,9 +19,15 @@ import {
     findFirstInvalidStep,
     getProductFormStep,
 } from "../libs";
+import { hasProductChanges } from "../mappers";
 
 
-export function useProductForm({ defaultValues, onSave, isSaving }: ProductFormOptions) {
+export function useProductForm({
+    defaultValues,
+    onSave,
+    isSaving,
+    requireChanges = false,
+}: ProductFormOptions) {
     const form = useForm<ProductFormValues>({
         defaultValues,
         mode: "onTouched",
@@ -39,6 +45,19 @@ export function useProductForm({ defaultValues, onSave, isSaving }: ProductFormO
     // eso sirve para saber si el paso actual está completo sin validar los
     // pasos que la persona todavía no ha visto.
     const { isValid: isStepValid } = useFormState({ control: form.control });
+
+    // Se compara con los valores con los que arrancó, con la misma regla que
+    // arma el cuerpo de la edición. Así, si alguien cambia algo y lo deja como
+    // estaba, el botón vuelve a bloquearse. Con `compute` solo se vuelve a
+    // pintar cuando cambia la respuesta, no con cada tecla.
+    const hasChanges = useWatch({
+        control: form.control,
+        compute: (values) => !requireChanges || hasProductChanges(values, defaultValues),
+    });
+
+    // Avanzar solo pide que el paso esté completo; guardar además pide que no
+    // haya otro guardado en camino y, si se exigen, que haya cambios.
+    const canSubmit = isStepValid && (!isLastStep || (!isSaving && hasChanges));
 
     const goToPreviousStep = React.useCallback(() => {
         setStepIndex((current) => Math.max(current - 1, 0));
@@ -84,6 +103,10 @@ export function useProductForm({ defaultValues, onSave, isSaving }: ProductFormO
                     return;
                 }
 
+                // El botón ya está bloqueado en estos casos; esto cubre un
+                // envío que llegue por otro lado, como un Enter.
+                if (isSaving || !hasChanges) return;
+
                 // La vuelta al listado la hace quien guarda, cuando el backend
                 // confirma. Si lo rechaza, la persona se queda aquí con su
                 // borrador para corregirlo.
@@ -95,7 +118,7 @@ export function useProductForm({ defaultValues, onSave, isSaving }: ProductFormO
                 Math.min(current + 1, PRODUCT_FORM_STEP_LENGTH - 1)
             );
         },
-        [form, isLastStep, onSave, step.fields]
+        [form, hasChanges, isLastStep, isSaving, onSave, step.fields]
     );
 
     return {
@@ -105,10 +128,12 @@ export function useProductForm({ defaultValues, onSave, isSaving }: ProductFormO
         stepIndex,
         isFirstStep,
         isLastStep,
-        /** El paso en pantalla no tiene campos vacíos, inválidos ni con error. */
-        isStepValid,
-        /** El guardado está en camino; el botón no debe volver a enviarlo. */
-        isSubmitting: isSaving,
+        /**
+         * Si el botón principal se puede pulsar. En los pasos intermedios basta
+         * con que el paso esté completo. En el último, además, no puede haber un
+         * guardado en camino y, si se exigen cambios, tiene que haberlos.
+         */
+        canSubmit,
         submitStep,
         goToPreviousStep,
     };

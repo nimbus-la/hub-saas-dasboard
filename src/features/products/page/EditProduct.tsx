@@ -52,6 +52,7 @@ function EditProductForm({ product }: { product: ProductApiResponse }) {
             defaultValues={initialValues}
             onSave={updateProduct.mutate}
             isSaving={updateProduct.isPending}
+            requireChanges
             currentCategory={{
                 value: product.productCategoryId,
                 label: product.nameProductCategory,

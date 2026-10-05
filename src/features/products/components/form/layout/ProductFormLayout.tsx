@@ -49,8 +49,7 @@ export default function ProductFormLayout({
         stepIndex,
         isFirstStep,
         isLastStep,
-        isStepValid,
-        isSubmitting,
+        canSubmit,
         submitStep,
         goToPreviousStep,
     } = useProductForm(options);
@@ -129,10 +128,10 @@ export default function ProductFormLayout({
                             )}
 
                             {/* En el último paso el botón cambia de papel: ya no
-                            queda a dónde avanzar, así que guarda. En todos se
-                            habilita solo cuando los campos del paso están
-                            completos y sin errores, y mientras se guarda se
-                            bloquea para no enviarlo dos veces. */}
+                            queda a dónde avanzar, así que guarda. Cuándo se
+                            puede pulsar lo decide `useProductForm`: el paso
+                            completo, sin otro guardado en camino y, al editar,
+                            con algo que haya cambiado. */}
                             <GenericButton
                                 type="submit"
                                 variant="primary"
@@ -141,7 +140,7 @@ export default function ProductFormLayout({
                                         ? formMessages.submit
                                         : messages.common.actions.continue
                                 }
-                                disabled={!isStepValid || isSubmitting}
+                                disabled={!canSubmit}
                                 {...(!isLastStep && { endIcon: ICON_TOKENS.NEXT })}
                             />
                         </div>

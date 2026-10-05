@@ -62,6 +62,12 @@ export interface ProductFormOptions {
     onSave: (values: ProductFormValues) => void;
     /** Mientras sea `true`, el botón de guardar se bloquea. */
     isSaving: boolean;
+    /**
+     * Bloquea el botón de guardar mientras el formulario siga igual a como
+     * empezó. Lo usa la edición; en el alta no tiene sentido, porque se parte
+     * de un formulario vacío que igual hay que llenar.
+     */
+    requireChanges?: boolean | undefined;
 }
 
 

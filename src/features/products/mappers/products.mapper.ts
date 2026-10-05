@@ -121,7 +121,9 @@ export const toProductFormValues = (product: ProductApiResponse): ProductFormVal
 
 
 /**
- * Arma el cuerpo de la edición con solo lo que cambió.
+ * Lo que cambió en el formulario respecto a como empezó, ya en el formato
+ * del backend. Es la base del cuerpo de la edición y también lo que decide si
+ * el botón de guardar se habilita, así los dos nunca opinan distinto.
  *
  * Los dos lados se pasan primero al formato del backend y se comparan ya
  * convertidos. Así un espacio de más al final del nombre o un `22000` contra
@@ -129,25 +131,23 @@ export const toProductFormValues = (product: ProductApiResponse): ProductFormVal
  *
  * La receta se compara en el formulario, con la misma regla que usa el paso
  * de precio para saber si se tocó. Va entera o no va, porque el backend la
- * reemplaza completa y enviarla siempre cuenta como cambio. El estado solo viaja si se activó o se
- * desactivó: mandarlo igual hace que el backend rechace toda la edición.
+ * reemplaza completa y enviarla siempre cuenta como cambio. El estado solo
+ * viaja si se activó o se desactivó: mandarlo igual hace que el backend
+ * rechace toda la edición.
  *
  * La descripción sí se manda vacía cuando se borra. Si se omitiera, el
  * backend dejaría la anterior y no habría forma de quitarla.
  */
-export const toUpdateProductParams = (
-    productId: string,
+const getProductChanges = (
     values: ProductFormValues,
     initial: ProductFormValues
-): UpdateProductParams => {
+): Omit<UpdateProductParams, "productId"> => {
     const current = toCreateProductParams(values);
     const before = toCreateProductParams(initial);
 
     const description = current.productDescription ?? "";
 
     return {
-        productId,
-
         ...(current.productName !== before.productName && {
             productName: current.productName,
         }),
@@ -173,9 +173,20 @@ export const toUpdateProductParams = (
 };
 
 
+/** Arma el cuerpo de la edición: el id del producto y solo lo que cambió. */
+export const toUpdateProductParams = (
+    productId: string,
+    values: ProductFormValues,
+    initial: ProductFormValues
+): UpdateProductParams => ({
+    productId,
+    ...getProductChanges(values, initial),
+});
+
+
 /**
- * Si la edición trae algo más que el id. Sin cambios no vale la pena llamar
- * al backend, que de todas formas respondería que no hay nada que guardar.
+ * Si el formulario cambió en algo que el backend guarda. Sin cambios no vale
+ * la pena llamarlo, porque respondería que no hay nada que guardar.
  */
-export const hasProductChanges = (params: UpdateProductParams): boolean =>
-    Object.keys(params).some((key) => key !== "productId");
+export const hasProductChanges = (values: ProductFormValues, initial: ProductFormValues): boolean =>
+    Object.keys(getProductChanges(values, initial)).length > 0;

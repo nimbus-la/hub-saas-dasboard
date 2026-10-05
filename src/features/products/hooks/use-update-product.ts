@@ -16,9 +16,10 @@ import { categoryKeys, createProductsService, productKeys } from "../services";
  * Edición de un producto. Recibe el formulario tal cual y aquí se compara con
  * cómo empezó, para mandar solo lo que cambió.
  *
- * Si no cambió nada no se llama al backend, que respondería con un error de
- * "sin cambios". Se vuelve al listado igual que si se hubiera guardado, y como
- * la mutación devuelve `null` no sale ningún aviso.
+ * La pantalla ya bloquea el botón de guardar mientras no haya cambios. Aun
+ * así, si llegara a enviarse sin cambios, no se llama al backend, que
+ * respondería con un error de "sin cambios": se vuelve al listado y, como la
+ * mutación devuelve `null`, no sale ningún aviso.
  *
  * El aviso de éxito es el mensaje del sobre y el de error lo pone el
  * `MutationCache`; si el backend rechaza la edición no se navega, y la persona
@@ -32,11 +33,10 @@ export function useUpdateProduct(productId: string, initialValues: ProductFormVa
     const service = React.useMemo(() => createProductsService(http), [http]);
 
     return useMutation({
-        mutationFn: async (values: ProductFormValues) => {
-            const params = toUpdateProductParams(productId, values, initialValues);
-
-            return hasProductChanges(params) ? service.update(params) : null;
-        },
+        mutationFn: async (values: ProductFormValues) =>
+            hasProductChanges(values, initialValues)
+                ? service.update(toUpdateProductParams(productId, values, initialValues))
+                : null,
 
         onSuccess: (response) => {
             if (response) {
