@@ -63,6 +63,18 @@ export function useProductForm({
         setStepIndex((current) => Math.max(current - 1, 0));
     }, []);
 
+    // Marca de "ya hay un envío en curso". Va en un ref y no en estado porque
+    // tiene que cambiar en el acto: el botón se bloquea recién cuando React
+    // vuelve a pintar, y dos clics seguidos alcanzan a entrar los dos antes de
+    // eso. Sin la marca se guardaba dos veces, o se saltaba un paso entero.
+    const isBusyRef = React.useRef(false);
+
+    // Cuando el guardado termina, salga bien o mal, se puede volver a enviar.
+    // Si el backend lo rechaza, la persona corrige y reintenta desde aquí.
+    React.useEffect(() => {
+        if (!isSaving) isBusyRef.current = false;
+    }, [isSaving]);
+
     /**
      * Valida el paso e intenta avanzar.
      *
@@ -83,42 +95,57 @@ export function useProductForm({
         async (event: React.SubmitEvent<HTMLFormElement>) => {
             event.preventDefault();
 
-            // Nada que validar en un paso sin campos; `trigger([])` validaría
-            // el formulario entero, que es justo lo contrario de lo que se
-            // quiere aquí.
-            const isValid =
-                step.fields.length === 0 ||
-                (await form.trigger(step.fields, { shouldFocus: true }));
+            // Se toma la marca antes de cualquier `await`, que es justo donde
+            // un segundo clic se colaría.
+            if (isBusyRef.current) return;
+            isBusyRef.current = true;
 
-            if (!isValid) return;
+            // Si el envío termina sin llegar a guardar, la marca se suelta al
+            // salir. Si se entregó a `onSave`, la suelta el efecto de arriba
+            // cuando el guardado acaba.
+            let isHandedOff = false;
 
-            if (isLastStep) {
-                // Se revisa el formulario entero y no solo el paso: se pudo
-                // volver atrás a cambiar algo y dejarlo a medias, y eso no se
-                // ve desde aquí.
-                const isComplete = await form.trigger();
+            try {
+                // Nada que validar en un paso sin campos; `trigger([])` validaría
+                // el formulario entero, que es justo lo contrario de lo que se
+                // quiere aquí.
+                const isValid =
+                    step.fields.length === 0 ||
+                    (await form.trigger(step.fields, { shouldFocus: true }));
 
-                if (!isComplete) {
-                    setStepIndex(findFirstInvalidStep(form.formState.errors));
+                if (!isValid) return;
+
+                if (isLastStep) {
+                    // Se revisa el formulario entero y no solo el paso: se pudo
+                    // volver atrás a cambiar algo y dejarlo a medias, y eso no se
+                    // ve desde aquí.
+                    const isComplete = await form.trigger();
+
+                    if (!isComplete) {
+                        setStepIndex(findFirstInvalidStep(form.formState.errors));
+                        return;
+                    }
+
+                    // El botón ya está bloqueado sin cambios; esto cubre un
+                    // envío que llegue por otro lado, como un Enter.
+                    if (!hasChanges) return;
+
+                    // La vuelta al listado la hace quien guarda, cuando el backend
+                    // confirma. Si lo rechaza, la persona se queda aquí con su
+                    // borrador para corregirlo.
+                    isHandedOff = true;
+                    onSave(form.getValues());
                     return;
                 }
 
-                // El botón ya está bloqueado en estos casos; esto cubre un
-                // envío que llegue por otro lado, como un Enter.
-                if (isSaving || !hasChanges) return;
-
-                // La vuelta al listado la hace quien guarda, cuando el backend
-                // confirma. Si lo rechaza, la persona se queda aquí con su
-                // borrador para corregirlo.
-                onSave(form.getValues());
-                return;
+                setStepIndex((current) =>
+                    Math.min(current + 1, PRODUCT_FORM_STEP_LENGTH - 1)
+                );
+            } finally {
+                if (!isHandedOff) isBusyRef.current = false;
             }
-
-            setStepIndex((current) =>
-                Math.min(current + 1, PRODUCT_FORM_STEP_LENGTH - 1)
-            );
         },
-        [form, hasChanges, isLastStep, isSaving, onSave, step.fields]
+        [form, hasChanges, isLastStep, onSave, step.fields]
     );
 
     return {
