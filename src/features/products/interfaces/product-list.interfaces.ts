@@ -31,7 +31,8 @@ export interface ProductApiResponse {
     productCategoryId: string;
     nameProductCategory: string;
     productName: string;
-    productDescription: string;
+    /** Es opcional al crear, así que puede llegar vacía. */
+    productDescription: string | null;
     productSku: string;
 
     /** Precio de venta en texto decimal, por ejemplo `"9000.00"`. */

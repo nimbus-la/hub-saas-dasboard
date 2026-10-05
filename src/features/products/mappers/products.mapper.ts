@@ -2,7 +2,15 @@ import { formatList } from "@/lib/format";
 import type { Product, ProductStatus } from "@/lib/products";
 import { formatMessage, messages } from "@/messages";
 
-import type { CreateProductParams, ProductApiResponse, ProductFormValues } from "../interfaces";
+import type {
+    CreateProductParams,
+    CreateProductRecipeLineParams,
+    ProductApiResponse,
+    ProductFormValues,
+    ProductRecipeFormValues,
+    UpdateProductParams,
+} from "../interfaces";
+import { DEFAULT_PRODUCT_FORM_VALUES } from "../libs";
 
 /**
  * Conversiones entre el producto del backend y el que usa la aplicación.
@@ -54,6 +62,18 @@ export const toProductList = (products: ProductApiResponse[]): Product[] =>
 
 
 /**
+ * La receta del formulario como la espera el backend. La usan el alta y la
+ * edición, que mandan las líneas exactamente igual.
+ */
+const toRecipeParams = (recipe: ProductRecipeFormValues[]): CreateProductRecipeLineParams[] =>
+    recipe.map((line) => ({
+        inventoryItemId: line.itemId,
+        quantity: String(line.quantity ?? 0),
+        isOptional: line.isOptional,
+    }));
+
+
+/**
  * Convierte el formulario del alta en el cuerpo que espera el backend.
  *
  * Solo se llama después de validar el formulario entero, así que el precio y
@@ -72,10 +92,110 @@ export const toCreateProductParams = (values: ProductFormValues): CreateProductP
         ...(description && { productDescription: description }),
         productBasePrice: String(values.price ?? 0),
         profitMargin: values.margin ?? 0,
-        recipe: values.recipe.map((line) => ({
-            inventoryItemId: line.itemId,
-            quantity: String(line.quantity ?? 0),
-            isOptional: line.isOptional,
-        })),
+        recipe: toRecipeParams(values.recipe),
     };
 };
+
+
+/**
+ * Llena el formulario con un producto que ya existe, para editarlo.
+ *
+ * El backend manda precio, margen y cantidades como texto decimal y el
+ * formulario trabaja con números. La foto y las sucursales se quedan como en
+ * un alta nueva porque el formulario todavía no las sabe cargar.
+ */
+export const toProductFormValues = (product: ProductApiResponse): ProductFormValues => ({
+    ...DEFAULT_PRODUCT_FORM_VALUES,
+    name: product.productName,
+    categoryId: product.productCategoryId,
+    description: product.productDescription ?? "",
+    price: Number(product.productBasePrice),
+    margin: Number(product.profitMargin),
+    isAvailable: product.productStatus,
+    recipe: product.ingredients.map((ingredient) => ({
+        itemId: ingredient.inventoryItemId,
+        quantity: Number(ingredient.quantity),
+        isOptional: ingredient.isOptional,
+    })),
+});
+
+
+/**
+ * Dos recetas son iguales si tienen las mismas líneas en el mismo orden. El
+ * orden cuenta porque así se muestra la receta, y moverlo también es editarla.
+ */
+const isSameRecipe = (
+    current: CreateProductRecipeLineParams[],
+    initial: CreateProductRecipeLineParams[]
+): boolean =>
+    current.length === initial.length &&
+    current.every((line, index) => {
+        const other = initial[index];
+
+        return (
+            other !== undefined &&
+            line.inventoryItemId === other.inventoryItemId &&
+            line.quantity === other.quantity &&
+            line.isOptional === other.isOptional
+        );
+    });
+
+
+/**
+ * Arma el cuerpo de la edición con solo lo que cambió.
+ *
+ * Los dos lados se pasan primero al formato del backend y se comparan ya
+ * convertidos. Así un espacio de más al final del nombre o un `22000` contra
+ * un `22000.00` no cuentan como cambio.
+ *
+ * La receta va entera o no va, porque el backend la reemplaza completa y
+ * enviarla siempre cuenta como cambio. El estado solo viaja si se activó o se
+ * desactivó: mandarlo igual hace que el backend rechace toda la edición.
+ *
+ * La descripción sí se manda vacía cuando se borra. Si se omitiera, el
+ * backend dejaría la anterior y no habría forma de quitarla.
+ */
+export const toUpdateProductParams = (
+    productId: string,
+    values: ProductFormValues,
+    initial: ProductFormValues
+): UpdateProductParams => {
+    const current = toCreateProductParams(values);
+    const before = toCreateProductParams(initial);
+
+    const description = current.productDescription ?? "";
+
+    return {
+        productId,
+
+        ...(current.productName !== before.productName && {
+            productName: current.productName,
+        }),
+        ...(current.productCategoryId !== before.productCategoryId && {
+            productCategoryId: current.productCategoryId,
+        }),
+        ...(description !== (before.productDescription ?? "") && {
+            productDescription: description,
+        }),
+        ...(current.productBasePrice !== before.productBasePrice && {
+            productBasePrice: current.productBasePrice,
+        }),
+        ...(current.profitMargin !== before.profitMargin && {
+            profitMargin: current.profitMargin,
+        }),
+        ...(!isSameRecipe(current.recipe, before.recipe) && {
+            recipe: current.recipe,
+        }),
+        ...(values.isAvailable !== initial.isAvailable && {
+            productStatus: values.isAvailable,
+        }),
+    };
+};
+
+
+/**
+ * Si la edición trae algo más que el id. Sin cambios no vale la pena llamar
+ * al backend, que de todas formas respondería que no hay nada que guardar.
+ */
+export const hasProductChanges = (params: UpdateProductParams): boolean =>
+    Object.keys(params).some((key) => key !== "productId");
