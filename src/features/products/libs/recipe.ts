@@ -51,6 +51,30 @@ export const snapshotRecipe = (
 
 
 /**
+ * Si la receta sigue igual a como empezó: mismas líneas, en el mismo orden,
+ * con la misma cantidad y el mismo opcional. El orden cuenta porque así se
+ * muestra la receta, y moverlo también es editarla.
+ *
+ * La inicial se recibe a medias porque react-hook-form entrega sus valores por
+ * defecto como parciales, aunque al formulario siempre se le pasen completos.
+ */
+export const isSameRecipe = (
+    current: readonly ProductRecipeFormValues[],
+    initial: readonly (Partial<ProductRecipeFormValues> | undefined)[] = []
+): boolean =>
+    current.length === initial.length &&
+    current.every((line, index) => {
+        const other = initial[index];
+
+        return (
+            line.itemId === other?.itemId &&
+            line.quantity === other.quantity &&
+            line.isOptional === other.isOptional
+        );
+    });
+
+
+/**
  * Busca el insumo de cada línea del formulario y calcula su costo.
  *
  * Si el insumo de una línea ya no existe en el inventario, esa línea se deja

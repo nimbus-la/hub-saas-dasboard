@@ -3,6 +3,7 @@
 import { Controller, useFormContext } from "react-hook-form";
 
 import { InputSelector, TextAreaField, TextField } from "@/components";
+import type { InputSelectorOption } from "@/interfaces";
 import { cn } from "@/lib/utils";
 import { messages } from "@/messages";
 
@@ -29,17 +30,20 @@ import { PRODUCT_FORM_RULES, PRODUCT_VALIDATION } from "../../../libs";
  */
 
 interface ProductBasicsStepProps {
+    /** La categoría que ya tiene el producto, para que el selector la nombre al editar. */
+    currentCategory?: InputSelectorOption | undefined;
     className?: string;
 }
 
 export default function ProductBasicsStep({
+    currentCategory,
     className,
 }: ProductBasicsStepProps) {
     const stepMessaages = messages.products.create.basics;
 
     const { control } = useFormContext<ProductFormValues>();
 
-    const categories = useCategoryOptions();
+    const categories = useCategoryOptions(currentCategory);
 
     return (
         // El `fieldset` agrupa los campos del paso y la leyenda le pone nombre

@@ -1,29 +1,35 @@
 "use client";
 
-// ── Formulario de alta de producto ──────────────────────────────────────────
+// ── Formulario del producto ─────────────────────────────────────────────────
 // Compone react-hook-form con la navegación entre pasos y devuelve una sola
 // API a la pantalla. El borrador, los errores y qué campo está tocado los
 // lleva la librería; aquí sólo vive lo que ella no sabe: en qué paso estamos y
 // qué campos hay que dar por buenos antes de avanzar.
+//
+// No sabe si está creando o editando. Quien lo usa le pasa con qué valores
+// empieza y qué hacer al guardar, así el alta y la edición comparten todo el
+// asistente.
 
 import * as React from "react";
-import { useForm, useFormState } from "react-hook-form";
+import { useForm, useFormState, useWatch } from "react-hook-form";
 
-import { ProductFormValues } from "../interfaces";
+import type { ProductFormOptions, ProductFormValues } from "../interfaces";
 import {
-    DEFAULT_PRODUCT_FORM_VALUES,
     PRODUCT_FORM_STEP_LENGTH,
     findFirstInvalidStep,
     getProductFormStep,
 } from "../libs";
-import { useCreateProduct } from "./use-create-product";
+import { hasProductChanges } from "../mappers";
 
 
-export function useProductForm() {
-    const createProduct = useCreateProduct();
-
+export function useProductForm({
+    defaultValues,
+    onSave,
+    isSaving,
+    requireChanges = false,
+}: ProductFormOptions) {
     const form = useForm<ProductFormValues>({
-        defaultValues: DEFAULT_PRODUCT_FORM_VALUES,
+        defaultValues,
         mode: "onTouched",
         reValidateMode: "onChange",
     });
@@ -40,9 +46,34 @@ export function useProductForm() {
     // pasos que la persona todavía no ha visto.
     const { isValid: isStepValid } = useFormState({ control: form.control });
 
+    // Se compara con los valores con los que arrancó, con la misma regla que
+    // arma el cuerpo de la edición. Así, si alguien cambia algo y lo deja como
+    // estaba, el botón vuelve a bloquearse. Con `compute` solo se vuelve a
+    // pintar cuando cambia la respuesta, no con cada tecla.
+    const hasChanges = useWatch({
+        control: form.control,
+        compute: (values) => !requireChanges || hasProductChanges(values, defaultValues),
+    });
+
+    // Avanzar solo pide que el paso esté completo; guardar además pide que no
+    // haya otro guardado en camino y, si se exigen, que haya cambios.
+    const canSubmit = isStepValid && (!isLastStep || (!isSaving && hasChanges));
+
     const goToPreviousStep = React.useCallback(() => {
         setStepIndex((current) => Math.max(current - 1, 0));
     }, []);
+
+    // Marca de "ya hay un envío en curso". Va en un ref y no en estado porque
+    // tiene que cambiar en el acto: el botón se bloquea recién cuando React
+    // vuelve a pintar, y dos clics seguidos alcanzan a entrar los dos antes de
+    // eso. Sin la marca se guardaba dos veces, o se saltaba un paso entero.
+    const isBusyRef = React.useRef(false);
+
+    // Cuando el guardado termina, salga bien o mal, se puede volver a enviar.
+    // Si el backend lo rechaza, la persona corrige y reintenta desde aquí.
+    React.useEffect(() => {
+        if (!isSaving) isBusyRef.current = false;
+    }, [isSaving]);
 
     /**
      * Valida el paso e intenta avanzar.
@@ -64,38 +95,57 @@ export function useProductForm() {
         async (event: React.SubmitEvent<HTMLFormElement>) => {
             event.preventDefault();
 
-            // Nada que validar en un paso sin campos; `trigger([])` validaría
-            // el formulario entero, que es justo lo contrario de lo que se
-            // quiere aquí.
-            const isValid =
-                step.fields.length === 0 ||
-                (await form.trigger(step.fields, { shouldFocus: true }));
+            // Se toma la marca antes de cualquier `await`, que es justo donde
+            // un segundo clic se colaría.
+            if (isBusyRef.current) return;
+            isBusyRef.current = true;
 
-            if (!isValid) return;
+            // Si el envío termina sin llegar a guardar, la marca se suelta al
+            // salir. Si se entregó a `onSave`, la suelta el efecto de arriba
+            // cuando el guardado acaba.
+            let isHandedOff = false;
 
-            if (isLastStep) {
-                // Se revisa el formulario entero y no solo el paso: se pudo
-                // volver atrás a cambiar algo y dejarlo a medias, y eso no se
-                // ve desde aquí.
-                const isComplete = await form.trigger();
+            try {
+                // Nada que validar en un paso sin campos; `trigger([])` validaría
+                // el formulario entero, que es justo lo contrario de lo que se
+                // quiere aquí.
+                const isValid =
+                    step.fields.length === 0 ||
+                    (await form.trigger(step.fields, { shouldFocus: true }));
 
-                if (!isComplete) {
-                    setStepIndex(findFirstInvalidStep(form.formState.errors));
+                if (!isValid) return;
+
+                if (isLastStep) {
+                    // Se revisa el formulario entero y no solo el paso: se pudo
+                    // volver atrás a cambiar algo y dejarlo a medias, y eso no se
+                    // ve desde aquí.
+                    const isComplete = await form.trigger();
+
+                    if (!isComplete) {
+                        setStepIndex(findFirstInvalidStep(form.formState.errors));
+                        return;
+                    }
+
+                    // El botón ya está bloqueado sin cambios; esto cubre un
+                    // envío que llegue por otro lado, como un Enter.
+                    if (!hasChanges) return;
+
+                    // La vuelta al listado la hace quien guarda, cuando el backend
+                    // confirma. Si lo rechaza, la persona se queda aquí con su
+                    // borrador para corregirlo.
+                    isHandedOff = true;
+                    onSave(form.getValues());
                     return;
                 }
 
-                // La vuelta al listado la hace la mutación al confirmarse. Si
-                // el backend rechaza el alta, la persona se queda aquí con su
-                // borrador para corregirlo.
-                createProduct.mutate(form.getValues());
-                return;
+                setStepIndex((current) =>
+                    Math.min(current + 1, PRODUCT_FORM_STEP_LENGTH - 1)
+                );
+            } finally {
+                if (!isHandedOff) isBusyRef.current = false;
             }
-
-            setStepIndex((current) =>
-                Math.min(current + 1, PRODUCT_FORM_STEP_LENGTH - 1)
-            );
         },
-        [createProduct, form, isLastStep, step.fields]
+        [form, hasChanges, isLastStep, onSave, step.fields]
     );
 
     return {
@@ -105,10 +155,12 @@ export function useProductForm() {
         stepIndex,
         isFirstStep,
         isLastStep,
-        /** El paso en pantalla no tiene campos vacíos, inválidos ni con error. */
-        isStepValid,
-        /** El alta está en camino; el botón de guardar no debe volver a enviarla. */
-        isSubmitting: createProduct.isPending,
+        /**
+         * Si el botón principal se puede pulsar. En los pasos intermedios basta
+         * con que el paso esté completo. En el último, además, no puede haber un
+         * guardado en camino y, si se exigen cambios, tiene que haberlos.
+         */
+        canSubmit,
         submitStep,
         goToPreviousStep,
     };

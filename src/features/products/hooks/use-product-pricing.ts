@@ -14,6 +14,7 @@ import {
     getMarginFromPrice,
     getPriceFromMargin,
     getRecipeCost,
+    isSameRecipe,
     resolveBranchPricing,
     resolveGlobalPricing,
     resolveRecipeLines,
@@ -23,7 +24,7 @@ import { useInventory } from "./use-inventory";
 
 
 export function useProductPricing() {
-    const { control, getValues, setValue } = useFormContext<ProductFormValues>();
+    const { control, formState, getValues, setValue } = useFormContext<ProductFormValues>();
 
     // El costo se recalcula desde la receta y no se guarda en el formulario:
     // si los insumos suben de precio, el paso tiene que mostrar el costo de
@@ -49,6 +50,14 @@ export function useProductPricing() {
     // margen/precio quedaría calculado sobre un costo que ya no existe. Al
     // entrar se rehace el precio desde el margen, no al revés: el margen es lo
     // que la persona decidió ganar y el precio es su consecuencia.
+    //
+    // Solo si la receta cambió desde que se abrió el formulario. Al editar,
+    // el precio y el margen guardados ya van juntos, y recalcular cambiaría lo
+    // que paga el cliente por un redondeo o porque subió un insumo, sin que
+    // nadie lo haya pedido. En el alta la receta parte vacía, así que siempre
+    // cuenta como cambiada.
+    const isRecipeChanged = !isSameRecipe(recipe, formState.defaultValues?.recipe);
+
     const syncedCost = React.useRef<number | null>(null);
 
     React.useEffect(() => {
@@ -56,12 +65,12 @@ export function useProductPricing() {
 
         syncedCost.current = cost.total;
 
-        if (margin === null) return;
+        if (margin === null || !isRecipeChanged) return;
 
         setValue("price", getPriceFromMargin(cost.total, margin), {
             shouldValidate: true,
         });
-    }, [cost.total, margin, setValue]);
+    }, [cost.total, isRecipeChanged, margin, setValue]);
 
     // Escribir uno rellena el otro. El campo avisa de sus cambios también
     // cuando el valor le llega por props, así que al rellenar el de al lado el

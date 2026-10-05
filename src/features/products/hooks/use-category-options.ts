@@ -9,6 +9,7 @@ import { useDebouncedValue } from "@/hooks";
 import type { InputSelectorOption } from "@/interfaces";
 import { toCategoryOptions } from "../mappers";
 import type { CategoryFilters } from "../interfaces";
+import { withCurrentCategory } from "../libs";
 import { ACTIVE_CATEGORY_FILTERS, categoriesInfiniteQueryOptions, createCategoriesService } from "../services";
 
 /**
@@ -27,7 +28,12 @@ import { ACTIVE_CATEGORY_FILTERS, categoriesInfiniteQueryOptions, createCategori
 const NO_OPTIONS: InputSelectorOption[] = [];
 
 
-export function useCategoryOptions() {
+/**
+ * @param currentCategory La categoría que ya tiene el producto al editarlo.
+ * Se muestra aunque no esté entre las tandas cargadas, salvo mientras se busca,
+ * porque ahí la lista son los resultados y colarla los ensuciaría.
+ */
+export function useCategoryOptions(currentCategory?: InputSelectorOption) {
     const http = useHttpClient();
 
     const service = React.useMemo(() => createCategoriesService(http), [http]);
@@ -60,8 +66,13 @@ export function useCategoryOptions() {
     // una tanda que falló no se reintenta sola al seguir desplazando.
     const canLoadMore = query.hasNextPage && query.fetchStatus === "idle" && !query.isFetchNextPageError;
 
+    const options = withCurrentCategory(
+        query.data ?? NO_OPTIONS,
+        searchText ? undefined : currentCategory
+    );
+
     return {
-        options: query.data ?? NO_OPTIONS,
+        options,
         isLoading: query.isLoading,
         setSearch,
         canLoadMore,
