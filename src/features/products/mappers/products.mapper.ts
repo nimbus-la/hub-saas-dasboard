@@ -10,7 +10,7 @@ import type {
     ProductRecipeFormValues,
     UpdateProductParams,
 } from "../interfaces";
-import { DEFAULT_PRODUCT_FORM_VALUES } from "../libs";
+import { DEFAULT_PRODUCT_FORM_VALUES, isSameRecipe } from "../libs";
 
 /**
  * Conversiones entre el producto del backend y el que usa la aplicación.
@@ -121,35 +121,15 @@ export const toProductFormValues = (product: ProductApiResponse): ProductFormVal
 
 
 /**
- * Dos recetas son iguales si tienen las mismas líneas en el mismo orden. El
- * orden cuenta porque así se muestra la receta, y moverlo también es editarla.
- */
-const isSameRecipe = (
-    current: CreateProductRecipeLineParams[],
-    initial: CreateProductRecipeLineParams[]
-): boolean =>
-    current.length === initial.length &&
-    current.every((line, index) => {
-        const other = initial[index];
-
-        return (
-            other !== undefined &&
-            line.inventoryItemId === other.inventoryItemId &&
-            line.quantity === other.quantity &&
-            line.isOptional === other.isOptional
-        );
-    });
-
-
-/**
  * Arma el cuerpo de la edición con solo lo que cambió.
  *
  * Los dos lados se pasan primero al formato del backend y se comparan ya
  * convertidos. Así un espacio de más al final del nombre o un `22000` contra
  * un `22000.00` no cuentan como cambio.
  *
- * La receta va entera o no va, porque el backend la reemplaza completa y
- * enviarla siempre cuenta como cambio. El estado solo viaja si se activó o se
+ * La receta se compara en el formulario, con la misma regla que usa el paso
+ * de precio para saber si se tocó. Va entera o no va, porque el backend la
+ * reemplaza completa y enviarla siempre cuenta como cambio. El estado solo viaja si se activó o se
  * desactivó: mandarlo igual hace que el backend rechace toda la edición.
  *
  * La descripción sí se manda vacía cuando se borra. Si se omitiera, el
@@ -183,7 +163,7 @@ export const toUpdateProductParams = (
         ...(current.profitMargin !== before.profitMargin && {
             profitMargin: current.profitMargin,
         }),
-        ...(!isSameRecipe(current.recipe, before.recipe) && {
+        ...(!isSameRecipe(values.recipe, initial.recipe) && {
             recipe: current.recipe,
         }),
         ...(values.isAvailable !== initial.isAvailable && {
