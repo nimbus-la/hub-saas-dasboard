@@ -5,6 +5,9 @@ import { HttpClient, HttpRequestConfig } from "@/interfaces";
 export function createLoginService(httpClient: HttpClient): LoginService {
     return {
         login: (credentials: LoginCredentials, config?: HttpRequestConfig) => 
-        httpClient.post<LoginContent>(ENDPOINTS.AUTH_LOGIN, credentials, config)
+        httpClient.post<LoginContent>(ENDPOINTS.AUTH_LOGIN, credentials, {
+            ...config,
+            skipAuthRefresh: true,
+        })
     };
 }

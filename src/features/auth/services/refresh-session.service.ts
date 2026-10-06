@@ -7,6 +7,8 @@ export function createRefreshSessionService(
 ): RefreshSessionService {
   return {
     refresh: () =>
-      httpClient.post<RefreshSessionContent>(ENDPOINTS.AUTH_REFRESH, {}),
+      httpClient.post<RefreshSessionContent>(ENDPOINTS.AUTH_REFRESH, {}, {
+        skipAuthRefresh: true,
+      }),
   };
 }

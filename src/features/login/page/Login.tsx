@@ -7,6 +7,7 @@ import { ICON_TOKENS } from "@/tokens";
 import { useLogin } from "../hooks/use-login";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth/auth.store";
+import { setAccessToken } from "@/lib/auth/access-token";
 import { useEffect } from "react";
 
 const LOGO_SIZE = 28;
@@ -39,6 +40,8 @@ export default function Login() {
   }) => {
     try {
       const response = await login(data);
+
+      setAccessToken(response.content.sessionToken);
 
       setSession(
         response.content.user,

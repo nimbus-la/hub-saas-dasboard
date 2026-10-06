@@ -2,13 +2,18 @@
 
 import { useState } from "react";
 
-import { Bell, MapPin, Menu, X } from "lucide-react";
+import { Bell, LogOut, MapPin, Menu, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { useSidebarLayout } from "@/context";
 import type { NavbarProps } from "@/interfaces";
 import { cn } from "@/lib/utils";
 import { messages } from "@/messages";
 import { ICON_SIZE, ICON_STROKE } from "@/tokens";
+import { useHttpClient } from "@/context";
+import { createLogoutService } from "@/features/auth/services/logout.service";
+import { clearAccessToken } from "@/lib/auth/access-token";
+import { useAuthStore } from "@/store/auth/auth.store";
 
 import { InputSelector } from "../inputs/InputSelector";
 import {
@@ -66,6 +71,21 @@ export default function Navbar({
 }: NavbarProps) {
     const { toggleMobileOpen } = useSidebarLayout();
     const [isSelectorOpen, setIsSelectorOpen] = useState(false);
+    const router = useRouter();
+    const http = useHttpClient();
+    const clearUser = useAuthStore((state) => state.clearUser);
+
+    const handleLogout = async () => {
+        try {
+            await createLogoutService(http).logout();
+        } catch {
+            // La sesión local debe cerrarse aunque el backend ya no responda.
+        } finally {
+            clearAccessToken();
+            clearUser();
+            router.replace("/login");
+        }
+    };
 
     return (
         <header className={navbarVariants()}>
@@ -156,6 +176,9 @@ export default function Navbar({
                                 {userRole}
                             </span>
                         </div>
+                        <button type="button" onClick={handleLogout} aria-label="Cerrar sesión" className={navbarIconButtonVariants()}>
+                            <LogOut size={CHROME_ICON_SIZE} strokeWidth={CHROME_ICON_STROKE} aria-hidden="true" />
+                        </button>
                     </div>
                 </div>
 
