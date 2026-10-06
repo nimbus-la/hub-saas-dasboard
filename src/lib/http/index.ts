@@ -1,7 +1,7 @@
 import type { HttpClient, HttpRequest, RequestInterceptor } from "@/interfaces";
 import { getAccessToken } from "@/lib/auth/access-token";
 import { createRefreshSessionService } from "@/features/auth/services/refresh-session.service";
-import { createSessionManager } from "@/lib/auth/session-manager";
+import { createSessionManager, type SessionManager } from "@/lib/auth/session-manager";
 import { useAuthStore } from "@/store/auth/auth.store";
 import { EnvelopeHttpClient } from "./envelope-http-client";
 import { FetchHttpClient } from "./fetch-http-client";
@@ -115,6 +115,10 @@ const withAuthorization = async (
  *   1. `FetchHttpClient`    — red. Sólo sabe de HTTP.
  *   2. `EnvelopeHttpClient` — quita el sobre y convierte un `code` de fallo en
  *                             un error lanzado.
+ *   3. `AuthHttpClient`     — sólo en el navegador. Por fuera del sobre, porque
+ *                             este backend puede anunciar un 401 dentro de un
+ *                             `200 OK` y una capa colocada por dentro no lo
+ *                             vería. Renueva la sesión y repite la petición.
  *
  * Existe como función y no sólo como constante para que el banco de pruebas
  * pueda apuntar a otro origen sin tocar variables de entorno.
@@ -127,10 +131,6 @@ const withAuthorization = async (
  *
  *   · `LoggingHttpClient` — **por fuera de todo**, porque es el único punto que
  *     ve tanto los fallos de red como los que lanza el decorador del sobre.
- *   · `AuthHttpClient` — por fuera del sobre, porque este backend puede anunciar
- *     un 401 dentro de un `200 OK` y una capa colocada por dentro no lo vería.
- *     Poner el token ya está resuelto; esa capa haría falta para reaccionar al
- *     401 (renovar la sesión o sacar al usuario).
  */
 export function createHttpClient(options: CreateHttpClientOptions = {}): HttpClient {
     const { onRequest, getAccessToken: resolveToken = getAccessToken } = options;
@@ -146,16 +146,34 @@ export function createHttpClient(options: CreateHttpClientOptions = {}): HttpCli
     const baseClient = new EnvelopeHttpClient(transport);
     if (typeof window === "undefined") return baseClient;
 
-    const refreshService = createRefreshSessionService(baseClient);
-    const sessionManager = createSessionManager(
-        () => refreshService.refresh(),
-        () => {
+    const sessionManager = createBrowserSessionManager(baseClient);
+
+    return new AuthHttpClient(baseClient, sessionManager);
+}
+
+
+
+/**
+ * Gestor de sesión del navegador, conectado al store.
+ *
+ * Lo usan la capa `AuthHttpClient` (renovación al recibir un 401) y el hook que
+ * renueva antes de que caduque el token. Comparten esta fábrica para que las
+ * dos guarden el token y las fechas igual, y la renovación en vuelo es una sola
+ * aunque cada una construya su gestor: ver `createSessionManager`.
+ */
+export function createBrowserSessionManager(client: HttpClient): SessionManager {
+    const refreshService = createRefreshSessionService(client);
+
+    return createSessionManager({
+        refreshRequest: async () => (await refreshService.refresh()).content,
+        onRefreshed: ({ expiredAt, refreshExpiresAt }) => {
+            useAuthStore.getState().updateSessionExpiration(expiredAt, refreshExpiresAt);
+        },
+        onSessionExpired: () => {
             useAuthStore.getState().clearUser();
             window.dispatchEvent(new CustomEvent("auth:session-expired"));
         },
-    );
-
-    return new AuthHttpClient(baseClient, sessionManager.refreshAccessToken, sessionManager.clearSession);
+    });
 }
 
 
