@@ -1,7 +1,11 @@
 import type { HttpClient, HttpRequest, RequestInterceptor } from "@/interfaces";
 import { getAccessToken } from "@/lib/auth/access-token";
+import { createRefreshSessionService } from "@/features/auth/services/refresh-session.service";
+import { createSessionManager } from "@/lib/auth/session-manager";
+import { useAuthStore } from "@/store/auth/auth.store";
 import { EnvelopeHttpClient } from "./envelope-http-client";
 import { FetchHttpClient } from "./fetch-http-client";
+import { AuthHttpClient } from "./auth-http-client";
 
 export * from "./api-alert";
 export * from "./base-http-client";
@@ -9,6 +13,7 @@ export * from "./envelope";
 export * from "./envelope-http-client";
 export * from "./fetch-http-client";
 export * from "./http-error";
+export * from "./auth-http-client";
 
 
 /**
@@ -138,7 +143,19 @@ export function createHttpClient(options: CreateHttpClientOptions = {}): HttpCli
             withAuthorization(onRequest ? await onRequest(request) : request, resolveToken),
     });
 
-    return new EnvelopeHttpClient(transport);
+    const baseClient = new EnvelopeHttpClient(transport);
+    if (typeof window === "undefined") return baseClient;
+
+    const refreshService = createRefreshSessionService(baseClient);
+    const sessionManager = createSessionManager(
+        () => refreshService.refresh(),
+        () => {
+            useAuthStore.getState().clearUser();
+            window.dispatchEvent(new CustomEvent("auth:session-expired"));
+        },
+    );
+
+    return new AuthHttpClient(baseClient, sessionManager.refreshAccessToken, sessionManager.clearSession);
 }
 
 

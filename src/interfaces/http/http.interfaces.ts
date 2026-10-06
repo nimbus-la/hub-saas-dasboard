@@ -34,6 +34,12 @@ export type ResponseFormat = "json" | "text" | "blob";
 
 /** Opciones de una petición, sin el método ni la URL. */
 export interface HttpRequestConfig {
+    /** No intenta renovar la sesión si esta petición devuelve 401. */
+    skipAuthRefresh?: boolean;
+
+    /** Marca interna para no reintentar dos veces la misma petición. */
+    authRetry?: boolean;
+
     /** Cabeceras propias de esta petición. Se fucionan sobre las del cliente. */
     headers?: Record<string, string>;
 

@@ -56,6 +56,10 @@ export const ENDPOINTS = {
     PRODUCTS_CATEGORY: "products/categories",
     PRODUCTS_CATEGORY_UPDATE: "products/categories/update",
 
+    // ── Autenticación ───────────────────────────────────────────────────────
+    AUTH_LOGIN: "auth/login",
+    AUTH_REFRESH: "auth/refresh",
+    AUTH_LOGOUT: "auth/logout",
     // ── Empleados ──────────────────────────────────────────────────────────
 
     /**

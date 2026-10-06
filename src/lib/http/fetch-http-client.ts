@@ -63,7 +63,7 @@ export class FetchHttpClient extends BaseHttpClient {
             (candidate): candidate is AbortSignal => Boolean(candidate)
         );
 
-        const credentials = request.credentials ?? this.credentials;
+        const credentials = request.credentials ?? this.credentials ?? "include";
 
         let response: Response;
 

@@ -5,7 +5,9 @@ import { cx } from "class-variance-authority";
 import { useSidebarLayout } from "@/context";
 import Sidebar from "../sidebar/Sidebar";
 import Navbar from "../navbar/Navbar";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useSessionRefresh } from "@/features/auth/hooks/use-session-refresh";
 
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
@@ -13,6 +15,17 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
      // El login no utiliza el layout del dashboard.
     const pathname = usePathname();
+    const router = useRouter();
+    useSessionRefresh();
+
+    useEffect(() => {
+        const handleSessionExpired = () => {
+            if (window.location.pathname !== "/login") router.replace("/login");
+        };
+
+        window.addEventListener("auth:session-expired", handleSessionExpired);
+        return () => window.removeEventListener("auth:session-expired", handleSessionExpired);
+    }, [router]);
     if (pathname === "/login") {
         return <>{children}</>;
     }
