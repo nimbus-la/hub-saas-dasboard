@@ -11,7 +11,6 @@
 import type { FieldErrors } from "react-hook-form";
 
 import { BRANCHES } from "@/lib/branches";
-import { PRODUCT_CATEGORIES } from "@/lib/products";
 import { formatMessage, messages } from "@/messages";
 
 import type {
@@ -132,13 +131,6 @@ export const PRODUCT_FORM_RULES = {
         },
     } satisfies ProductFieldRules<"description">
 } as const;
-
-
-
-export const PRODUCT_CATEGORY_OPTIONS = PRODUCT_CATEGORIES.map(category => ({
-    label: category,
-    value: category
-}))
 
 
 /* -------------------------------------------------------------------------- */

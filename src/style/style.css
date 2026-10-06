@@ -409,6 +409,53 @@
     border-radius: inherit;
 }
 
+/* Barra de scroll fina y discreta, igual en todos los navegadores. Pista
+   transparente y un pulgar de 4px que se aclara en reposo y se oscurece
+   cuando el puntero entra al contenedor, para que se note sin robar la vista.
+
+   Firefox solo entiende las propiedades estándar, y van dentro de @supports a
+   propósito: Chrome 121+ también las entiende y, en cuanto las ve, ignora los
+   pseudoelementos ::-webkit-scrollbar. Su `thin` es bastante más grueso que
+   4px y trae flechas en Windows. */
+@utility scrollbar-subtle {
+    &::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        border-radius: 9999px;
+        background-color: var(--color-neutral-300);
+    }
+
+    &:hover::-webkit-scrollbar-thumb,
+    &:focus-within::-webkit-scrollbar-thumb {
+        background-color: var(--color-neutral-400);
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background-color: var(--color-neutral-500);
+    }
+
+    &::-webkit-scrollbar-button {
+        display: none;
+    }
+
+    @supports not selector(::-webkit-scrollbar) {
+        scrollbar-width: thin;
+        scrollbar-color: var(--color-neutral-300) transparent;
+
+        &:hover,
+        &:focus-within {
+            scrollbar-color: var(--color-neutral-400) transparent;
+        }
+    }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

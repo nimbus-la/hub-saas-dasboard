@@ -40,6 +40,10 @@ export const products = {
             title: "Nuevo producto · Vorea",
             description: "Añade un producto a la carta de tus sucursales.",
         },
+        edit: {
+            title: "Editar producto · Vorea",
+            description: "Cambia los datos, la receta o el precio de un producto de la carta.",
+        },
         categories: {
             title: "Categorías · Vorea",
             description: "Secciones en las que se agrupa la carta de tus sucursales.",
@@ -85,6 +89,9 @@ export const products = {
         other: "{count} ingredientes",
     } satisfies Plural,
 
+    /** Aviso de la tarjeta cuando faltan insumos obligatorios: `Sin Camarón y Limón`. */
+    missingIngredients: "Sin {ingredients}",
+
     /**
      * Unidades de medida del inventario.
      *
@@ -112,7 +119,7 @@ export const products = {
             "Gestiona la carta de tus sucursales y avisa al equipo cuando falte un insumo.",
         createProduct: "Crear producto",
 
-        searchPlaceholder: "Buscar por nombre o categoría",
+        searchPlaceholder: "Buscar por nombre o SKU",
         searchLabel: "Buscar productos",
 
         tabsLabel: "Categorías de productos",
@@ -130,7 +137,7 @@ export const products = {
         /** Lo que ocupa `{category}` cuando no hay filtro puesto. */
         allCategoriesLabel: "todas las categorías",
 
-        /** Cómo se llama lo que se pagina, en el pie del listado. */
+        /** Cómo se llama lo que se lista, en el pie del scroll infinito. */
         itemLabel: {
             one: "producto",
             other: "productos",
@@ -164,12 +171,6 @@ export const products = {
         backLabel: "Volver a la lista de productos",
 
         submit: "Guardar producto",
-
-        /** Lo que se anuncia al terminar el alta. */
-        success: {
-            title: "Producto creado",
-            description: "«{name}» ya está en el catálogo.",
-        },
 
         /* ── Indicador de pasos ─────────────────────────────────────────── */
 
@@ -272,6 +273,8 @@ export const products = {
                  * vea— y dice dónde mirar si el insumo debería existir.
                  */
                 empty: "Ningún insumo del inventario coincide con «{query}». Revisa la escritura o dalo de alta en Inventario.",
+                /** Mientras llega el inventario, para no decir antes de tiempo que nada coincide. */
+                loading: "Cargando el inventario…",
                 /** Cuando todo lo que coincide ya está en la receta. */
                 allAdded: "Todos los insumos que coinciden con «{query}» ya están en la receta.",
 
@@ -543,6 +546,24 @@ export const products = {
             categoryRequired: "Elige la categoría en la que se agrupa dentro de la carta.",
             descriptionMax: "La descripción supera los {max} caracteres.",
         },
+    },
+
+
+    /* ====================================================================== */
+    /*  Edición de producto                                                   */
+    /* ====================================================================== */
+    // Usa el mismo asistente que el alta, así que aquí solo están los textos
+    // que cambian. Los rótulos de los campos y las validaciones son los de
+    // `create`.
+
+    edit: {
+        title: "Editar producto",
+        /** Nombra el producto para que quede claro cuál se está cambiando. */
+        subtitle:
+            "Cambia los datos de «{name}». Nada se guardará hasta el último paso.",
+        backLabel: "Volver a la lista de productos",
+
+        submit: "Guardar cambios",
     },
 
 

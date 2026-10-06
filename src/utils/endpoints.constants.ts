@@ -35,6 +35,18 @@ export const ENDPOINTS = {
 
     // ── Productos ───────────────────────────────────────────────────────────
 
+    /** Catálogo de productos. Pagina y filtra por texto, categoría y estado. */
+    PRODUCTS: "products",
+
+    /** Alta de un producto con su receta. */
+    PRODUCTS_CREATE: "products/create",
+
+    /**
+     * Edición parcial de un producto. El id viaja en el cuerpo y no en la
+     * ruta, por eso tiene su propia entrada.
+     */
+    PRODUCTS_UPDATE: "products/update",
+
     /**
      * Categorías de producto.
      *
@@ -48,5 +60,23 @@ export const ENDPOINTS = {
     AUTH_LOGIN: "auth/login",
     AUTH_REFRESH: "auth/refresh",
     AUTH_LOGOUT: "auth/logout",
+    // ── Empleados ──────────────────────────────────────────────────────────
+
+    /**
+     * Empleados y usuarios del panel.
+     *
+     * Colección suelta a la que el servicio le añade el identificador para el
+     * detalle, la edición y la baja. Está documentada para que se busque desde
+     * aquí el día que el backend confirme la ruta: si mañana cambia, este es el
+     * único lugar que tocar.
+     */
+    EMPLOYEES: "employees",
+    // ── Inventario ──────────────────────────────────────────────────────────
+
+    /**
+     * Insumos del inventario. Pagina hasta 100 por página, filtra por sucursal
+     * y no busca por texto.
+     */
+    INVENTORY_ITEMS: "inventory/item",
 
 } as const;

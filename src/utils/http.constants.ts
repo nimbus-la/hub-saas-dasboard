@@ -58,8 +58,9 @@ export const API_SUCCESS_CODE = "0000";
 /**
  * La consulta salió bien y no hay nada que devolver.
  * 
- * El backend lo manda con `status: "INFO"`, `httpStatus: 200` y una página
- * vacía pero completa: `{ data: [], pageNumber, pageSize, total: 0 }`.
+ * El backend lo manda con `status: "INFO"`, `httpStatus: 200` y
+ * `content: null`, sin página. Los servicios que paginan lo cambian por
+ * `emptyPage` de `@/lib/pagination`.
  * 
  * Tiene código propio —y no `0000`— porque para el backend "no hay resultados"
  * es una respuesta con matiz, no un éxito raso. Para la interfaz **no es un
@@ -85,5 +86,27 @@ export const API_NON_FAILURE_CODES: readonly string[] = [
 ];
 
 
-/** El único `httpStatus` cuyo `message` se le enseña al usuario. */
-export const API_PRESENTABLE_STATUS = 200;
+// ---- Avisos --------------------------------------------------------------------------------
+
+/**
+ * Estados que nunca muestran aviso.
+ *
+ * El 401 queda fuera porque una sesión caducada no se arregla leyendo un
+ * aviso: se arregla volviendo a entrar, y de eso se encargará la capa de
+ * sesión. Además, con la sesión caída fallan a la vez todas las consultas de
+ * la pantalla, y cada una sacaría su propio aviso repetido.
+ *
+ * Se comparan con `effectiveStatus`, así que también cuenta un 401 que el
+ * backend declara dentro de un 200.
+ */
+export const HTTP_SILENT_STATUSES: readonly number[] = [401];
+
+
+/**
+ * Códigos de negocio que nunca muestran aviso.
+ *
+ * Para los fallos que la aplicación resuelve sola en todas partes. Si solo una
+ * pantalla quiere callarlo, eso va en su query con `meta: { alertOnError: false }`
+ * y no aquí.
+ */
+export const API_SILENT_CODES: readonly string[] = [];

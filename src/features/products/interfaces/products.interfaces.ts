@@ -1,5 +1,7 @@
 import { RegisterOptions } from "react-hook-form";
 
+import type { InputSelectorOption } from "@/interfaces";
+
 /**
  * Una línea de la receta tal como la guarda el formulario.
  *
@@ -45,6 +47,51 @@ export interface ProductFormValues {
     isAvailable: boolean;
     recipe: ProductRecipeFormValues[];
     branches: ProductBranchFormValues[];
+}
+
+
+
+/**
+ * Lo que necesita el asistente para funcionar en cualquier modo: con qué
+ * valores empieza y qué hacer al guardar. El alta lo arranca vacío y la
+ * edición con el producto cargado.
+ */
+export interface ProductFormOptions {
+    defaultValues: ProductFormValues;
+    /** Recibe el formulario entero, ya validado. */
+    onSave: (values: ProductFormValues) => void;
+    /** Mientras sea `true`, el botón de guardar se bloquea. */
+    isSaving: boolean;
+    /**
+     * Bloquea el botón de guardar mientras el formulario siga igual a como
+     * empezó. Lo usa la edición; en el alta no tiene sentido, porque se parte
+     * de un formulario vacío que igual hay que llenar.
+     */
+    requireChanges?: boolean | undefined;
+}
+
+
+/**
+ * Los mensajes que cambian entre crear y editar. Tienen la misma forma que
+ * los bloques `create` y `edit` de `messages.products`, así que la pantalla
+ * recibe el bloque tal cual.
+ */
+export interface ProductFormMessages {
+    title: string;
+    subtitle: string;
+    backLabel: string;
+    submit: string;
+}
+
+
+export interface ProductFormLayoutProps extends ProductFormOptions {
+    formMessages: ProductFormMessages;
+
+    /**
+     * La categoría con su nombre, solo al editar. El formulario guarda el id y
+     * el selector necesita la etiqueta, que puede no estar entre las cargadas.
+     */
+    currentCategory?: InputSelectorOption | undefined;
 }
 
 

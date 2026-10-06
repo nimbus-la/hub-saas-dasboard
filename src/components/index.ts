@@ -68,6 +68,8 @@ export {
 // ── Navegación y listados ───────────────────────────────────────────────────
 export { default as Pagination } from './pagination/Pagination';
 export * from './pagination/pagination.style';
+export { default as LoadMore } from './pagination/LoadMore';
+export * from './pagination/load-more.style';
 export * from './tabs/filter-tabs.style';
 export { FilterTabs } from './tabs/FilterTabs';
 

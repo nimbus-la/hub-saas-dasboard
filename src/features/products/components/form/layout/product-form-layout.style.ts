@@ -9,7 +9,7 @@ import {
 
 
 /**
- * Estilos de la pantalla de alta de producto
+ * Estilos de la pantalla del producto, la misma para crear y para editar.
  *
  * Mismo esqueleto que la lista: `gap-6` entre el encabezado y el cuerpo, que
  * son dos bloques distintos. Lo que cambia es que aquí el cuerpo es un panel
@@ -27,7 +27,7 @@ import {
  * de las demás pantallas. El tope de ancho no vive aquí sino en el panel, que
  * es lo único que lo necesita.
  */
-export const createProductPageVariants = cva([
+export const productFormPageVariants = cva([
     "flex w-full flex-col",
     SPACING_CLASS.gap.xl,
 ]);
@@ -50,7 +50,7 @@ export const createProductPageVariants = cva([
  * a 768px, donde "Precio de venta y estado en la carta" llegaba hasta
  * "estado…" — un texto de ayuda truncado no ayuda, ocupa.
  */
-export const createProductPanelVariants = cva([
+export const productFormPanelVariants = cva([
     "flex w-full max-w-4xl flex-col",
     "mx-auto border border-neutral-200 bg-white",
     RADIUS_SEMANTIC.surface,
@@ -63,7 +63,7 @@ export const createProductPanelVariants = cva([
  * El relleno sube a 24px a partir de `sm`. En móvil el ancho es el recurso
  * escaso y cada píxel de relleno se le quita al campo.
  */
-export const createProductBodyVariants = cva([
+export const productFormBodyVariants = cva([
     "px-4 py-6 sm:px-6",
     "focus-visible:outline-none",
 ]);
@@ -76,7 +76,7 @@ export const createProductBodyVariants = cva([
  * de estrujar los botones. La separación entre botones es `gap-3`, un escalón
  * por debajo del que los separa de la nota — se leen como un grupo.
  */
-export const createProductFooterVariants = cva([
+export const productFormFooterVariants = cva([
     "flex flex-wrap items-center justify-between",
     "gap-x-4 gap-y-3",
     "border-t border-neutral-200 px-4 py-4 sm:px-6",
@@ -84,14 +84,14 @@ export const createProductFooterVariants = cva([
 
 
 /** Nota del pie: qué falta o qué es obligatorio. */
-export const createProductFooterNoteVariants = cva([
+export const productFormFooterNoteVariants = cva([
     "text-neutral-600",
     TYPOGRAPHY.caption,
 ]);
 
 
 /** Botones del pie, siempre pegados al margen derecho. */
-export const createProductActionsVariants = cva([
+export const productFormActionsVariants = cva([
     "flex items-center",
     SPACING_CLASS.gap.md,
     "ms-auto",
@@ -104,6 +104,6 @@ export const createProductActionsVariants = cva([
  * Enlace con aspecto de botón terciario, por lo mismo que la flecha del
  * encabezado: cancelar es volver a la lista, y volver es navegar.
  */
-export const createProductCancelVariants = cva([
+export const productFormCancelVariants = cva([
     genericButtonVariants({ variant: "ghost", size: "md" }),
 ]);

@@ -77,12 +77,13 @@ export type RecipeRow = Pick<RecipeLine, "index" | "ingredient" | "isOutOfStock"
  * En qué situación está el buscador de insumos.
  *
  * - `idle` cuando no se ha escrito nada.
+ * - `loading` cuando hay texto pero el inventario todavía no ha llegado.
  * - `results` cuando hay insumos para añadir.
  * - `empty` cuando ningún insumo del inventario coincide.
  * - `allAdded` cuando todo lo que coincide ya está en la receta.
  * - `full` cuando la receta llegó al tope de insumos.
  */
-export type IngredientSearchStatus = "idle" | "results" | "empty" | "allAdded" | "full";
+export type IngredientSearchStatus = "idle" | "loading" | "results" | "empty" | "allAdded" | "full";
 
 
 /** Lo que devuelve una búsqueda de insumos para la receta. */

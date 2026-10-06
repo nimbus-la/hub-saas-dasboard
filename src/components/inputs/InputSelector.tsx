@@ -2,6 +2,7 @@
 
 import * as React from "react"
 
+import { useScrollEndLoad } from "@/hooks"
 import { cn } from "@/lib/utils"
 import { messages } from "@/messages"
 import {
@@ -29,6 +30,7 @@ import {
     inputSelectorLabelVariants,
     inputSelectorLeftIconVariants,
     inputSelectorListVariants,
+    inputSelectorLoadingVariants,
 } from "./input-selector.style"
 
 /* -------------------------------------------------------------------------- */
@@ -40,6 +42,14 @@ function normalize(options: InputSelectorRawOption[]): InputSelectorOption[] {
         typeof option === "string" ? { label: option, value: option } : option
     )
 }
+
+/**
+ * Cambios del texto que son búsqueda de verdad: escribir o pegar. El resto
+ * —elegir una opción, cerrar, limpiar— también reescriben el campo (con la
+ * etiqueta elegida o vacío), y buscar esa etiqueta dejaría la lista reducida a
+ * una sola opción la próxima vez que se abra.
+ */
+const SEARCH_REASONS = new Set(["input-change", "input-paste"])
 
 /* -------------------------------------------------------------------------- */
 /*  Componente                                                                 */
@@ -63,6 +73,10 @@ export function InputSelector({
     leftIcon,
     leadingIcon,
     emptyMessage = messages.components.inputSelector.empty,
+    onSearchChange,
+    canLoadMore = false,
+    onLoadMore,
+    isLoadingMore = false,
     size = "md",
     fullWidth = true,
     name,
@@ -83,11 +97,30 @@ export function InputSelector({
 
     // Referencias estables para que Base UI compare por identidad.
     const items = React.useMemo(() => normalize(options), [options])
+
+    // Con búsqueda en el servidor la opción elegida puede no estar entre las
+    // cargadas: se eligió en un resultado de búsqueda y, al borrarla, la lista
+    // vuelve a las primeras tandas. Se recuerda aquí para que el campo siga
+    // mostrando su etiqueta.
+    const [selectedItem, setSelectedItem] = React.useState<InputSelectorOption | null>(null)
+
     const findItem = React.useCallback(
         (target?: string | null) =>
-            items.find((item) => item.value === target) ?? null,
-        [items]
+            items.find((item) => item.value === target) ??
+            (selectedItem && selectedItem.value === target ? selectedItem : null),
+        [items, selectedItem]
     )
+
+    // La lista vive en el panel, que se monta al abrirse: el nodo va en estado
+    // para que la carga por scroll se conecte cada vez que aparece.
+    const [list, setList] = React.useState<HTMLDivElement | null>(null)
+
+    useScrollEndLoad({
+        scroller: list,
+        axis: "y",
+        enabled: canLoadMore && onLoadMore !== undefined,
+        onLoadMore: () => onLoadMore?.(),
+    })
 
     const isControlled = value !== undefined
     const startIcon = leftIcon ?? leadingIcon
@@ -97,12 +130,18 @@ export function InputSelector({
 
     const handleValueChange = React.useCallback(
         (item: unknown) => {
+            setSelectedItem(item ? (item as InputSelectorOption) : null)
+
             const next = item ? (item as InputSelectorOption).value : null
             onChange?.(next ?? "")
             onValueChange?.(next)
         },
         [onChange, onValueChange]
     )
+
+    const handleInputValueChange = (query: string, details: { reason: string }) => {
+        onSearchChange?.(SEARCH_REASONS.has(details.reason) ? query : "")
+    }
 
     return (
         <div className={cn(fullWidth ? "w-full" : "inline-block", className)}>
@@ -126,6 +165,17 @@ export function InputSelector({
                     ? { value: findItem(value) }
                     : { defaultValue: findItem(defaultValue) })}
                 onValueChange={handleValueChange}
+                // La opción recordada no es la misma instancia que la que llega
+                // en `items` tras una recarga, así que se compara por valor.
+                isItemEqualToValue={(item, selected) =>
+                    (item as InputSelectorOption)?.value === (selected as InputSelectorOption)?.value
+                }
+                {...(onSearchChange && {
+                    // El servidor ya devuelve las opciones filtradas; volver a
+                    // filtrarlas aquí esconde las que coinciden por otro campo.
+                    filter: null,
+                    onInputValueChange: handleInputValueChange,
+                })}
                 // Resalta la primera coincidencia mientras se escribe, para que
                 // Enter seleccione sin tener que bajar con las flechas.
                 autoHighlight
@@ -176,7 +226,7 @@ export function InputSelector({
                     sideOffset={4}
                     className={cn(inputSelectorContentVariants(), contentClassName)}
                 >
-                    <ComboboxList className={inputSelectorListVariants()}>
+                    <ComboboxList ref={setList} className={inputSelectorListVariants()}>
                         {(item: InputSelectorOption) => (
                             <ComboboxItem
                                 key={item.value}
@@ -197,6 +247,12 @@ export function InputSelector({
                             </ComboboxItem>
                         )}
                     </ComboboxList>
+
+                    {isLoadingMore && (
+                        <p role="status" className={inputSelectorLoadingVariants({ size })}>
+                            {messages.components.inputSelector.loadingMore}
+                        </p>
+                    )}
 
                     <ComboboxEmpty className={inputSelectorEmptyVariants({ size })}>
                         {emptyMessage}

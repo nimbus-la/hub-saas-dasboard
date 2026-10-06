@@ -12,6 +12,8 @@ export interface CategoryListApiResponse {
     /** Indica si la categoría se ofrece hoy en la carta. */
     isActive: boolean;
 
+    productCount: number;
+
     /** Fechas en formato ISO 8601. */
     updatedAt: string;
     createdAt: string;
@@ -27,6 +29,8 @@ export interface CategoryList {
     description: string;
 
     isActive: boolean;
+
+    productCount: number;
 
     /** Fecha de la última actualización en ISO 8601. Se formatea al mostrarla. */
     updatedAt: string;
@@ -102,7 +106,4 @@ export interface CategoriesService {
         payload: UpdateCategoryParams,
         config?: HttpRequestConfig
     ): Promise<ApiEnvelope<null>>;
-
-    /** Elimina una categoría. El backend no devuelve datos al eliminar. */
-    remove(config?: HttpRequestConfig): Promise<unknown>;
 }

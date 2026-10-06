@@ -59,6 +59,18 @@ export class HttpError extends Error {
         return this.api.httpStatus !== this.status;
     }
 
+    /**
+     * El estado con el que se clasifica el error.
+     *
+     * Manda el del sobre, porque este backend a veces responde 200 y declara
+     * el fallo real dentro. El del navegador solo se usa cuando no llegó sobre,
+     * por ejemplo la página HTML de un proxy caído.
+     */
+    public get effectiveStatus(): number | null {
+        return this.api?.httpStatus ?? this.status;
+    }
+
+
     /** Sesión ausente o caducada */
     public get isUnauthorized(): boolean {
         return this.status === 401 || this.api?.httpStatus === 401;

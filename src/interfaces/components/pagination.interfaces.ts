@@ -1,3 +1,5 @@
+import type { Ref } from "react";
+
 import type { Plural } from "@/messages";
 
 export interface PaginationProps {
@@ -18,6 +20,23 @@ export interface PaginationProps {
      * le toca a cada cantidad lo decide `formatPlural` con las reglas del
      * idioma, no un `=== 1` dentro de este componente.
      */
+    itemLabel?: Plural;
+    className?: string;
+}
+
+
+export interface LoadMoreProps {
+    /** Ref del centinela, la que devuelve `useInfiniteScroll`. */
+    sentinelRef: Ref<HTMLDivElement>;
+    /** Elementos ya pintados en la lista. */
+    loadedItems: number;
+    /** Total de elementos ya filtrados (no el del catálogo completo). */
+    totalItems: number;
+    hasNextPage: boolean;
+    isFetchingNextPage: boolean;
+    isFetchNextPageError: boolean;
+    onRetry: () => void;
+    /** Nombre del elemento listado para el resumen ("Mostrando 12 de 93 productos"). */
     itemLabel?: Plural;
     className?: string;
 }
