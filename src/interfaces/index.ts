@@ -1,38 +1,28 @@
-/**
- * @file Tipos — punto de entrada único
- * 
- * @description
- * Este archivo actúa como un punto de entrada único para todas las interfaces
- * y tipos utilizados en la aplicación. Se organiza en tres categorías principales:
- * 
- * 1. `components/`: Contiene las interfaces de props de los componentes, con un
- *    archivo por familia de componentes.
- * 2. `tokens/`: Contiene la forma de las recetas del design system.
- * 3. `*.types.ts`: Contiene tipos relacionados con el dominio y augmentación de
- *    librerías externas.
- */
-
-/** Props de componentes */
-export * from "./components";
-
-
-/** Dominio */
-export * from "./menu.types";
-export * from "./pagination.interface";
-
-
-/** Infraestructura */
-export * from "./http/api-alert.interface";
-export * from "./http/api-envelope.interfaces";
-export * from "./http/fetch-http-client.interfaces";
-export * from "./http/http-error.interfaces";
-export * from "./http/http.interfaces";
-
-
-/** Tokens */
-export * from "./tokens/elevation-token.interface";
-export * from "./tokens/sizes-token.interface";
-
-
-export * from "./query-types.interface";
-
+export * from './data-table.types';
+export * from './generic-types.interfaces';
+export * from './menu.types';
+export * from './pagination.interface';
+export * from './query-types.interface';
+export * from './auth/session.interfaces';
+export * from './components/alerts.interfaces';
+export * from './components/avatar.interfaces';
+export * from './components/badge.interfaces';
+export * from './components/buttons.interfaces';
+export * from './components/cards.interfaces';
+export * from './components/filters.interfaces';
+export * from './components/inputs.interfaces';
+export * from './components/layout.interfaces';
+export * from './components/modals.interfaces';
+export * from './components/navbar.interfaces';
+export * from './components/pagination.interfaces';
+export * from './components/sidebar.interfaces';
+export * from './components/tables.interfaces';
+export * from './components/tabs.interfaces';
+export * from './components/toggles.interfaces';
+export * from './http/api-alert.interface';
+export * from './http/api-envelope.interfaces';
+export * from './http/fetch-http-client.interfaces';
+export * from './http/http-error.interfaces';
+export * from './http/http.interfaces';
+export * from './tokens/elevation-token.interface';
+export * from './tokens/sizes-token.interface';

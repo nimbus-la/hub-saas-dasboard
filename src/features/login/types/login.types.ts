@@ -20,14 +20,7 @@ export interface LoginUser {
     sex: string;
 }
 
-export interface LoginContent {
-    sessionToken: string;
-    expiredAt: string;
-    refreshToken: string;
-    refreshExpiresAt: string;
-    lastLogin: string;
-    user: LoginUser;
-}
+export interface LoginContent extends RefreshedSession {}
 
 export type LoginResponse = ApiEnvelope<LoginContent>;
 
