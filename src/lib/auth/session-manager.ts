@@ -1,6 +1,6 @@
 import { useAuthStore } from "@/store";
 import { HttpClient, SessionExpiration, SessionManager } from "@/interfaces";
-import { ENDPOINTS, LOGIN_HREF } from "@/utils";
+import { ENDPOINTS, LOGIN_HREF, buildLoginHref } from "@/utils";
 
 import { isHttpError } from "@/lib/http/http-error";
 
@@ -42,10 +42,10 @@ async function runWithCrossTabLock<T>(task: () => Promise<T>): Promise<T> {
  * descartan la caché de TanStack Query y todo el estado en memoria, y lo que
  * vio un usuario no asoma en la pantalla del siguiente.
  */
-function redirectToLogin(): void {
+function redirectToLogin(from?: string): void {
   if (typeof window === "undefined" || window.location.pathname === LOGIN_HREF) return;
 
-  window.location.href = LOGIN_HREF;
+  window.location.href = buildLoginHref(from);
 }
 
 
@@ -62,14 +62,34 @@ export function createSessionManager(client: HttpClient): SessionManager {
    * se quedara en el navegador, el proxy devolvería al panel a quien acabamos
    * de mandar al login.
    */
-  const closeSession = async (): Promise<void> => {
+  const endSession = async (from?: string): Promise<void> => {
     try {
       await client.post<unknown>(ENDPOINTS.AUTH_LOGOUT, {}, { skipAuthRefresh: true });
 
     } finally {
       useAuthStore.getState().clearSession();
-      redirectToLogin();
+      redirectToLogin(from);
     }
+  };
+
+  /**
+   * El usuario sale. El login no recuerda dónde estaba: quien entre después
+   * puede ser otra persona, y llevarla a la pantalla del anterior no tiene
+   * sentido.
+   */
+  const closeSession = (): Promise<void> => endSession();
+
+  /**
+   * La sesión dejó de valer. El login recuerda la pantalla para devolver al
+   * usuario a ella al volver a entrar. La ruta se toma antes de la petición,
+   * que es asíncrona y podría resolverse ya en otra página.
+   */
+  const expireSession = (): Promise<void> => {
+    const from = typeof window === "undefined"
+      ? undefined
+      : window.location.pathname + window.location.search;
+
+    return endSession(from);
   };
 
   const requestRefresh = async (): Promise<void> => {
@@ -88,7 +108,7 @@ export function createSessionManager(client: HttpClient): SessionManager {
         // Solo un 401 dice que la sesión ya no existe. Un timeout o un 503 del
         // refresh son pasajeros: expulsar por ellos obligaría a volver a
         // iniciar sesión por un fallo que se arregla solo.
-        if (isHttpError(error) && error.isUnauthorized) void closeSession();
+        if (isHttpError(error) && error.isUnauthorized) void expireSession();
 
         throw error;
       })
@@ -100,5 +120,6 @@ export function createSessionManager(client: HttpClient): SessionManager {
   return {
     refreshSession,
     closeSession,
+    expireSession,
   };
 }

@@ -2,6 +2,20 @@ import { DEFAULT_HOME_HREF, LOGIN_HREF } from "./session.constants";
 
 
 /**
+ * Ruta del login que recuerda de dónde se venía.
+ *
+ * La usan el proxy, al cortar el paso, y el gestor de sesión, al expulsar a
+ * alguien cuya sesión caducó: así los dos escriben `from` igual y
+ * `resolvePostLoginHref` lo lee en un solo formato.
+ */
+export function buildLoginHref(from?: string): string {
+    if (!from || from === LOGIN_HREF) return LOGIN_HREF;
+
+    return `${LOGIN_HREF}?${new URLSearchParams({ from }).toString()}`;
+}
+
+
+/**
  * A dónde volver después de iniciar sesión.
  *
  * `from` lo escribe el proxy, pero viaja en la URL y cualquiera puede armar un
