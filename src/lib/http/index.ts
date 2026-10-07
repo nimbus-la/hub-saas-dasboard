@@ -1,8 +1,5 @@
-import type { HttpClient, HttpRequest, RequestInterceptor } from "@/interfaces";
-import { getAccessToken } from "@/lib/auth/access-token";
-import { createRefreshSessionService } from "@/features/auth/services/refresh-session.service";
-import { createSessionManager, type SessionManager } from "@/lib/auth/session-manager";
-import { useAuthStore } from "@/store/auth/auth.store";
+import type { HttpClient, RequestInterceptor } from "@/interfaces";
+import { createSessionManager } from "../auth/session-manager";
 import { EnvelopeHttpClient } from "./envelope-http-client";
 import { FetchHttpClient } from "./fetch-http-client";
 import { AuthHttpClient } from "./auth-http-client";
@@ -63,47 +60,7 @@ export interface CreateHttpClientOptions {
      * sola vez al construir el cliente.
      */
     onRequest?: RequestInterceptor;
-
-    /**
-     * Resuelve el token de cada petición. Por defecto, `getAccessToken` de
-     * `@/lib/auth/access-token`.
-     *
-     * Es una función y no el token en sí porque un token de sesión caduca y se
-     * renueva: se consulta en cada petición en vez de quedar congelado al
-     * construir el cliente.
-     */
-    getAccessToken?: () => string | undefined | Promise<string | undefined>;
 }
-
-
-
-/**
- * Pone `Authorization: Bearer <token>` si hay token.
- *
- * Respeta un `Authorization` que ya traiga la petición, venga de la llamada o
- * del interceptor del llamante, para que un caso puntual pueda autenticarse con
- * otra credencial. La comparación ignora mayúsculas porque las cabeceras de la
- * petición son un objeto plano y nadie garantiza cómo se escribió la clave.
- */
-const withAuthorization = async (
-    request: HttpRequest,
-    resolveToken: () => string | undefined | Promise<string | undefined>
-): Promise<HttpRequest> => {
-    const hasOwnAuthorization = Object.keys(request.headers ?? {}).some(
-        (key) => key.toLowerCase() === "authorization"
-    );
-
-    if (hasOwnAuthorization) return request;
-
-    const token = await resolveToken();
-
-    if (!token) return request;
-
-    return {
-        ...request,
-        headers: { ...request.headers, Authorization: `Bearer ${token}` },
-    };
-};
 
 
 
@@ -133,47 +90,19 @@ const withAuthorization = async (
  *     ve tanto los fallos de red como los que lanza el decorador del sobre.
  */
 export function createHttpClient(options: CreateHttpClientOptions = {}): HttpClient {
-    const { onRequest, getAccessToken: resolveToken = getAccessToken } = options;
+    const { onRequest } = options;
 
     const transport = new FetchHttpClient({
         baseUrl: options.baseUrl ?? DEFAULT_BASE_URL,
         headers: { Accept: "application/json" },
         credentials: "include",
-        onRequest: async (request) =>
-            withAuthorization(onRequest ? await onRequest(request) : request, resolveToken),
+        ...(onRequest ? { onRequest } : {}),
     });
 
     const baseClient = new EnvelopeHttpClient(transport);
     if (typeof window === "undefined") return baseClient;
 
-    const sessionManager = createBrowserSessionManager(baseClient);
-
-    return new AuthHttpClient(baseClient, sessionManager);
-}
-
-
-
-/**
- * Gestor de sesión del navegador, conectado al store.
- *
- * Lo usan la capa `AuthHttpClient` (renovación al recibir un 401) y el hook que
- * renueva antes de que caduque el token. Comparten esta fábrica para que las
- * dos guarden el token y las fechas igual, y la renovación en vuelo es una sola
- * aunque cada una construya su gestor: ver `createSessionManager`.
- */
-export function createBrowserSessionManager(client: HttpClient): SessionManager {
-    const refreshService = createRefreshSessionService(client);
-
-    return createSessionManager({
-        refreshRequest: async () => (await refreshService.refresh()).content,
-        onRefreshed: ({ expiredAt, refreshExpiresAt }) => {
-            useAuthStore.getState().updateSessionExpiration(expiredAt, refreshExpiresAt);
-        },
-        onSessionExpired: () => {
-            useAuthStore.getState().clearUser();
-            window.dispatchEvent(new CustomEvent("auth:session-expired"));
-        },
-    });
+    return new AuthHttpClient(baseClient, createSessionManager(baseClient));
 }
 
 
