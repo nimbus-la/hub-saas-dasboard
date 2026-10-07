@@ -133,7 +133,7 @@ export default function AlertToaster({
  * mismo aviso dos veces.
  */
 const notifyWithTone =
-    (tone: AlertTone) =>
+    (tone: AlertTone, loading = false) =>
         (title: string, options: NotifyOptions = {}) => {
             const { duration = ALERT_DURATION, id, onClose, ...alert } = options;
 
@@ -142,6 +142,7 @@ const notifyWithTone =
                     <Alert
                         {...alert}
                         tone={tone}
+                        loading={loading}
                         variant="outline"
                         title={title}
                         countdownMs={duration}
@@ -211,6 +212,17 @@ export const notify = {
 
     /** Sin color: un aviso que sólo informa de un cambio. */
     neutral: notifyWithTone("neutral"),
+
+    /**
+     * Algo está en curso. No caduca ni se cierra con la equis: dura lo que
+     * dure la operación, y quien lo lanzó lo convierte en su resultado
+     * llamando a otro tono con el mismo `id`:
+     *
+     *   const id = notify.loading("Guardando…");
+     *   notify.success("Guardado", { id });
+     */
+    loading: (title: string, options: Omit<NotifyOptions, "duration" | "dismissible"> = {}) =>
+        notifyWithTone("info", true)(title, { ...options, duration: null, dismissible: false }),
 
     /**
      * Retira un aviso antes de tiempo, o todos si no se dice cuál.

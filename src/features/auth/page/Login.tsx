@@ -30,7 +30,7 @@ const LOGO_SIZE = 28;
 const authMessages = messages.auth;
 
 export default function Login({ redirectTo }: LoginPageProps) {
-  const { mutate: login, isPending } = useLogin(redirectTo);
+  const { mutateAsync: login } = useLogin(redirectTo);
 
   return (
     <main className={loginPageVariants()}>
@@ -51,7 +51,7 @@ export default function Login({ redirectTo }: LoginPageProps) {
 
         {/* Formulario */}
         <section className={loginPageFormSectionVariants()}>
-          <LoginForm onSubmit={(credentials: LoginCredentials) => login(credentials)} isPending={isPending} />
+          <LoginForm onSubmit={(credentials: LoginCredentials) => login(credentials)} />
         </section>
 
         {/* Panel visual */}

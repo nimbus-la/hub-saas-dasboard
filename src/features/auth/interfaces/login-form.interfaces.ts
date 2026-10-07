@@ -2,14 +2,13 @@ import type { LoginCredentials } from "./auth.interfaces";
 
 
 export interface LoginFormProps {
-    onSubmit: (credentials: LoginCredentials) => void;
-
     /**
-     * El inicio de sesión está en curso.
+     * Envía las credenciales y se resuelve cuando el backend contesta.
      *
-     * Llega de fuera y no del `isSubmitting` del formulario porque quien envía
-     * es la mutación: el `onSubmit` vuelve al instante y el formulario creería
-     * que ya terminó.
+     * Devuelve la promesa para que el formulario sepa cuándo terminó y si
+     * falló: con eso mantiene el botón bloqueado mientras dura la petición y
+     * devuelve el foco a la contraseña tras un rechazo. El aviso del error no
+     * es asunto suyo, lo da el hook.
      */
-    isPending: boolean;
+    onSubmit: (credentials: LoginCredentials) => Promise<unknown>;
 }

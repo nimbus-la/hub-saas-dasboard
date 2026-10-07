@@ -235,6 +235,31 @@ export const alertMediaGlyphVariants = cva(["col-start-1 row-start-1"], {
 });
 
 
+/**
+ * Medallón de un aviso en curso.
+ *
+ * Una sola capa: un círculo abierto no tiene silueta que rellenar, y el color
+ * del tono lo pone el trazo. Sin animación para quien la tiene desactivada en
+ * el sistema; el texto ya dice que algo está pasando.
+ */
+export const alertMediaSpinnerVariants = cva(
+    ["col-start-1 row-start-1 animate-spin motion-reduce:animate-none"],
+    {
+        variants: {
+            tone: {
+                info: "text-info-darker",
+                success: "text-success-darker",
+                warning: "text-warning-darker",
+                error: "text-error-darker",
+                neutral: "text-neutral-700",
+            },
+        },
+
+        defaultVariants: { tone: "info" },
+    }
+);
+
+
 /* -------------------------------------------------------------------------- */
 /*  Contenido                                                                  */
 /* -------------------------------------------------------------------------- */
