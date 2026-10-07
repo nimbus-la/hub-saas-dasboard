@@ -44,7 +44,9 @@ export default function Login({ redirectTo }: LoginPageProps) {
             stroke="var(--color-primary-main)"
           />
 
-          <span className={loginPageBrandNameVariants()}>Vorea</span>
+          <span className={loginPageBrandNameVariants()}>
+            {messages.navigation.app.name}
+          </span>
         </div>
 
         {/* Formulario */}

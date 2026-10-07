@@ -105,7 +105,7 @@ export default function LoginForm({ onSubmit, isPending }: LoginFormProps) {
           type="submit"
           size="md"
           label={isPending ? texts.submitting : texts.submit}
-          className="w-full"
+          fullWidth
           disabled={!isValid || isPending}
         />
       </div>

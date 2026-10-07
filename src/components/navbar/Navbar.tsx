@@ -164,7 +164,7 @@ export default function Navbar() {
                             type="button"
                             onClick={() => logout()}
                             disabled={isLoggingOut}
-                            aria-label="Cerrar sesión"
+                            aria-label={messages.navigation.navbar.logout}
                             className={navbarIconButtonVariants()}
                         >
                             <LogOut size={CHROME_ICON_SIZE} strokeWidth={CHROME_ICON_STROKE} aria-hidden="true" />
