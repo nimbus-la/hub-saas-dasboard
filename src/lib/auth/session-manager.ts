@@ -13,8 +13,8 @@ import { isHttpError } from "@/lib/http/http-error";
  * Hace falta porque las pestañas comparten la cookie `jwt_refresh` pero no la
  * memoria. El backend rota esa cookie en cada uso y revoca la sesión entera si
  * recibe una ya rotada: dos pestañas renovando a la vez bastan para sacar al
- * usuario. Con el candado, la segunda espera a que termine la primera y sale
- * ya con la cookie nueva.
+ * usuario. Con el candado, la segunda espera a que termine la primera y, al
+ * entrar, ve que la sesión ya se renovó y no pide otra (ver `requestRefresh`).
  */
 const CROSS_TAB_REFRESH_LOCK = "vorea:session-refresh";
 
@@ -92,7 +92,23 @@ export function createSessionManager(client: HttpClient): SessionManager {
     return endSession(from);
   };
 
-  const requestRefresh = async (): Promise<void> => {
+  /**
+   * `knownExpiresAt` es la caducidad que esta pestaña tenía al decidir
+   * renovar. Las pestañas comparten la misma fecha, así que sus temporizadores
+   * saltan a la vez y todas acaban en la cola del candado: sin esta
+   * comprobación, cada una renovaría al llegar su turno y N pestañas harían N
+   * renovaciones —y N rotaciones— por ciclo.
+   *
+   * Se relee el almacenamiento y no la memoria porque el evento `storage` que
+   * trae la fecha nueva puede llegar después de que el candado se suelte.
+   */
+  const requestRefresh = async (knownExpiresAt: string | null): Promise<void> => {
+    await useAuthStore.persist.rehydrate();
+
+    // Otra pestaña renovó mientras ésta esperaba: la cookie del navegador ya
+    // es la nueva, y quien pidió la renovación puede seguir con ella.
+    if (useAuthStore.getState().accessExpiresAt !== knownExpiresAt) return;
+
     const { content } = await client.post<SessionExpiration>(
       ENDPOINTS.AUTH_REFRESH,
       {},
@@ -103,7 +119,11 @@ export function createSessionManager(client: HttpClient): SessionManager {
   }
 
   const refreshSession = (): Promise<void> => {
-    pendingRefresh ??= runWithCrossTabLock(requestRefresh)
+    if (pendingRefresh) return pendingRefresh;
+
+    const knownExpiresAt = useAuthStore.getState().accessExpiresAt;
+
+    pendingRefresh = runWithCrossTabLock(() => requestRefresh(knownExpiresAt))
       .catch((error: unknown) => {
         // Solo un 401 dice que la sesión ya no existe. Un timeout o un 503 del
         // refresh son pasajeros: expulsar por ellos obligaría a volver a

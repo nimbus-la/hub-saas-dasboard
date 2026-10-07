@@ -4,7 +4,7 @@ import Image from "next/image";
 
 import { ICON_TOKENS } from "@/tokens";
 import { messages } from "@/messages";
-import { useLogin } from "../hooks";
+import { useDiscardStaleSession, useLogin } from "../hooks";
 import { LoginCredentials, LoginPageProps } from "../interfaces";
 import { LoginForm } from "../components";
 
@@ -31,6 +31,8 @@ const authMessages = messages.auth;
 
 export default function Login({ redirectTo }: LoginPageProps) {
   const { mutateAsync: login } = useLogin(redirectTo);
+
+  useDiscardStaleSession();
 
   return (
     <main className={loginPageVariants()}>
