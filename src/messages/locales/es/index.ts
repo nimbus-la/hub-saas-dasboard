@@ -12,6 +12,7 @@
  * responden y no por dónde están los archivos.
  */
 
+import { auth } from "./auth.messages";
 import { common } from "./common.messages";
 import { components } from "./components.messages";
 import { employees } from "./employees.messages";
@@ -38,4 +39,7 @@ export const es = {
 
     /** Módulo de empleados: equipo de trabajo y su acceso. */
     employees,
+
+    /** Inicio de sesión. */
+    auth,
 } as const;
