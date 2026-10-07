@@ -26,10 +26,6 @@ La plantilla explica cada variable, pero en resumen son estas:
 # Dirección del backend. La usan tanto el navegador como el servidor.
 NEXT_PUBLIC_API_URL=http://localhost:8000
 
-# Token de pruebas con el que se firman las peticiones mientras no exista
-# el inicio de sesión real. Sin él, el backend rechaza todas las peticiones.
-NEXT_PUBLIC_API_ACCESS_TOKEN=
-
 # Dominio desde el que se sirven las fotos de producto. Si lo dejas vacío,
 # las tarjetas muestran las iniciales del producto en lugar de la foto.
 NEXT_PUBLIC_PRODUCT_IMAGES_ORIGIN=

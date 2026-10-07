@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { useRouter } from "next/navigation";
 
 import { useMutation } from "@tanstack/react-query";
@@ -11,7 +10,7 @@ import { notify } from "@/components";
 import { messages } from "@/messages";
 import { getApiErrorMessage, isHttpError } from "@/lib/http";
 
-import { AuthService, LoginCredentials } from "../interfaces";
+import { LoginCredentials } from "../interfaces";
 import { createAuthService } from "../services";
 import { toSession } from "../mappers";
 
@@ -21,10 +20,7 @@ export function useLogin() {
   const router = useRouter();
   const startSession = useAuthStore((state) => state.startSession);
 
-  const service = React.useMemo<AuthService>(
-    () => createAuthService(http),
-    [http]
-  );
+  const service = createAuthService(http);
 
   return useMutation({
     mutationFn: (credentials: LoginCredentials) => service.login(credentials),

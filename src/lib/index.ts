@@ -8,7 +8,6 @@ export * from './recent-orders';
 export * from './theme';
 export * from './top-products';
 export * from './utils';
-export * from './auth/access-token';
 export * from './auth/session-manager';
 export * from './http/api-alert';
 export * from './http/auth-http-client';

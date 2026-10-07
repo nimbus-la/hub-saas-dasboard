@@ -825,24 +825,18 @@ mientras no había red el dato pudo quedarse atrás sin que nadie se enterara.
 
 Cosas conocidas, para que no se descubran leyendo el código:
 
-**El token es provisional.** `createHttpClient` firma cada petición con
-`Authorization: Bearer <token>`, y el token sale de `getAccessToken`
-(`src/lib/auth/access-token.ts`), que hoy lee un JWT fijo de
-`NEXT_PUBLIC_API_ACCESS_TOKEN`. Cuando exista la sesión real se cambia esa
-función y nada más. El backend saca el inquilino del token, así que ningún
-servicio manda `tenantId`.
+**La sesión va en cookies.** El login deja `jwt_access` y `jwt_refresh` como
+cookies HttpOnly y el transporte las manda con `credentials: "include"`, así
+que el cliente no firma nada a mano. El backend saca el inquilino del token, de
+modo que ningún servicio manda `tenantId`.
 
 **`detail` y `remove` no tienen consumidores.** Están implementados y tipados,
 pero ninguna pantalla los llama. El borrado de categorías tiene su diálogo
 montado y la llamada comentada en `Categories.tsx`, con el `TODO` a la vista.
 
-**Falta reaccionar a la sesión caducada.** Poner el token ya está resuelto, y
-el 401 ya no saca aviso (`HTTP_SILENT_STATUSES`); lo que falta es qué hacer
-ante él (renovar o sacar al usuario). Hasta entonces, un 401 no enseña nada.
-`AuthHttpClient` iría por fuera del decorador del sobre, porque este backend
-puede anunciar un 401 dentro de un `200 OK` y una capa colocada por dentro no lo
-vería. `LoggingHttpClient` iría por fuera de todo, que es el único punto que ve
-tanto los fallos de red como los que lanza el sobre.
+**Falta el registro de peticiones.** `LoggingHttpClient` iría por fuera de
+todo, también de `AuthHttpClient`, porque es el único punto que ve tanto los
+fallos de red como los que lanza el sobre.
 
 **El resto de módulos no está integrado.** `main-dashboard`, `cashier` y `login`
 leen los datos de ejemplo de `src/lib/*.ts`, que están escritos con el mismo

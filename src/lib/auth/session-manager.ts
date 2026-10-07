@@ -69,7 +69,7 @@ export function createSessionManager(client: HttpClient): SessionManager {
     } finally {
       useAuthStore.getState().clearSession();
       redirectToLogin();
-    };
+    }
   };
 
   const requestRefresh = async (): Promise<void> => {
