@@ -164,7 +164,7 @@ diálogos, porque `GenericButton` ya cubría su función.
 | `products/` | 76 | Construido con el sistema: catálogo, alta por pasos y categorías, textos incluidos |
 | `main-dashboard/` | 19 | Pendiente. Sus paneles siguen en `rounded-lg` donde el resto usa `rounded-xl`, y sus gráficos llevan tamaños de texto arbitrarios (`text-[28px]`, `text-[26px]`) |
 | `cashier/` | 29 | Pendiente, y es el más alejado: no importa `@/tokens` ni `@/messages`, usa tipografía fuera de la rampa (`text-xl`), espaciado fuera de la escala (`space-y-5`) y sombra en superficies estáticas |
-| `login/` | 5 | Pendiente. Solo un archivo lee tokens |
+| `auth/` | 21 | Construido con el sistema: login, renovación y cierre de sesión. El flujo está en `http.md` → "Sesión" |
 
 El orden natural para continuar es `main-dashboard` (donde el desfase es de
 radios y tamaños sueltos) y después `cashier`, que necesita también sus textos.

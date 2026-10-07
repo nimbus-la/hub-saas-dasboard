@@ -224,10 +224,10 @@ la parte cara: `messages.products.list.title` se seguirá escribiendo igual.
 | `lib/http` — mensajes de red y de tiempo agotado | Hecho, en `errors.http` |
 | `features/products/` — catálogo, alta por pasos y categorías | Hecho, reglas de validación incluidas |
 | `lib/products.ts` — estados y contadores del dominio | Hecho |
-| `app/` — metadata de las rutas de productos y del layout raíz | Hecho |
+| `app/` — metadata de las rutas de productos, del login y del layout raíz | Hecho |
 | `features/main-dashboard/` | **Pendiente.** Sus gráficas, leyendas y tablas accesibles siguen con literales |
 | `features/cashier/` | **Pendiente.** Ningún archivo importa `@/messages` |
-| `features/login/` | **Pendiente.** El formulario lleva sus textos escritos dentro |
+| `features/auth/` — login, validación y avisos de inicio de sesión | Hecho, en `auth` (la marca y "Cerrar sesión" en `navigation`) |
 
 Los nombres de las sucursales del `Navbar` y el catálogo de ejemplo de
 `lib/products.ts` no están en el catálogo **a propósito**: son datos de prueba
