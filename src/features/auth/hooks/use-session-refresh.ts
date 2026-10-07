@@ -10,14 +10,21 @@ import { createSessionManager } from "@/lib";
 const REFRESH_BEFORE_EXPIRATION_MS = 60 * 1000;
 
 
-export function useSessionRefresh() {
+/**
+ * Programa la renovación del token un minuto antes de que caduque.
+ *
+ * `enabled` va a `false` en el login: ahí lo que haya en el almacenamiento es
+ * de una sesión anterior, y renovarla resucitaría una sesión con el formulario
+ * todavía en pantalla.
+ */
+export function useSessionRefresh(enabled: boolean) {
   const http = useHttpClient();
   const accessExpiresAt = useAuthStore((state) => state.accessExpiresAt);
 
   const { refreshSession } = React.useMemo(() => createSessionManager(http), [http]);
 
   React.useEffect(() => {
-    if (!accessExpiresAt) return;
+    if (!enabled || !accessExpiresAt) return;
 
     const refreshTime = new Date(accessExpiresAt).getTime() - REFRESH_BEFORE_EXPIRATION_MS;
     const delay = Math.max(refreshTime - Date.now(), 0);
@@ -31,5 +38,5 @@ export function useSessionRefresh() {
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, [accessExpiresAt, refreshSession]);
+  }, [enabled, accessExpiresAt, refreshSession]);
 }

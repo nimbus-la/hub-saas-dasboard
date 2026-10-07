@@ -28,6 +28,7 @@ import {
     navbarProfileVariants,
     navbarSectionVariants,
     navbarUserNameVariants,
+    navbarUserPlaceholderVariants,
     navbarUserRoleVariants,
     navbarVariants,
 } from "./navbar.style";
@@ -152,13 +153,22 @@ export default function Navbar() {
                         </Avatar>
 
                         <div className={navbarProfileTextVariants()}>
-                            <span className={navbarUserNameVariants()}>
-                                {userName}
-                            </span>
+                            {user ? (
+                                <>
+                                    <span className={navbarUserNameVariants()}>
+                                        {userName}
+                                    </span>
 
-                            <span className={navbarUserRoleVariants()}>
-                                {user?.rolName}
-                            </span>
+                                    <span className={navbarUserRoleVariants()}>
+                                        {user.rolName}
+                                    </span>
+                                </>
+                            ) : (
+                                <>
+                                    <span aria-hidden="true" className={navbarUserPlaceholderVariants({ line: "name" })} />
+                                    <span aria-hidden="true" className={navbarUserPlaceholderVariants({ line: "role" })} />
+                                </>
+                            )}
                         </div>
                         <button
                             type="button"
