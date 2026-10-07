@@ -220,7 +220,9 @@ La frontera se cruza una sola vez, y hacia abajo no se propaga:
   directiva marca dónde empieza el árbol, no cada rama; ponerla en una pieza que
   solo recibe props y pinta no cambia nada y despista sobre quién manda.
 - **El cliente HTTP se coge distinto según dónde estés.** En un Server Component
-  o una Server Action se importa `httpClient` de `@/lib/http`; en un componente
+  o una Server Action se crea con `await createServerHttpClient()` de
+  `@/lib/http/server-http-client`, que reenvía la cookie de acceso del usuario;
+  en un componente
   o un hook se pide con `useHttpClient()` de `@/context`, que permite inyectar
   un doble en pruebas. Nadie instancia un cliente por su cuenta.
 

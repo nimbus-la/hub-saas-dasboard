@@ -4,7 +4,7 @@ import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 
 import Categories from "@/features/products/page/Categories";
 import { categoriesQueryOptions, createCategoriesService } from "@/features/products/services";
-import { httpClient } from "@/lib/http";
+import { createServerHttpClient } from "@/lib/http/server-http-client";
 import { getQueryClient } from "@/lib/query/query-client";
 import { messages } from "@/messages";
 
@@ -25,12 +25,13 @@ export default async function CategoriesPage() {
 
     // Se crea una caché nueva por visita, para no compartir datos entre usuarios.
     const queryClient = getQueryClient();
+    const http = await createServerHttpClient();
 
     // Usa la misma página por defecto que el hook, para que el navegador
     // encuentre los datos en la caché. Si el backend falla no rompe la
     // página, el error queda guardado y el navegador vuelve a intentarlo.
     await queryClient.prefetchQuery(
-        categoriesQueryOptions(createCategoriesService(httpClient))
+        categoriesQueryOptions(createCategoriesService(http))
     );
 
     // Pasa al navegador lo que quedó en la caché, así el hook de categorías

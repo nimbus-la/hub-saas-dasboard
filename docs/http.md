@@ -160,8 +160,10 @@ const { content } = await http.get<Category[]>(ENDPOINTS.PRODUCTS_CATEGORY);
 Depende de dónde estés, y no es intercambiable:
 
 ```ts
-// Server Component o Server Action
-import { httpClient } from "@/lib/http";
+// Server Component o Server Action: uno por petición, con la sesión de quien
+// pide la página. Va fuera del barril porque importa `next/headers`.
+import { createServerHttpClient } from "@/lib/http/server-http-client";
+const http = await createServerHttpClient();
 
 // Componente o hook de cliente
 import { useHttpClient } from "@/context";
@@ -614,9 +616,10 @@ export default async function CategoriesPage() {
     await connection();                     // se renderiza en cada petición
 
     const queryClient = getQueryClient();   // uno nuevo por render en servidor
+    const http = await createServerHttpClient();  // con la cookie de acceso
 
     await queryClient.prefetchQuery(
-        categoriesQueryOptions(createCategoriesService(httpClient))
+        categoriesQueryOptions(createCategoriesService(http))
     );
 
     return (

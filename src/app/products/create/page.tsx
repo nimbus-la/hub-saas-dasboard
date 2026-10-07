@@ -6,7 +6,7 @@ import { messages } from "@/messages";
 
 import CreateProduct from "@/features/products/page/CreateProduct";
 import { ACTIVE_CATEGORY_FILTERS, categoriesInfiniteQueryOptions, createCategoriesService } from "@/features/products/services";
-import { httpClient } from "@/lib/http";
+import { createServerHttpClient } from "@/lib/http/server-http-client";
 import { getQueryClient } from "@/lib/query/query-client";
 
 export const metadata: Metadata = messages.products.metadata.create;
@@ -21,11 +21,12 @@ export default async function CreateProductPage() {
     await connection();
 
     const queryClient = getQueryClient();
+    const http = await createServerHttpClient();
 
     // Misma consulta que usa el selector, así el navegador la encuentra en la
     // caché. Si falla, el selector la vuelve a pedir al montar.
     await queryClient.prefetchInfiniteQuery(
-        categoriesInfiniteQueryOptions(createCategoriesService(httpClient), ACTIVE_CATEGORY_FILTERS)
+        categoriesInfiniteQueryOptions(createCategoriesService(http), ACTIVE_CATEGORY_FILTERS)
     );
 
     return (

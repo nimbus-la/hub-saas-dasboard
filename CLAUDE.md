@@ -83,7 +83,10 @@ página vacía, no un error.
 
 Cómo se consume el cliente:
 
-- Server Component o Server Action → importa `httpClient` de `@/lib/http`.
+- Server Component o Server Action → `await createServerHttpClient()` de
+  `@/lib/http/server-http-client` (fuera del barril: importa `next/headers`).
+  Crea un cliente por petición que reenvía la cookie `jwt_access` de quien pide
+  la página; el `httpClient` compartido sale anónimo y el backend responde 401.
 - Componente o hook cliente → `useHttpClient()` de `@/context`, que permite
   inyectar un doble en pruebas. Nadie instancia un cliente por su cuenta.
 
