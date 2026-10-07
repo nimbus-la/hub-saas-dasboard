@@ -1,32 +1,24 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { cx } from "class-variance-authority";
 
 import { useSidebarLayout } from "@/context";
+import { useSessionRefresh } from "@/features/auth/hooks";
+import { LOGIN_HREF } from "@/utils";
+
 import Sidebar from "../sidebar/Sidebar";
 import Navbar from "../navbar/Navbar";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { useSessionRefresh } from "@/features/auth/hooks/use-session-refresh";
 
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
     const { isCollapsed } = useSidebarLayout();
 
-     // El login no utiliza el layout del dashboard.
     const pathname = usePathname();
-    const router = useRouter();
+
     useSessionRefresh();
 
-    useEffect(() => {
-        const handleSessionExpired = () => {
-            if (window.location.pathname !== "/login") router.replace("/login");
-        };
-
-        window.addEventListener("auth:session-expired", handleSessionExpired);
-        return () => window.removeEventListener("auth:session-expired", handleSessionExpired);
-    }, [router]);
-    if (pathname === "/login") {
+    if (pathname === LOGIN_HREF) {
         return <>{children}</>;
     }
 

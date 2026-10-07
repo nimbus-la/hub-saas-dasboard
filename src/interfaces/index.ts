@@ -13,7 +13,6 @@ export * from './components/filters.interfaces';
 export * from './components/inputs.interfaces';
 export * from './components/layout.interfaces';
 export * from './components/modals.interfaces';
-export * from './components/navbar.interfaces';
 export * from './components/pagination.interfaces';
 export * from './components/sidebar.interfaces';
 export * from './components/tables.interfaces';
