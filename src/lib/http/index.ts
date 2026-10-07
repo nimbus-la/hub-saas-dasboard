@@ -4,4 +4,5 @@ export * from './base-http-client';
 export * from './envelope-http-client';
 export * from './envelope';
 export * from './fetch-http-client';
+export * from './http-client';
 export * from './http-error';
