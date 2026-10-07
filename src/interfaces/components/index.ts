@@ -26,8 +26,6 @@ export * from "./layout.interfaces";
 
 export * from "./modals.interfaces";
 
-export * from "./navbar.interfaces";
-
 export * from "./pagination.interfaces";
 
 export * from "./sidebar.interfaces";

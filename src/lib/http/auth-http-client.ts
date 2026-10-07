@@ -1,16 +1,13 @@
-import type { HttpClient, HttpRequest, HttpResponse } from "@/interfaces";
-import { HttpError } from "./http-error";
+import type { HttpClient, HttpRequest, HttpResponse, SessionManager } from "@/interfaces";
+import { isHttpError } from "./http-error";
 import { BaseHttpClient } from "./base-http-client";
 
-type RefreshAccessToken = () => Promise<string>;
-type ClearSession = () => void;
 
 /** Renueva una sesión caducada y repite una única vez la petición original. */
 export class AuthHttpClient extends BaseHttpClient {
     public constructor(
         private readonly inner: HttpClient,
-        private readonly refreshAccessToken: RefreshAccessToken,
-        private readonly clearSession: ClearSession,
+        private readonly session: SessionManager,
     ) {
         super();
     }
@@ -18,9 +15,10 @@ export class AuthHttpClient extends BaseHttpClient {
     public async request<TData>(request: HttpRequest): Promise<HttpResponse<TData>> {
         try {
             return await this.inner.request<TData>(request);
-        } catch (error) {
+
+        } catch (error: unknown) {
             if (
-                !(error instanceof HttpError) ||
+                !isHttpError(error) ||
                 !error.isUnauthorized ||
                 request.skipAuthRefresh ||
                 request.authRetry
@@ -28,20 +26,19 @@ export class AuthHttpClient extends BaseHttpClient {
                 throw error;
             }
 
-            try {
-                const token = await this.refreshAccessToken();
+            // Si la renovación falla, el gestor ya decidió si cerrar la sesión.
+            await this.session.refreshSession();
 
-                return await this.inner.request<TData>({
-                    ...request,
-                    authRetry: true,
-                    headers: {
-                        ...request.headers,
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-            } catch (refreshError) {
-                this.clearSession();
-                throw refreshError;
+            try {
+                return await this.inner.request<TData>({ ...request, authRetry: true });
+
+            } catch (retryError) {
+                // Un 401 con un token recién emitido sí significa que la sesión
+                // no vale. Cualquier otro fallo es de la petición —un 422, un
+                // 503— y cerrar la sesión por él sacaría al usuario sin motivo.
+                if (isHttpError(retryError) && retryError.isUnauthorized) void this.session.closeSession();
+
+                throw retryError;
             }
         }
     }

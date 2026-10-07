@@ -3,17 +3,13 @@
 import { useState } from "react";
 
 import { Bell, LogOut, MapPin, Menu, X } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 import { useSidebarLayout } from "@/context";
-import type { NavbarProps } from "@/interfaces";
 import { cn } from "@/lib/utils";
 import { messages } from "@/messages";
 import { ICON_SIZE, ICON_STROKE } from "@/tokens";
-import { useHttpClient } from "@/context";
-import { createLogoutService } from "@/features/auth/services/logout.service";
-import { clearAccessToken } from "@/lib/auth/access-token";
-import { useAuthStore } from "@/store/auth/auth.store";
+import { useAuthStore } from "@/store";
+import { useLogout } from "@/features/auth/hooks";
 
 import { InputSelector } from "../inputs/InputSelector";
 import {
@@ -64,28 +60,16 @@ function initialsFrom(name: string) {
         .join("");
 }
 
-export default function Navbar({
-    userName = "Juan Manuel",
-    userRole = "Administrador",
-    userAvatarUrl = "",
-}: NavbarProps) {
-    const { toggleMobileOpen } = useSidebarLayout();
-    const [isSelectorOpen, setIsSelectorOpen] = useState(false);
-    const router = useRouter();
-    const http = useHttpClient();
-    const clearUser = useAuthStore((state) => state.clearUser);
+export default function Navbar() {
+    const user = useAuthStore((state) => state.user);
 
-    const handleLogout = async () => {
-        try {
-            await createLogoutService(http).logout();
-        } catch {
-            // La sesión local debe cerrarse aunque el backend ya no responda.
-        } finally {
-            clearAccessToken();
-            clearUser();
-            router.replace("/login");
-        }
-    };
+    const { toggleMobileOpen } = useSidebarLayout();
+    const { mutate: logout, isPending: isLoggingOut } = useLogout();
+
+    const [isSelectorOpen, setIsSelectorOpen] = useState(false);
+
+    const userName = `${user?.firstName ?? ""} ${user?.firstLastName ?? ""}`.trim();
+    const userAvatarUrl = "";
 
     return (
         <header className={navbarVariants()}>
@@ -173,10 +157,16 @@ export default function Navbar({
                             </span>
 
                             <span className={navbarUserRoleVariants()}>
-                                {userRole}
+                                {user?.rolName}
                             </span>
                         </div>
-                        <button type="button" onClick={handleLogout} aria-label="Cerrar sesión" className={navbarIconButtonVariants()}>
+                        <button
+                            type="button"
+                            onClick={() => logout()}
+                            disabled={isLoggingOut}
+                            aria-label="Cerrar sesión"
+                            className={navbarIconButtonVariants()}
+                        >
                             <LogOut size={CHROME_ICON_SIZE} strokeWidth={CHROME_ICON_STROKE} aria-hidden="true" />
                         </button>
                     </div>

@@ -1,39 +1,35 @@
 "use client";
 
-import { useEffect } from "react";
-import { useAuthStore } from "@/store/auth/auth.store";
-import { useRefreshSession } from "./use-refresh-session";
+import React from "react";
+
+import { useHttpClient } from "@/context";
+import { useAuthStore } from "@/store";
+import { createSessionManager } from "@/lib";
+
 
 const REFRESH_BEFORE_EXPIRATION_MS = 60 * 1000;
 
+
 export function useSessionRefresh() {
-  const expiredAt = useAuthStore((state) => state.expiredAt);
-  const refreshExpiresAt = useAuthStore((state) => state.refreshExpiresAt);
+  const http = useHttpClient();
+  const accessExpiresAt = useAuthStore((state) => state.accessExpiresAt);
 
-  const { refresh } = useRefreshSession();
+  const { refreshSession } = React.useMemo(() => createSessionManager(http), [http]);
 
-  useEffect(() => {
-    if (!expiredAt || !refreshExpiresAt) {
-      return;
-    }
+  React.useEffect(() => {
+    if (!accessExpiresAt) return;
 
-    const expirationTime = new Date(expiredAt).getTime();
-    const refreshTime = expirationTime - REFRESH_BEFORE_EXPIRATION_MS;
+    const refreshTime = new Date(accessExpiresAt).getTime() - REFRESH_BEFORE_EXPIRATION_MS;
+    const delay = Math.max(refreshTime - Date.now(), 0);
 
-    const delay = refreshTime - Date.now();
-
-    if (delay <= 0) {
-      refresh().catch(() => {});
-
-      return;
-    }
-
+    // El fallo no se avisa aquí: un 401 ya cierra la sesión en el gestor, y
+    // cualquier otro lo vuelve a intentar la primera petición que reciba un 401.
     const timeoutId = window.setTimeout(() => {
-      refresh().catch(() => {});
+      refreshSession().catch(() => {});
     }, delay);
 
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, [expiredAt, refreshExpiresAt, refresh]);
+  }, [accessExpiresAt, refreshSession]);
 }
