@@ -15,7 +15,7 @@ import { createAuthService } from "../services";
 import { toSession } from "../mappers";
 
 
-export function useLogin() {
+export function useLogin(redirectTo: string) {
   const http = useHttpClient();
   const router = useRouter();
   const startSession = useAuthStore((state) => state.startSession);
@@ -27,7 +27,7 @@ export function useLogin() {
 
     onSuccess: ({ content }) => {
       startSession(toSession(content));
-      router.replace("/dashboard");
+      router.replace(redirectTo);
     },
 
     onError: (error) => {
