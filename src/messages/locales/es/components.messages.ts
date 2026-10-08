@@ -35,8 +35,14 @@ export const components = {
 
     confirmDialog: {
         cancel: "Cancelar",
-        /** Etiqueta del botón mientras la acción espera al servidor. */
-        loading: "Procesando…",
+    },
+
+
+    /* ── Espera ─────────────────────────────────────────────────────────── */
+
+    globalLoader: {
+        /** Para la mutación que no dice qué está haciendo. */
+        fallback: "Procesando…",
     },
 
 

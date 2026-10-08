@@ -51,6 +51,6 @@ export function useLogin(redirectTo: string) {
 
     // Los avisos de esta mutación los lleva el hook de principio a fin: si la
     // caché pusiera los suyos, saldrían duplicados junto al de carga.
-    meta: { alertOnError: false, alertOnSuccess: false },
+    meta: { alertOnError: false, alertOnSuccess: false, globalLoading: false },
   })
 }

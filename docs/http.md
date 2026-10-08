@@ -445,8 +445,27 @@ Lo que se puede declarar en `meta`:
 | `alertOnError: false` | Silencia el aviso de error de esa consulta o mutación |
 | `alertOnSuccess: true` | Avisa al terminar bien. Solo en mutaciones |
 | `alertOptions` | `NotifyOptions` para ese aviso: `duration`, `id`, `description`… |
+| `loadingMessage` | Texto del loader global mientras la mutación está en curso. Solo en mutaciones |
+| `globalLoading: false` | La mutación no enciende el loader global (el login, que lleva su propio aviso) |
 
-Está tipado: `QueryAlertPolicy` y `MutationAlertPolicy` se registran en el
+### Loader global
+
+Ningún botón dibuja su propio "cargando". `GlobalLoader`, montado una vez en
+el layout raíz, lee de la caché qué mutaciones siguen en curso
+(`useGlobalLoading`, con `useMutationState`):
+
+- Al empezar, bloquea los clics de toda la pantalla sin enseñar nada todavía.
+- A los 300 ms, si sigue en curso, aparece un velo con una tarjeta y el
+  `loadingMessage` de la mutación ("Eliminando producto…"). Por debajo de eso
+  no se ve nada, para no parpadear.
+- Una vez visible se queda al menos 500 ms. Los tiempos están en
+  `GLOBAL_LOADER_TIMING` (`@/tokens`).
+- Queda por encima de modales y desplegables y por debajo de los avisos, para
+  que el de éxito o error se lea mientras se retira.
+
+Las consultas no lo encienden: tablas y listados ya enseñan su propia espera.
+
+Está tipado: `QueryAlertPolicy`, `MutationAlertPolicy` y `MutationLoadingPolicy` se registran en el
 módulo de TanStack Query, así que `meta` autocompleta y no admite claves
 inventadas.
 
@@ -955,6 +974,7 @@ mientras no había red el dato pudo quedarse atrás sin que nadie se enterara.
 - [ ] El listado usa `placeholderData: keepPreviousData`
 - [ ] Las mutaciones invalidan por prefijo (`lists()`), no la página actual
 - [ ] Las que confirman algo llevan `meta: { alertOnSuccess: true }`
+- [ ] Las mutaciones llevan `loadingMessage` en gerundio, desde `@/messages`
 - [ ] Las que no deben avisar llevan `meta: { alertOnError: false }`, en vez de un try/catch
 - [ ] La ruta llama a `await connection()` antes de precargar
 - [ ] Los textos nuevos salen de `@/messages`

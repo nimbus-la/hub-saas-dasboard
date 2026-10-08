@@ -197,21 +197,7 @@ export const confirmDialogActionVariants = cva(["w-full sm:flex-1"], {
             cancel: "border border-neutral-300",
             confirm: "",
         },
-
-        /**
-         * Acción en curso.
-         *
-         * El botón deshabilitado ya no responde, pero solo con eso parece
-         * roto: el giro del icono dice que la petición sigue viva. El selector
-         * alcanza el icono desde aquí porque el botón lo pinta por prop y no
-         * acepta clases para él. Con movimiento reducido el icono se queda
-         * quieto y el cambio de etiqueta basta.
-         */
-        loading: {
-            true: "[&_svg]:animate-spin motion-reduce:[&_svg]:animate-none",
-            false: "",
-        },
     },
 
-    defaultVariants: { role: "confirm", loading: false },
+    defaultVariants: { role: "confirm" },
 });

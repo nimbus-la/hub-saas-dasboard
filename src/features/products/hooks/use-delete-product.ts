@@ -5,6 +5,7 @@ import React from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { useHttpClient } from "@/context";
+import { messages } from "@/messages";
 
 import { categoryKeys, createProductsService, productKeys } from "../services";
 
@@ -35,6 +36,6 @@ export function useDeleteProduct() {
             void queryClient.invalidateQueries({ queryKey: categoryKeys.lists() });
         },
 
-        meta: { alertOnSuccess: true },
+        meta: { alertOnSuccess: true, loadingMessage: messages.products.pending.delete },
     });
 }

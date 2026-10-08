@@ -130,15 +130,11 @@ export interface ConfirmDialogProps {
      */
     tone?: ConfirmDialogTone;
 
-    /** Bloquea los botones mientras la acción está en vuelo. */
-    loading?: boolean;
-
     /**
-     * Texto del botón de confirmar mientras `loading` está activo. Conviene el
-     * gerundio de la acción ("Eliminando…"): dice que lo pedido ya está en
-     * marcha, no solo que hay que esperar.
+     * Bloquea los botones mientras la acción está en vuelo. No dibuja nada:
+     * la espera la enseña el `GlobalLoader` a partir de la mutación.
      */
-    loadingLabel?: string;
+    loading?: boolean;
 
     className?: string;
 }

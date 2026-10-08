@@ -6,6 +6,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tansta
 
 import { useHttpClient } from "@/context";
 import { useClampedPage, usePagination } from "@/hooks";
+import { messages } from "@/messages";
 import { CategoryList, CreateCategoryParams, UpdateCategoryParams } from "../interfaces";
 import { DEFAULT_CATEGORIES_PAGINATION, categoriesQueryOptions, categoryKeys, createCategoriesService } from "../services";
 import { useCategoryFilters } from "./use-category-filters";
@@ -61,13 +62,13 @@ export function useProductsCategories() {
     const createCategory = useMutation({
         mutationFn: (params: CreateCategoryParams) => service.create(params),
         onSuccess: invalidate,
-        meta: { alertOnSuccess: true },
+        meta: { alertOnSuccess: true, loadingMessage: messages.products.pending.createCategory },
     });
 
     const updateCategory = useMutation({
         mutationFn: (params: UpdateCategoryParams) => service.update(params),
         onSuccess: invalidate,
-        meta: { alertOnSuccess: true },
+        meta: { alertOnSuccess: true, loadingMessage: messages.products.pending.updateCategory },
     });
 
     return {

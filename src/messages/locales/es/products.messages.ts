@@ -109,6 +109,20 @@ export const products = {
     },
 
 
+    /**
+     * Lo que dice el loader global mientras el servidor responde. En gerundio
+     * y nombrando el objeto: "Procesando…" no confirma que se pulsó lo que se
+     * quería.
+     */
+    pending: {
+        create: "Creando producto…",
+        update: "Guardando cambios…",
+        delete: "Eliminando producto…",
+        createCategory: "Creando categoría…",
+        updateCategory: "Guardando cambios…",
+    },
+
+
     /* ====================================================================== */
     /*  Catálogo                                                            */
     /* ====================================================================== */
@@ -168,7 +182,6 @@ export const products = {
         delete: {
             title: "Eliminar producto",
             confirm: "Eliminar",
-            confirming: "Eliminando…",
             cancel: "Cancelar",
             description:
                 "«{name}» se eliminará de forma permanente. Si solo quieres dejar de venderlo, puedes desactivarlo.",

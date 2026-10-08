@@ -6,6 +6,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tansta
 
 import { useHttpClient } from "@/context";
 import { useClampedPage, usePagination } from "@/hooks";
+import { messages } from "@/messages";
 import { CreateEmployeeParams, EmployeeList, EmployeesService, UpdateEmployeeParams } from "../interfaces";
 import { DEFAULT_EMPLOYEES_PAGINATION, createEmployeesService, employeeKeys, employeesQueryOptions } from "../services";
 import { useEmployeeFilters } from "./use-employee-filters";
@@ -109,7 +110,7 @@ export function useEmployees() {
     const createEmployee = useMutation({
         mutationFn: (params: CreateEmployeeParams) => service.create(params),
         onSuccess: invalidate,
-        meta: { alertOnSuccess: true }
+        meta: { alertOnSuccess: true, loadingMessage: messages.employees.pending.create }
     });
 
 
@@ -118,14 +119,14 @@ export function useEmployees() {
             service.update(id, params),
 
         onSuccess: invalidate,
-        meta: { alertOnSuccess: true }
+        meta: { alertOnSuccess: true, loadingMessage: messages.employees.pending.update }
     });
 
 
     const deleteEmployee = useMutation({
         mutationFn: (id: string) => service.remove(id),
         onSuccess: invalidate,
-        meta: { alertOnSuccess: true }
+        meta: { alertOnSuccess: true, loadingMessage: messages.employees.pending.delete }
     });
 
 

@@ -6,6 +6,7 @@ import React from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { useHttpClient } from "@/context";
+import { messages } from "@/messages";
 
 import type { ProductFormValues } from "../interfaces";
 import { PRODUCTS_LIST_HREF } from "../libs";
@@ -40,6 +41,6 @@ export function useCreateProduct() {
             router.push(PRODUCTS_LIST_HREF);
         },
 
-        meta: { alertOnSuccess: true },
+        meta: { alertOnSuccess: true, loadingMessage: messages.products.pending.create },
     });
 }

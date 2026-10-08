@@ -161,7 +161,6 @@ export default function Products() {
                         name: deleteTarget.name,
                     })}
                     confirmLabel={COPY.delete.confirm}
-                    loadingLabel={COPY.delete.confirming}
                     cancelLabel={COPY.delete.cancel}
                     onConfirm={handleDeleteConfirm}
                     loading={deleteProduct.isPending}

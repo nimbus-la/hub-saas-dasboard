@@ -50,6 +50,11 @@ export * from './alerts/alert.style';
 export { default as AlertToaster, notify } from './alerts/AlertToaster';
 export * from "./alerts/notify-api";
 
+// ── Espera ──────────────────────────────────────────────────────────────────
+// Se monta una sola vez en el layout raíz, como `AlertToaster`.
+export * from './feedback/global-loader.style';
+export { default as GlobalLoader } from './feedback/GlobalLoader';
+
 
 // ── Insignias ───────────────────────────────────────────────────────────────
 export { statusBadgeVariants } from './badges/status-badge.style';

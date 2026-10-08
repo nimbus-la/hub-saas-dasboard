@@ -62,6 +62,22 @@ export const EASING_CLASS = {
 
 
 /**
+ * Tiempos del loader global, en milisegundos.
+ *
+ * `showDelay`: lo que espera antes de dejarse ver. Por debajo de eso una
+ * respuesta se siente inmediata y enseñar el velo solo sería un parpadeo.
+ *
+ * `minVisible`: una vez a la vista, lo mínimo que se queda. Un velo que entra
+ * y sale en 50ms se lee como un fallo de la pantalla, no como una espera.
+ */
+export const GLOBAL_LOADER_TIMING = {
+    showDelay: 300,
+    minVisible: 500,
+} as const;
+
+
+
+/**
  * Transiciones ya compuestas, listas para pegar en un `cva`.
  *
  * Se limita la propiedad animada a propósito: `transition-all` obliga al
