@@ -61,21 +61,27 @@ export function createSessionManager(client: HttpClient): SessionManager {
    * cookies son HttpOnly y solo el backend puede borrarlas. Si `jwt_refresh`
    * se quedara en el navegador, el proxy devolvería al panel a quien acabamos
    * de mandar al login.
+   *
+   * Por lo mismo, si el logout falla no se toca nada. Vaciar el
+   * almacenamiento con las cookies todavía puestas deja un panel sin usuario
+   * al que el proxy deja pasar, y `useSessionRefresh`, al verlo vacío, vuelve
+   * a expulsar: un bucle de redirecciones mientras el backend no conteste, y
+   * una sesión que sigue abierta aunque la pantalla diga lo contrario.
    */
   const endSession = async (from?: string): Promise<void> => {
-    try {
-      await client.post<unknown>(ENDPOINTS.AUTH_LOGOUT, {}, { skipAuthRefresh: true });
+    await client.post<unknown>(ENDPOINTS.AUTH_LOGOUT, {}, { skipAuthRefresh: true });
 
-    } finally {
-      useAuthStore.getState().clearSession();
-      redirectToLogin(from);
-    }
+    useAuthStore.getState().clearSession();
+    redirectToLogin(from);
   };
 
   /**
    * El usuario sale. El login no recuerda dónde estaba: quien entre después
    * puede ser otra persona, y llevarla a la pantalla del anterior no tiene
    * sentido.
+   *
+   * Si falla, el error llega a la mutación de `useLogout` y la caché lo avisa:
+   * quien pulsó "Cerrar sesión" tiene que saber que sigue dentro.
    */
   const closeSession = (): Promise<void> => endSession();
 
@@ -83,13 +89,21 @@ export function createSessionManager(client: HttpClient): SessionManager {
    * La sesión dejó de valer. El login recuerda la pantalla para devolver al
    * usuario a ella al volver a entrar. La ruta se toma antes de la petición,
    * que es asíncrona y podría resolverse ya en otra página.
+   *
+   * Un fallo aquí se calla: nadie pidió salir, y el siguiente 401 lo vuelve a
+   * intentar. Quien llama lo hace sin esperar, así que tampoco hay a quién
+   * devolverle el error.
    */
-  const expireSession = (): Promise<void> => {
+  const expireSession = async (): Promise<void> => {
     const from = typeof window === "undefined"
       ? undefined
       : window.location.pathname + window.location.search;
 
-    return endSession(from);
+    try {
+      await endSession(from);
+    } catch {
+      // Ver arriba: sin logout, la sesión se queda como está.
+    }
   };
 
   /**

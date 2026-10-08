@@ -324,9 +324,12 @@ saber cuándo renovar sin preguntar.
 
 `app/login/page.tsx` lee `from` en el servidor y lo pasa por
 `resolvePostLoginHref` (`src/utils/session.utils.ts`), que solo acepta rutas
-internas del panel: lo que empieza por `//` o `/\` el navegador lo lee como
-otro origen, y un enlace a `/login?from=https://otro-sitio` no debe sacar a
-nadie del panel. Lo demás cae a `DEFAULT_HOME_HREF`.
+internas del panel: un enlace a `/login?from=https://otro-sitio` no debe sacar
+a nadie del panel. No basta con mirar si empieza por `//` o `/\`: el navegador
+borra tabuladores y saltos de línea, así que `/\t/otro-sitio` acaba siendo
+`//otro-sitio`, y `/.//otro-sitio` normaliza a lo mismo. Por eso `from` se
+resuelve con `new URL` y se devuelve la ruta ya resuelta, no la que llegó. Lo
+demás cae a `DEFAULT_HOME_HREF`.
 
 El formulario recorta empresa y usuario, nunca la contraseña, y se bloquea con
 un candado propio mientras dura el envío, porque un doble clic llega antes de
@@ -370,9 +373,17 @@ tirar la caché de TanStack Query y no enseñarle al siguiente usuario nada del
 anterior. `closeSession` no recuerda la ruta porque quien entre después puede
 ser otra persona.
 
+Si el logout falla, no se toca nada. Vaciar el almacenamiento con las cookies
+todavía puestas dejaría un panel sin usuario al que el proxy deja pasar, y
+`useSessionRefresh` volvería a expulsar en bucle mientras el backend no
+conteste. `closeSession` deja que el error llegue a la mutación, que lo avisa;
+`expireSession` lo calla y lo vuelve a intentar con el siguiente 401.
+
 `useSessionSync` escucha el evento `storage`, que solo llega a las pestañas que
 no escribieron: si otra cerró sesión, ésta va al login; si otra la abrió
-mientras ésta estaba en el login, ésta va al panel.
+mientras ésta estaba en el login, ésta va al panel. Hace lo mismo con
+`pageshow` cuando la página sale de la bfcache, porque ahí el navegador la
+restaura sin pasar por el proxy ni volver a montar nada.
 
 ### En el servidor
 

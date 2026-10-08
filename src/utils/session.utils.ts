@@ -16,19 +16,41 @@ export function buildLoginHref(from?: string): string {
 
 
 /**
+ * Origen ficticio contra el que se resuelve `from`. Solo sirve para saber si la
+ * ruta se queda en casa: si al resolverla el origen cambia, apuntaba fuera.
+ */
+const PANEL_ORIGIN_PLACEHOLDER = "http://panel.invalid";
+
+
+/**
  * A dónde volver después de iniciar sesión.
  *
  * `from` lo escribe el proxy, pero viaja en la URL y cualquiera puede armar un
- * enlace a `/login?from=https://otro-sitio.com`. Solo se acepta una ruta del
- * propio panel: empieza por `/` y no por `//` ni `/\`, que el navegador lee
- * como otro origen. Volver al propio login no tiene sentido, así que también
- * cae al inicio.
+ * enlace a `/login?from=https://otro-sitio.com`. Mirar el texto no basta: el
+ * navegador borra tabuladores y saltos de línea y lee `\` como `/`, así que
+ * `/\t/otro-sitio.com` acaba siendo `//otro-sitio.com`. Por eso se resuelve
+ * con el mismo parser que usará el navegador y se devuelve lo que salió de él,
+ * no lo que llegó.
+ *
+ * La ruta resuelta también se comprueba: `/.//otro-sitio.com` se queda en el
+ * origen al resolverla, pero normaliza a `//otro-sitio.com`, y eso en un
+ * `href` vuelve a ser otro sitio. Volver al propio login no tiene sentido, así
+ * que también cae al inicio.
  */
 export function resolvePostLoginHref(from: string | string[] | undefined): string {
-    if (typeof from !== "string") return DEFAULT_HOME_HREF;
+    if (typeof from !== "string" || !from.startsWith("/")) return DEFAULT_HOME_HREF;
 
-    const isInternalPath = from.startsWith("/") && !from.startsWith("//") && !from.startsWith("/\\");
-    if (!isInternalPath || from === LOGIN_HREF) return DEFAULT_HOME_HREF;
+    let url: URL;
+    try {
+        url = new URL(from, PANEL_ORIGIN_PLACEHOLDER);
+    } catch {
+        return DEFAULT_HOME_HREF;
+    }
 
-    return from;
+    const isSameOrigin = url.origin === PANEL_ORIGIN_PLACEHOLDER;
+    if (!isSameOrigin || url.pathname.startsWith("//") || url.pathname === LOGIN_HREF) {
+        return DEFAULT_HOME_HREF;
+    }
+
+    return url.pathname + url.search + url.hash;
 }
