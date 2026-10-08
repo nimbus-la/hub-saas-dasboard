@@ -29,6 +29,16 @@ export const useAuthStore = create<AuthState>()(
         accessExpiresAt,
         refreshExpiresAt,
       }),
+
+      // Sin nada guardado, zustand conserva por defecto lo que hay en memoria.
+      // Aquí eso resucita la sesión: si alguien vacía el almacenamiento, las
+      // otras pestañas seguirían con el usuario y la siguiente renovación lo
+      // volvería a escribir. Que no haya nada guardado significa que no hay
+      // sesión.
+      merge: (persistedState, currentState) => ({
+        ...currentState,
+        ...(persistedState ?? NO_SESSION_DATA),
+      }),
     }
   )
 );

@@ -310,6 +310,12 @@ las dos fechas de caducidad (`src/store/auth/auth.store.ts`). El usuario porque
 el backend no tiene un "quién soy" y solo lo devuelve el login; las fechas para
 saber cuándo renovar sin preguntar.
 
+Que no haya nada guardado significa que no hay sesión. Por defecto, zustand
+conserva lo que tiene en memoria al rehidratar con el almacenamiento vacío, y
+eso resucitaba la sesión: si alguien vaciaba el `localStorage`, las demás
+pestañas seguían con el usuario y la siguiente renovación lo volvía a escribir.
+El `merge` del store lo cambia, y lo heredan todos los que rehidratan.
+
 | Pieza | Dónde | Qué hace |
 |---|---|---|
 | Proxy | `src/proxy.ts` | Deja pasar con cualquiera de las dos cookies; sin ninguna, manda a `/login?from=<ruta>` |
