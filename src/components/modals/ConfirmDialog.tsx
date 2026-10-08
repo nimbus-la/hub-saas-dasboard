@@ -1,6 +1,7 @@
 "use client";
 
 import { AlertDialog } from "@base-ui/react/alert-dialog";
+import { LoaderCircle } from "lucide-react";
 
 import GenericButton from "@/components/buttons/GenericButton";
 import type { ConfirmDialogProps, ConfirmDialogTone } from "@/interfaces";
@@ -76,6 +77,7 @@ export default function ConfirmDialog({
     icon,
     tone = "danger",
     loading = false,
+    loadingLabel = messages.components.confirmDialog.loading,
     className,
 }: ConfirmDialogProps) {
     const Icon = icon ?? DEFAULT_ICON[tone];
@@ -130,13 +132,19 @@ export default function ConfirmDialog({
                             }
                         />
 
+                        {/* El botón conserva su ancho al cambiar de etiqueta
+                            porque reparte la fila con "Cancelar", así que el
+                            pie no salta al entrar en carga. */}
                         <GenericButton
                             variant={CONFIRM_VARIANT[tone]}
-                            label={confirmLabel}
+                            label={loading ? loadingLabel : confirmLabel}
+                            {...(loading && { startIcon: LoaderCircle })}
                             onClick={onConfirm}
                             disabled={loading}
+                            aria-busy={loading}
                             className={confirmDialogActionVariants({
                                 role: "confirm",
+                                loading,
                             })}
                         />
                     </div>

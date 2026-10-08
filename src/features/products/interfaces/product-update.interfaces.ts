@@ -1,4 +1,5 @@
 import type { CreateProductParams } from "./product-create.interfaces";
+import type { ProductApiStatus } from "./product-list.interfaces";
 
 
 /**
@@ -8,10 +9,16 @@ import type { CreateProductParams } from "./product-create.interfaces";
  * queda como estaba. La receta es la excepción, porque si se manda reemplaza
  * entera a la anterior.
  *
- * `productStatus` solo se envía para activar o desactivar de verdad. Mandarlo
+ * `status` solo se envía para activar o desactivar de verdad. Mandarlo
  * con el mismo valor que ya tiene el producto hace que el backend rechace toda
  * la edición.
  */
 export type UpdateProductParams = { productId: string } & Partial<CreateProductParams> & {
-    productStatus?: boolean;
+    status?: ProductApiStatus;
 };
+
+
+/** Cuerpo de la baja. Igual que en la edición, el id viaja en el cuerpo. */
+export interface DeleteProductParams {
+    productId: string;
+}

@@ -82,6 +82,9 @@ export function createProductsService(http: HttpClient): ProductsService {
 
         update: (payload, config) =>
             http.patch(ENDPOINTS.PRODUCTS_UPDATE, payload, config),
+
+        delete: (payload, config) =>
+            http.delete(ENDPOINTS.PRODUCTS_DELETE, payload, config),
     };
 }
 

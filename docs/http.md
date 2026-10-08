@@ -147,8 +147,11 @@ get<TContent>(url, config?)
 post<TContent>(url, body?, config?)
 put<TContent>(url, body?, config?)
 patch<TContent>(url, body?, config?)
-delete<TContent>(url, config?)
+delete<TContent>(url, body?, config?)
 ```
+
+`delete` acepta cuerpo como los demás verbos de escritura porque algunas rutas
+del backend (`products/delete`) reciben el id ahí y no en la URL.
 
 El parámetro de tipo es el `content`, que es lo único que cambia de un endpoint
 a otro. Quien solo quiere los datos los saca con un destructuring:

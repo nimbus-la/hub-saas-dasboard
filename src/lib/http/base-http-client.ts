@@ -77,12 +77,14 @@ export abstract class BaseHttpClient implements HttpClient {
 
     public async delete<TContent>(
         url: string,
+        body?: unknown,
         config?: HttpRequestConfig
     ): Promise<ApiEnvelope<TContent>> {
         const { data: envelope } = await this.request<ApiEnvelope<TContent>>({
             ...config,
             method: "DELETE",
             url,
+            body
         });
 
         return envelope;

@@ -6,6 +6,7 @@ import type {
     CreateProductParams,
     CreateProductRecipeLineParams,
     ProductApiResponse,
+    ProductApiStatus,
     ProductFormValues,
     ProductRecipeFormValues,
     UpdateProductParams,
@@ -15,6 +16,16 @@ import { DEFAULT_PRODUCT_FORM_VALUES, isSameRecipe } from "../libs";
 /**
  * Conversiones entre el producto del backend y el que usa la aplicación.
  */
+
+
+/**
+ * El backend escribe el estado como texto y el resto de la aplicación lo trata
+ * como un sí o un no. La traducción vive solo aquí para que el literal no se
+ * repita por las pantallas.
+ */
+const isActiveStatus = (status: ProductApiStatus): boolean => status === "ACTIVE";
+
+const toApiStatus = (isActive: boolean): ProductApiStatus => (isActive ? "ACTIVE" : "INACTIVE");
 
 
 /**
@@ -44,7 +55,7 @@ export const toProduct = (product: ProductApiResponse): Product => {
         name: product.productName,
         category: product.nameProductCategory,
         price: Number(product.productBasePrice),
-        status: toProductStatus(product.productStatus, missingIngredients.length > 0),
+        status: toProductStatus(isActiveStatus(product.status),missingIngredients.length > 0),
         ingredientsCount: product.ingredients.length,
 
         ...(missingIngredients.length > 0 && {
@@ -111,7 +122,7 @@ export const toProductFormValues = (product: ProductApiResponse): ProductFormVal
     description: product.productDescription ?? "",
     price: Number(product.productBasePrice),
     margin: Number(product.profitMargin),
-    isAvailable: product.productStatus,
+    isAvailable: isActiveStatus(product.status),
     recipe: product.ingredients.map((ingredient) => ({
         itemId: ingredient.inventoryItemId,
         quantity: Number(ingredient.quantity),
@@ -167,7 +178,7 @@ const getProductChanges = (
             recipe: current.recipe,
         }),
         ...(values.isAvailable !== initial.isAvailable && {
-            productStatus: values.isAvailable,
+            status: toApiStatus(values.isAvailable),
         }),
     };
 };

@@ -35,6 +35,8 @@ export const components = {
 
     confirmDialog: {
         cancel: "Cancelar",
+        /** Etiqueta del botón mientras la acción espera al servidor. */
+        loading: "Procesando…",
     },
 
 
