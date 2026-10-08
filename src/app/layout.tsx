@@ -5,6 +5,7 @@ import "@/style/style.css";
 import { HttpClientProvider, QueryProvider, SidebarLayoutProvider } from "@/context";
 import { DEFAULT_LOCALE, messages } from "@/messages";
 import AlertToaster from "@/components/alerts/AlertToaster";
+import GlobalLoader from "@/components/feedback/GlobalLoader";
 import AppShell from "@/components/layout/AppShell";
 import { cn } from "@/lib/utils";
 
@@ -40,6 +41,7 @@ export default function RootLayout({
               </AppShell>
             </SidebarLayoutProvider>
 
+            <GlobalLoader />
             <AlertToaster />
           </QueryProvider>
         </HttpClientProvider>

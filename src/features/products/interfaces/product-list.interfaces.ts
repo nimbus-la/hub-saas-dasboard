@@ -2,7 +2,7 @@ import type { ApiEnvelope, ApiResponseWithPagination, HttpRequestConfig, Paginat
 import type { Product } from "@/lib/products";
 
 import type { CreateProductParams } from "./product-create.interfaces";
-import type { UpdateProductParams } from "./product-update.interfaces";
+import type { DeleteProductParams, UpdateProductParams } from "./product-update.interfaces";
 
 
 /**
@@ -24,6 +24,13 @@ export interface ProductIngredientApiResponse {
 }
 
 
+/**
+ * Estado del producto como lo escribe el backend. Solo dice si está en la
+ * carta; que se pueda preparar o no lo decide el stock de la receta.
+ */
+export type ProductApiStatus = "ACTIVE" | "INACTIVE";
+
+
 /** Producto tal como lo envía el backend. */
 export interface ProductApiResponse {
     id: string;
@@ -40,8 +47,8 @@ export interface ProductApiResponse {
     costCurrency: string;
     profitMargin: string;
 
-    /** En `false` el producto se retiró de la carta. */
-    productStatus: boolean;
+    /** En `INACTIVE` el producto se retiró de la carta. */
+    status: ProductApiStatus;
 
     ingredients: ProductIngredientApiResponse[];
 
@@ -94,4 +101,10 @@ export interface ProductsService {
         payload: UpdateProductParams,
         config?: HttpRequestConfig
     ): Promise<ApiEnvelope<ProductApiResponse>>;
+
+    /** Elimina el producto. El backend responde sin datos. */
+    delete(
+        payload: DeleteProductParams,
+        config?: HttpRequestConfig
+    ): Promise<ApiEnvelope<null>>;
 }

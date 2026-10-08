@@ -109,6 +109,20 @@ export const products = {
     },
 
 
+    /**
+     * Lo que dice el loader global mientras el servidor responde. En gerundio
+     * y nombrando el objeto: "Procesando…" no confirma que se pulsó lo que se
+     * quería.
+     */
+    pending: {
+        create: "Creando producto…",
+        update: "Guardando cambios…",
+        delete: "Eliminando producto…",
+        createCategory: "Creando categoría…",
+        updateCategory: "Guardando cambios…",
+    },
+
+
     /* ====================================================================== */
     /*  Catálogo                                                            */
     /* ====================================================================== */
@@ -156,6 +170,21 @@ export const products = {
             withQuery:
                 "Ningún producto de esta categoría coincide con “{query}”. Revisa la escritura o prueba con otro término.",
             withoutQuery: "Esta categoría todavía no tiene productos en la carta.",
+        },
+
+        /**
+         * Borrado desde la tarjeta.
+         *
+         * Como en categorías, nombra el producto para confirmar que se pulsó
+         * la tarjeta correcta y ofrece desactivarlo, que es lo que se busca
+         * casi siempre que algo deja de venderse por un tiempo.
+         */
+        delete: {
+            title: "Eliminar producto",
+            confirm: "Eliminar",
+            cancel: "Cancelar",
+            description:
+                "«{name}» se eliminará de forma permanente. Si solo quieres dejar de venderlo, puedes desactivarlo.",
         },
     },
 

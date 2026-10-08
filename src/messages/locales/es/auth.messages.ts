@@ -45,7 +45,7 @@ export const auth = {
         },
 
         submit: "Iniciar sesión",
-        submitting: "Iniciando sesión...",
+        submitting: "Iniciando sesión…",
 
         /** Cuando el backend confirma el acceso sin redactar un mensaje. */
         success: "Sesión iniciada.",
@@ -67,6 +67,12 @@ export const auth = {
 
     /* ====================================================================== */
     /*  Panel de bienvenida                                                   */
+    logout: {
+        /** Lo que dice el loader global hasta que la sesión se cierra. */
+        loading: "Cerrando sesión…",
+    },
+
+
     /* ====================================================================== */
 
     showcase: {

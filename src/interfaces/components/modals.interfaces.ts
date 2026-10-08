@@ -130,7 +130,10 @@ export interface ConfirmDialogProps {
      */
     tone?: ConfirmDialogTone;
 
-    /** Bloquea los botones mientras la acción está en vuelo. */
+    /**
+     * Bloquea los botones mientras la acción está en vuelo. No dibuja nada:
+     * la espera la enseña el `GlobalLoader` a partir de la mutación.
+     */
     loading?: boolean;
 
     className?: string;

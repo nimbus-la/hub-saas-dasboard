@@ -163,8 +163,13 @@ export interface HttpClient {
         config?: HttpRequestConfig
     ): Promise<ApiEnvelope<TContent>>;
 
+    /**
+     * Admite cuerpo como los otros verbos de escritura: hay rutas del backend
+     * que reciben el id en el cuerpo y no en la URL.
+     */
     delete<TContent>(
         url: string,
+        body?: unknown,
         config?: HttpRequestConfig
     ): Promise<ApiEnvelope<TContent>>;
 };

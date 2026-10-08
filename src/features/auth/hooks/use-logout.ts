@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 
 import { useHttpClient } from "@/context";
 import { createSessionManager } from "@/lib/auth/session-manager";
+import { messages } from "@/messages";
 
 
 export function useLogout() {
@@ -11,5 +12,8 @@ export function useLogout() {
 
     const { closeSession } = createSessionManager(http);
 
-    return useMutation({ mutationFn: closeSession })
+    return useMutation({
+        mutationFn: closeSession,
+        meta: { loadingMessage: messages.auth.logout.loading },
+    });
 }

@@ -12,6 +12,7 @@
 import { useRouter } from "next/navigation";
 import * as React from "react";
 
+import { ConfirmDialog } from "@/components";
 import { TextField } from "@/components/inputs/TextField";
 import LoadMore from "@/components/pagination/LoadMore";
 import { FilterTabs } from "@/components/tabs/FilterTabs";
@@ -25,7 +26,7 @@ import {
     ProductsGrid,
     ProductsHeader,
 } from "../components/list";
-import { useCategoryTabs, useProducts } from "../hooks";
+import { useCategoryTabs, useDeleteProduct, useProducts } from "../hooks";
 import { PRODUCT_CREATE_HREF, getProductEditHref } from "../libs";
 import {
     productsPageBodyVariants,
@@ -43,6 +44,12 @@ export default function Products() {
 
     const products = useProducts();
     const categories = useCategoryTabs();
+    const deleteProduct = useDeleteProduct();
+
+    // El producto a eliminar se guarda aparte de si el diálogo está abierto,
+    // para que el diálogo no se quede sin texto mientras se cierra.
+    const [deleteTarget, setDeleteTarget] = React.useState<Product | null>(null);
+    const [isDeleteOpen, setIsDeleteOpen] = React.useState(false);
 
     const categoryTabs: FilterTabItem[] = [
         { value: ALL_CATEGORIES, label: COPY.allCategories, count: products.catalogTotal },
@@ -61,11 +68,26 @@ export default function Products() {
         router.push(getProductEditHref(product.id));
     }, [router]);
 
+    // La tarjeta solo avisa de la intención; borrar es irreversible, así que
+    // antes de llamar al servicio se pide confirmación.
     const handleDeleteProduct = React.useCallback((product: Product) => {
-        // Pedir confirmación aquí antes de llamar al servicio: la tarjeta solo
-        // avisa de la intención, borrar es irreversible.
-        void product;
+        setDeleteTarget(product);
+        setIsDeleteOpen(true);
     }, []);
+
+    // El diálogo se cierra cuando el backend responde, no antes, para que el
+    // botón muestre que está trabajando.
+    const handleDeleteConfirm = async () => {
+        if (!deleteTarget) return;
+
+        try {
+            await deleteProduct.mutateAsync(deleteTarget.id);
+            setIsDeleteOpen(false);
+        } catch {
+            // El aviso del error ya lo muestra la caché de mutaciones. El
+            // diálogo se queda abierto para poder reintentar.
+        }
+    };
 
     const handleRetry = () => {
         void products.fetchNextPage();
@@ -128,8 +150,22 @@ export default function Products() {
                     onRetry={handleRetry}
                     itemLabel={COPY.itemLabel}
                 />
-
             </section>
+
+            {deleteTarget && (
+                <ConfirmDialog
+                    open={isDeleteOpen}
+                    onOpenChange={setIsDeleteOpen}
+                    title={COPY.delete.title}
+                    description={formatMessage(COPY.delete.description, {
+                        name: deleteTarget.name,
+                    })}
+                    confirmLabel={COPY.delete.confirm}
+                    cancelLabel={COPY.delete.cancel}
+                    onConfirm={handleDeleteConfirm}
+                    loading={deleteProduct.isPending}
+                />
+            )}
         </div>
     );
 };

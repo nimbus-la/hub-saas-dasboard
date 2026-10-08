@@ -38,6 +38,14 @@ export const components = {
     },
 
 
+    /* ── Espera ─────────────────────────────────────────────────────────── */
+
+    globalLoader: {
+        /** Para la mutación que no dice qué está haciendo. */
+        fallback: "Procesando…",
+    },
+
+
     /* ── Formularios ────────────────────────────────────────────────────── */
 
     textField: {

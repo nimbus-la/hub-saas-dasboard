@@ -285,6 +285,15 @@ export const employees = {
         phoneChars: "El teléfono solo admite números, espacios y los signos + ( ) -",
     },
 
+    /* ── Espera ─────────────────────────────────────────────────────────── */
+
+    /** Lo que dice el loader global mientras el servidor responde. */
+    pending: {
+        create: "Creando empleado…",
+        update: "Guardando cambios…",
+        delete: "Eliminando empleado…",
+    },
+
     /* ── Borrado ────────────────────────────────────────────────────────── */
 
     delete: {

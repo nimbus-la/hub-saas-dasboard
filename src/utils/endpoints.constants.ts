@@ -47,6 +47,9 @@ export const ENDPOINTS = {
      */
     PRODUCTS_UPDATE: "products/update",
 
+    /** Baja de un producto. Como en la edición, el id viaja en el cuerpo. */
+    PRODUCTS_DELETE: "products/delete",
+
     /**
      * Categorías de producto.
      *

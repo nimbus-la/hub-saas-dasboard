@@ -113,6 +113,13 @@ export const Z_INDEX = {
      * un modal— tiene que taparlo, no esconderse debajo.
      */
     dropdown: 70,
+    /**
+     * Loader global de las mutaciones. Tapa modales y desplegables porque
+     * bloquea la pantalla entera mientras el servidor responde, pero queda
+     * debajo de los avisos: el de éxito o error tiene que leerse mientras el
+     * velo se retira.
+     */
+    loader: 75,
     /** Notificaciones. */
     toast: 80,
     /** Tooltips: siempre lo último. */
@@ -128,6 +135,7 @@ export const Z_INDEX_CLASS = {
     drawer: "z-50",
     modal: "z-[60]",
     dropdown: "z-[70]",
+    loader: "z-[75]",
     toast: "z-[80]",
     tooltip: "z-[90]",
 } as const;

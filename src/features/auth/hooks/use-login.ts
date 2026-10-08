@@ -28,29 +28,24 @@ export function useLogin(redirectTo: string) {
   return useMutation({
     mutationFn: (credentials: LoginCredentials) => service.login(credentials),
 
-    // Cada intento abre su propio aviso y lo convierte en su resultado. Como
-    // el id es nuevo en cada intento, los errores de intentos distintos se
-    // apilan en vez de pisarse.
-    onMutate: () => ({ alertId: notify.loading(texts.submitting) }),
-
-    onSuccess: (envelope, _credentials, context) => {
-      notify.success(resolveApiAlert(envelope)?.message ?? texts.success, { id: context.alertId });
+    onSuccess: (envelope) => {
+      notify.success(resolveApiAlert(envelope)?.message ?? texts.success);
 
       startSession(toSession(envelope.content));
       router.replace(redirectTo);
     },
 
-    onError: (error, _credentials, context) => {
+    onError: (error) => {
       const message = isHttpError(error) && error.isUnauthorized
         ? error.apiMessage ?? texts.invalidCredentials
         : getApiErrorMessage(error);
 
-      // Sin contexto no llegó a abrirse el aviso de carga; el error sale solo.
-      notify.error(message, context ? { id: context.alertId } : {});
+      notify.error(message);
     },
 
-    // Los avisos de esta mutación los lleva el hook de principio a fin: si la
-    // caché pusiera los suyos, saldrían duplicados junto al de carga.
-    meta: { alertOnError: false, alertOnSuccess: false },
+    // La espera la enseña el loader global, como en el resto del panel. Los
+    // avisos de éxito y error los pone el hook porque el 401 aquí no es una
+    // sesión caducada sino credenciales malas, y necesita su propio texto.
+    meta: { alertOnError: false, alertOnSuccess: false, loadingMessage: texts.submitting },
   })
 }
