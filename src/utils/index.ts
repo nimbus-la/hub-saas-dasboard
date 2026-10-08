@@ -6,4 +6,5 @@ export * from './http.constants';
 export * from './menu.utils';
 export * from './query.constants';
 export * from './session.constants';
+export * from './session.utils';
 export * from './validation.utils';

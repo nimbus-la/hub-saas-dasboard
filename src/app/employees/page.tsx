@@ -6,7 +6,7 @@ import { connection } from "next/server";
 
 import Employees from "@/features/employees/page/Employees";
 import { createEmployeesService, employeesQueryOptions } from "@/features/employees/services/employees.service";
-import { httpClient } from "@/lib/http";
+import { createServerHttpClient } from "@/lib/http/server-http-client";
 import { getQueryClient } from "@/lib/query/query-client";
 
 export const metadata: Metadata = messages.employees.metadata.list;
@@ -37,14 +37,15 @@ export default async function EmployeesPage() {
     // del servidor: uno compartido sería una caché común a todos los usuarios
     // que atiende el proceso.
     const queryClient = getQueryClient();
+    const http = await createServerHttpClient();
 
     /*
      * El listado se pide aquí, antes de mandar nada al navegador, para que la
      * tabla llegue pintada en el HTML en lugar de aparecer vacía y rellenarse
      * después.
      *
-     * El servicio se construye con el `httpClient` del servidor —el que se
-     * importa directamente, no el del contexto de React— y con la paginación
+     * El servicio se construye con el cliente del servidor, firmado con la
+     * sesión de quien pide la página —no el del contexto de React— y con la paginación
      * por defecto de `employeesQueryOptions`, que es la misma que usa el hook
      * en su primer render. Si no coincidieran, la clave de caché sería otra y
      * la precarga no serviría de nada.
@@ -54,7 +55,7 @@ export default async function EmployeesPage() {
      * renderiza igual y el navegador reintenta por su cuenta.
      */
     await queryClient.prefetchQuery(
-        employeesQueryOptions(createEmployeesService(httpClient))
+        employeesQueryOptions(createEmployeesService(http))
     );
 
     /*

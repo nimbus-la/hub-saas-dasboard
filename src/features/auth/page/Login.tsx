@@ -1,12 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 
 import { ICON_TOKENS } from "@/tokens";
 import { messages } from "@/messages";
-import { useLogin } from "../hooks";
-import { LoginCredentials } from "../interfaces";
+import { useDiscardStaleSession, useLogin } from "../hooks";
+import { LoginCredentials, LoginPageProps } from "../interfaces";
 import { LoginForm } from "../components";
 
 import {
@@ -30,18 +29,16 @@ const LOGO_SIZE = 28;
 
 const authMessages = messages.auth;
 
-export default function Login() {
-  const { mutate: login, isPending } = useLogin();
+export default function Login({ redirectTo }: LoginPageProps) {
+  const { mutateAsync: login } = useLogin(redirectTo);
+
+  useDiscardStaleSession();
 
   return (
     <main className={loginPageVariants()}>
       <div className={loginPageCardVariants()}>
         {/* Logo */}
-        <Link
-          href="/"
-          aria-label="Vorea — ir al inicio"
-          className={loginPageBrandVariants()}
-        >
+        <div className={loginPageBrandVariants()}>
           <ICON_TOKENS.FLAME
             size={LOGO_SIZE}
             aria-hidden="true"
@@ -49,12 +46,14 @@ export default function Login() {
             stroke="var(--color-primary-main)"
           />
 
-          <span className={loginPageBrandNameVariants()}>Vorea</span>
-        </Link>
+          <span className={loginPageBrandNameVariants()}>
+            {messages.navigation.app.name}
+          </span>
+        </div>
 
         {/* Formulario */}
         <section className={loginPageFormSectionVariants()}>
-          <LoginForm onSubmit={(credentials: LoginCredentials) => login(credentials)} isPending={isPending} />
+          <LoginForm onSubmit={(credentials: LoginCredentials) => login(credentials)} />
         </section>
 
         {/* Panel visual */}

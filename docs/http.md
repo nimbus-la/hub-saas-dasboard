@@ -52,16 +52,18 @@ fetch
       │                    y traduce cualquier fallo a HttpError
       └── EnvelopeHttpClient   abre el sobre del backend y convierte un
           │                    código de fallo en un error lanzado
-          └── httpClient       la instancia compartida (lib/http/index.ts)
-              │
-              ├── servicio      qué ruta y qué verbo usa cada operación,
-              │   + mapper      y traduce la respuesta al dominio
-              │
-              ├── queryOptions  clave de caché + función de consulta
-              │
-              └── hook          estado de pantalla: filtros, página, mutaciones
+          └── AuthHttpClient   solo en el navegador: ante un 401 renueva la
+              │                sesión y repite la petición una vez
+              └── httpClient   la instancia compartida (lib/http/http-client.ts)
                   │
-                  └── pantalla  composición y diálogos
+                  ├── servicio      qué ruta y qué verbo usa cada operación,
+                  │   + mapper      y traduce la respuesta al dominio
+                  │
+                  ├── queryOptions  clave de caché + función de consulta
+                  │
+                  └── hook          estado de pantalla: filtros, página, mutaciones
+                      │
+                      └── pantalla  composición y diálogos
 ```
 
 En paralelo, la caché de TanStack Query enruta errores y éxitos hacia los
@@ -160,8 +162,10 @@ const { content } = await http.get<Category[]>(ENDPOINTS.PRODUCTS_CATEGORY);
 Depende de dónde estés, y no es intercambiable:
 
 ```ts
-// Server Component o Server Action
-import { httpClient } from "@/lib/http";
+// Server Component o Server Action: uno por petición, con la sesión de quien
+// pide la página. Va fuera del barril porque importa `next/headers`.
+import { createServerHttpClient } from "@/lib/http/server-http-client";
+const http = await createServerHttpClient();
 
 // Componente o hook de cliente
 import { useHttpClient } from "@/context";
@@ -175,10 +179,11 @@ caer al cliente compartido, para que un componente fuera del proveedor falle a
 la primera en vez de saltarse el doble en las pruebas.
 
 Nadie más instancia un cliente. El único punto de composición es
-`src/lib/http/index.ts`; ahí se apilan los decoradores y ahí entrarían los que
-faltan (`AuthHttpClient`, `LoggingHttpClient`). También es ahí donde se pone el
-`Authorization` de cada petición, así que ningún servicio ni pantalla toca el
-token.
+`createHttpClient`, en `src/lib/http/http-client.ts`: ahí se apilan los
+decoradores y ahí entraría el que falta (`LoggingHttpClient`).
+`createServerHttpClient` no es otra composición: llama a la misma fábrica y solo
+le añade la cookie de la visita. Ningún servicio ni pantalla toca la sesión; ver
+[Sesión](#sesión).
 
 ### Las rutas
 
@@ -292,6 +297,125 @@ botón.
 
 ---
 
+## Sesión
+
+La sesión vive en dos cookies HttpOnly que pone el backend al iniciar sesión y
+que el panel nunca lee: `jwt_access`, que caduca en una hora, y `jwt_refresh`,
+que dura una semana. El transporte las manda con `credentials: "include"`, así
+que ningún servicio firma nada, y el backend saca de ellas el inquilino, así que
+ningún servicio manda `tenantId`.
+
+Lo que el panel sí guarda, en `localStorage` bajo `vorea-auth`, es el usuario y
+las dos fechas de caducidad (`src/store/auth/auth.store.ts`). El usuario porque
+el backend no tiene un "quién soy" y solo lo devuelve el login; las fechas para
+saber cuándo renovar sin preguntar.
+
+Que no haya nada guardado significa que no hay sesión. Por defecto, zustand
+conserva lo que tiene en memoria al rehidratar con el almacenamiento vacío, y
+eso resucitaba la sesión: si alguien vaciaba el `localStorage`, las demás
+pestañas seguían con el usuario y la siguiente renovación lo volvía a escribir.
+El `merge` del store lo cambia, y lo heredan todos los que rehidratan.
+
+| Pieza | Dónde | Qué hace |
+|---|---|---|
+| Proxy | `src/proxy.ts` | Deja pasar con cualquiera de las dos cookies; sin ninguna, manda a `/login?from=<ruta>` |
+| `useLogin` | `features/auth/hooks/` | Inicia sesión, guarda el usuario y entra a la ruta de `from` |
+| Gestor de sesión | `src/lib/auth/session-manager.ts` | `refreshSession`, `closeSession` y `expireSession` |
+| `AuthHttpClient` | `src/lib/http/` | Ante un 401, renueva y repite la petición una vez |
+| `useSessionRefresh` | `features/auth/hooks/` | Renueva un minuto antes de que caduque el acceso |
+| `useSessionSync` | `features/auth/hooks/` | Lleva los cambios de sesión de una pestaña a las demás |
+| `createServerHttpClient` | `src/lib/http/server-http-client.ts` | Precarga en el servidor con la cookie de acceso |
+
+### Entrar
+
+`app/login/page.tsx` lee `from` en el servidor y lo pasa por
+`resolvePostLoginHref` (`src/utils/session.utils.ts`), que solo acepta rutas
+internas del panel: un enlace a `/login?from=https://otro-sitio` no debe sacar
+a nadie del panel. No basta con mirar si empieza por `//` o `/\`: el navegador
+borra tabuladores y saltos de línea, así que `/\t/otro-sitio` acaba siendo
+`//otro-sitio`, y `/.//otro-sitio` normaliza a lo mismo. Por eso `from` se
+resuelve con `new URL` y se devuelve la ruta ya resuelta, no la que llegó. Lo
+demás cae a `DEFAULT_HOME_HREF`.
+
+El formulario recorta empresa y usuario, nunca la contraseña, y se bloquea con
+un candado propio mientras dura el envío, porque un doble clic llega antes de
+que el botón se deshabilite y abriría dos sesiones. Cada intento abre un aviso
+de carga que se convierte en el mensaje del backend o en el error.
+
+### Renovar
+
+Hay dos caminos, y los dos acaban en `refreshSession`:
+
+- **El temporizador** de `useSessionRefresh`, un minuto antes de
+  `accessExpiresAt`. Está apagado en `/login`: lo que haya guardado ahí es de
+  una sesión anterior, y renovarla la resucitaría con el formulario en pantalla.
+- **Un 401** en cualquier petición. `AuthHttpClient` va por fuera de
+  `EnvelopeHttpClient` porque este backend puede anunciar el 401 dentro de un
+  `200 OK`, y una capa colocada por dentro no lo vería. El login, el refresh y
+  el logout llevan `skipAuthRefresh`, para que su propio 401 no intente renovar.
+
+Renovar dos veces a la vez es peligroso: el backend rota `jwt_refresh` en cada
+uso y revoca la sesión entera si recibe una ya gastada. Por eso hay tres
+defensas: dentro de una pestaña se comparte la renovación en curso
+(`pendingRefresh`); entre pestañas, un Web Lock las pone en fila para que la
+segunda salga ya con la cookie nueva; y `useSessionSync` reprograma el
+temporizador de las demás en cuanto una renueva.
+
+Solo un 401 del refresh expulsa. Un timeout o un 503 son pasajeros: se ignoran
+y lo vuelve a intentar la siguiente petición que reciba un 401.
+
+### Salir
+
+| | Cuándo | A dónde |
+|---|---|---|
+| `closeSession` | El usuario pulsa "Cerrar sesión" | `/login` |
+| `expireSession` | El refresh da 401, o lo da una petición repetida con el token recién renovado, o hay cookies pero no usuario guardado | `/login?from=<ruta y query>` |
+
+Las dos pasan siempre por `POST /auth/logout`, incluso con la sesión ya caída:
+las cookies son HttpOnly y solo el backend puede borrarlas, y si `jwt_refresh`
+se quedara, el proxy devolvería al panel a quien acaba de salir. Después vacían
+el almacenamiento y navegan con una carga completa, no con el router, para
+tirar la caché de TanStack Query y no enseñarle al siguiente usuario nada del
+anterior. `closeSession` no recuerda la ruta porque quien entre después puede
+ser otra persona.
+
+Si el logout falla, no se toca nada. Vaciar el almacenamiento con las cookies
+todavía puestas dejaría un panel sin usuario al que el proxy deja pasar, y
+`useSessionRefresh` volvería a expulsar en bucle mientras el backend no
+conteste. `closeSession` deja que el error llegue a la mutación, que lo avisa;
+`expireSession` lo calla y lo vuelve a intentar con el siguiente 401.
+
+`useSessionSync` escucha el evento `storage`, que solo llega a las pestañas que
+no escribieron: si otra cerró sesión, ésta va al login; si otra la abrió
+mientras ésta estaba en el login, ésta va al panel. Hace lo mismo con
+`pageshow` cuando la página sale de la bfcache, porque ahí el navegador la
+restaura sin pasar por el proxy ni volver a montar nada.
+
+### En el servidor
+
+`createServerHttpClient()` reenvía solo `jwt_access`. No renueva: rotaría
+`jwt_refresh`, y un Server Component no puede devolverle la cookie nueva al
+navegador, que se quedaría con una gastada. Si el acceso caducó, `prefetchQuery`
+guarda el error en silencio, `dehydrate` no lo serializa y el navegador pide de
+nuevo tras renovar.
+
+Con `fetchQuery`, que sí lanza, un 401 hay que tratarlo a mano. Es el caso de
+la edición de producto, que necesita el producto para responder 404: un 401 lo
+deja "sin comprobar" y la pantalla va dentro de un `Suspense`, porque su
+`useSuspenseQuery` intentaría pedirlo en el render del servidor con el mismo
+acceso caducado y tumbaría la página entera.
+
+### Requisito de despliegue
+
+El proxy y la precarga ven la sesión porque el navegador manda las cookies del
+backend también al panel. En local funciona porque los dos están en `localhost`
+y las cookies no distinguen puertos. En producción, el backend tiene que
+emitirlas para un dominio que comparta con el panel —`api.vorea.co` y
+`app.vorea.co` con las cookies en `.vorea.co`—; si no, el proxy no verá nunca
+la sesión y mandará al login aunque el usuario la tenga.
+
+---
+
 ## Avisos
 
 ### Los automáticos
@@ -391,6 +515,18 @@ notify.neutral("Sucursal cambiada a Centro");
 
 notify.dismiss(id);   // retirar uno, o todos si no se pasa id
 ```
+
+Para algo que tarda, `notify.loading` abre un aviso con un círculo que gira, sin
+caducidad ni equis, y quien lo abrió lo convierte en su resultado repitiendo el
+`id` con otro tono:
+
+```ts
+const id = notify.loading("Guardando…");
+notify.success("Guardado", { id });   // o notify.error(…, { id })
+```
+
+Un `id` nuevo por operación hace que los resultados de operaciones seguidas se
+apilen; un `id` fijo los haría pisarse. Es lo que hace el login con cada intento.
 
 Es una función y no un hook porque un aviso se lanza casi siempre desde donde
 no hay render: el `onSuccess` de una mutación, un `catch`, un manejador de
@@ -614,9 +750,10 @@ export default async function CategoriesPage() {
     await connection();                     // se renderiza en cada petición
 
     const queryClient = getQueryClient();   // uno nuevo por render en servidor
+    const http = await createServerHttpClient();  // con la cookie de acceso
 
     await queryClient.prefetchQuery(
-        categoriesQueryOptions(createCategoriesService(httpClient))
+        categoriesQueryOptions(createCategoriesService(http))
     );
 
     return (
@@ -825,26 +962,20 @@ mientras no había red el dato pudo quedarse atrás sin que nadie se enterara.
 
 Cosas conocidas, para que no se descubran leyendo el código:
 
-**El token es provisional.** `createHttpClient` firma cada petición con
-`Authorization: Bearer <token>`, y el token sale de `getAccessToken`
-(`src/lib/auth/access-token.ts`), que hoy lee un JWT fijo de
-`NEXT_PUBLIC_API_ACCESS_TOKEN`. Cuando exista la sesión real se cambia esa
-función y nada más. El backend saca el inquilino del token, así que ningún
-servicio manda `tenantId`.
+**El backend no tiene un "quién soy".** El usuario solo llega en la respuesta
+del login y se guarda en el almacenamiento. Si se pierde con las cookies todavía
+vivas, no hay forma de recuperarlo y la sesión se da por caducada (ver
+[Sesión](#sesión)). Cuando exista ese endpoint, conviene pedir el usuario en vez
+de expulsar.
 
 **`detail` y `remove` no tienen consumidores.** Están implementados y tipados,
 pero ninguna pantalla los llama. El borrado de categorías tiene su diálogo
 montado y la llamada comentada en `Categories.tsx`, con el `TODO` a la vista.
 
-**Falta reaccionar a la sesión caducada.** Poner el token ya está resuelto, y
-el 401 ya no saca aviso (`HTTP_SILENT_STATUSES`); lo que falta es qué hacer
-ante él (renovar o sacar al usuario). Hasta entonces, un 401 no enseña nada.
-`AuthHttpClient` iría por fuera del decorador del sobre, porque este backend
-puede anunciar un 401 dentro de un `200 OK` y una capa colocada por dentro no lo
-vería. `LoggingHttpClient` iría por fuera de todo, que es el único punto que ve
-tanto los fallos de red como los que lanza el sobre.
+**Falta el registro de peticiones.** `LoggingHttpClient` iría por fuera de
+todo, también de `AuthHttpClient`, porque es el único punto que ve tanto los
+fallos de red como los que lanza el sobre.
 
-**El resto de módulos no está integrado.** `main-dashboard`, `cashier` y `login`
-leen los datos de ejemplo de `src/lib/*.ts`, que están escritos con el mismo
-shape que tendrá el servicio para que la sustitución sea un cambio de import.
-`features/login/hooks/use-login.ts` está vacío.
+**El resto de módulos no está integrado.** `main-dashboard` y `cashier` leen
+los datos de ejemplo de `src/lib/*.ts`, que están escritos con el mismo shape
+que tendrá el servicio para que la sustitución sea un cambio de import.

@@ -120,6 +120,28 @@ export const navbarUserRoleVariants = cva([
 
 
 /**
+ * Barras grises en el sitio del nombre y el rol mientras la sesión no ha
+ * llegado del almacenamiento. El servidor no puede pintar el nombre —solo ve
+ * cookies que no se leen—, y una barra que late dice "cargando" donde un hueco
+ * en blanco parece un fallo.
+ *
+ * Cada barra más su margen mide lo mismo que la línea que sustituye —20px el
+ * nombre, 18px el rol—, así que el texto real entra sin mover nada.
+ */
+export const navbarUserPlaceholderVariants = cva(
+    ["block bg-neutral-200 animate-pulse motion-reduce:animate-none", RADIUS_FULL_CLASS],
+    {
+        variants: {
+            line: {
+                name: "my-1 h-3 w-24",
+                role: "my-1 h-2.5 w-16",
+            },
+        },
+    }
+);
+
+
+/**
  * Selector de sucursal desplegado sobre la barra en móvil.
  *
  * Tapa la fila entera en vez de empujarla: con 360px de ancho no caben el

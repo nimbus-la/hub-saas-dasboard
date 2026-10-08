@@ -220,7 +220,9 @@ La frontera se cruza una sola vez, y hacia abajo no se propaga:
   directiva marca dónde empieza el árbol, no cada rama; ponerla en una pieza que
   solo recibe props y pinta no cambia nada y despista sobre quién manda.
 - **El cliente HTTP se coge distinto según dónde estés.** En un Server Component
-  o una Server Action se importa `httpClient` de `@/lib/http`; en un componente
+  o una Server Action se crea con `await createServerHttpClient()` de
+  `@/lib/http/server-http-client`, que reenvía la cookie de acceso del usuario;
+  en un componente
   o un hook se pide con `useHttpClient()` de `@/context`, que permite inyectar
   un doble en pruebas. Nadie instancia un cliente por su cuenta.
 
@@ -300,18 +302,19 @@ existe: ahí solo hay `libs/`.
 
 ## Estado real
 
-Solo `products` sigue lo que describe este documento. Los otros tres módulos son
-anteriores y cada uno eligió su propia forma:
+`products` y `auth` siguen lo que describe este documento. `auth` reemplazó al
+antiguo `login`, y su flujo de sesión está en `docs/http.md` → "Sesión". Los
+otros dos módulos son anteriores y cada uno eligió su propia forma:
 
-| | `cashier` | `login` | `main-dashboard` |
-|---|---|---|---|
-| Archivos | 29 | 5 | 19 |
-| Carpeta de página | `pages/` | `page/` | `page/` |
-| Carpeta de tipos | `types/` | `types/` | no tiene |
-| Datos | `data/` propio | ninguno | `@/lib/*` |
-| Estilos en `.style.ts` | no | uno, a medias | no |
-| Textos de `@/messages` | no | no | no |
-| Barriles | ninguno | ninguno | parciales |
+| | `cashier` | `main-dashboard` |
+|---|---|---|
+| Archivos | 29 | 19 |
+| Carpeta de página | `pages/` | `page/` |
+| Carpeta de tipos | `types/` | no tiene |
+| Datos | `data/` propio | `@/lib/*` |
+| Estilos en `.style.ts` | no | no |
+| Textos de `@/messages` | no | no |
+| Barriles | ninguno | parciales |
 
 `main-dashboard` es el más cercano: ya tiene la configuración de Chart.js fuera
 de los componentes, en `utils/charts/`, y el estado de la leyenda en un hook. Le
@@ -338,10 +341,7 @@ descubrir dos veces:
   filtros y paginación dentro de la pantalla, donde categorías tiene
   `useProductsCategories`.
 - **Código muerto**: `cashier/components/layout/CashierStatus.tsx` no lo importa
-  nadie, `login/hooks/use-login.ts` está vacío, `login/types/login.types.ts` no
-  se usa, y `main-dashboard/utils/index.ts` es un barril sin nada dentro.
-- **`src/app/page.tsx`** sigue siendo el andamio de Next, con un `<h1>Hola</h1>`.
-  La ruta real del panel es `/dashboard`.
+  nadie, y `main-dashboard/utils/index.ts` es un barril sin nada dentro.
 - **`src/components/ui/`** todavía tiene tres archivos de shadcn: `input.tsx`,
   que solo usa `cashier`, y `card.tsx` y `tabs.tsx`, que no usa nadie.
 

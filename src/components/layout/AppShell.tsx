@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { cx } from "class-variance-authority";
 
 import { useSidebarLayout } from "@/context";
-import { useSessionRefresh } from "@/features/auth/hooks";
+import { useSessionRefresh, useSessionSync } from "@/features/auth/hooks";
 import { LOGIN_HREF } from "@/utils";
 
 import Sidebar from "../sidebar/Sidebar";
@@ -15,10 +15,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     const { isCollapsed } = useSidebarLayout();
 
     const pathname = usePathname();
+    const isLogin = pathname === LOGIN_HREF;
 
-    useSessionRefresh();
+    useSessionRefresh(!isLogin);
+    useSessionSync();
 
-    if (pathname === LOGIN_HREF) {
+    if (isLogin) {
         return <>{children}</>;
     }
 

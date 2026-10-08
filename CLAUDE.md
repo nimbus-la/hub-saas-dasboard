@@ -25,8 +25,6 @@ algo por terminado.
 
 Variables de entorno: copia `.env.exam` a `.env`. `NEXT_PUBLIC_API_URL` es el
 origen del backend; `API_INTERNAL_URL` solo servidor y solo en producción;
-`NEXT_PUBLIC_API_ACCESS_TOKEN` es el JWT provisional que firma las peticiones
-hasta que exista la sesión real (lo lee `src/lib/auth/access-token.ts`);
 `NEXT_PUBLIC_PRODUCT_IMAGES_ORIGIN` es necesario para que Next optimice las
 fotos remotas de producto (sin él, las tarjetas caen a las iniciales).
 
@@ -60,8 +58,9 @@ módulos nuevos (`products`) siguen esa forma completa; `cashier` es más antigu
 
 Los datos de `src/lib/products.ts`, `ingredients.ts`, `recent-orders.ts`,
 `top-products.ts` y `branch-sales.ts` son **mocks en memoria** pensados para
-reemplazarse por servicios reales manteniendo el mismo shape. El único módulo
-conectado al backend hoy es categorías de producto.
+reemplazarse por servicios reales manteniendo el mismo shape. Conectados al
+backend hoy: `auth` y `products` (catálogo, categorías, alta y edición);
+`employees` tiene servicio, pero el backend todavía no expone su ruta.
 
 ### Capa HTTP: decoradores sobre fetch
 
@@ -74,9 +73,11 @@ conectado al backend hoy es categorías de producto.
   `aborted` · `parse` · `response`).
 - `EnvelopeHttpClient` — desenvuelve el protocolo del backend y convierte un
   `code` de fallo en un `HttpError` lanzado, incluso si llegó con HTTP 200.
-- `src/lib/http/index.ts` es el **único punto de composición**:
+- `AuthHttpClient` — solo en el navegador y por fuera del sobre (el 401 puede
+  venir dentro de un 200): ante un 401 renueva la sesión y repite una vez.
+- `src/lib/http/http-client.ts` es el **único punto de composición**:
   `createHttpClient()` apila los decoradores y exporta la instancia `httpClient`.
-  Las capas nuevas (logging, auth) se enchufan ahí y en ningún otro sitio.
+  Las capas nuevas (logging) se enchufan ahí y en ningún otro sitio.
 
 Todas las respuestas del backend viajan en un sobre (`{ code, status, message,
 content, httpStatus }`). `API_NON_FAILURE_CODES`, en `src/utils/http.constants.ts`,
@@ -85,12 +86,36 @@ página vacía, no un error.
 
 Cómo se consume el cliente:
 
-- Server Component o Server Action → importa `httpClient` de `@/lib/http`.
+- Server Component o Server Action → `await createServerHttpClient()` de
+  `@/lib/http/server-http-client` (fuera del barril: importa `next/headers`).
+  Crea un cliente por petición que reenvía la cookie `jwt_access` de quien pide
+  la página; el `httpClient` compartido sale anónimo y el backend responde 401.
 - Componente o hook cliente → `useHttpClient()` de `@/context`, que permite
   inyectar un doble en pruebas. Nadie instancia un cliente por su cuenta.
 
 Las rutas del backend salen siempre de `ENDPOINTS`
 (`src/utils/endpoints.constants.ts`), nunca escritas a mano en un servicio.
+
+### Sesión
+
+Cookies HttpOnly del backend (`jwt_access` 1 h, `jwt_refresh` 7 días) que el
+panel nunca lee; en `localStorage` (`vorea-auth`, `src/store/auth/`) solo el
+usuario y las fechas de caducidad. El flujo completo está en `docs/http.md`
+→ "Sesión". Lo que no hay que romper:
+
+- El proxy deja pasar con **cualquiera** de las dos cookies y escribe `from`
+  con `buildLoginHref`; el login lo valida con `resolvePostLoginHref`.
+- Toda renovación pasa por `refreshSession` del gestor
+  (`src/lib/auth/session-manager.ts`): comparte la que esté en curso y usa un
+  Web Lock entre pestañas, porque el backend revoca la sesión si recibe un
+  `jwt_refresh` ya rotado. Nada renueva en el servidor.
+- `closeSession` (el usuario sale, login sin `from`) y `expireSession` (la
+  sesión caducó, login con `from`) siempre llaman a `/auth/logout` y navegan con
+  carga completa.
+- `useSessionRefresh` y `useSessionSync` los monta `AppShell`; el primero va
+  apagado en `/login`.
+- Funciona porque backend y panel comparten dominio de cookies; en producción
+  hay que mantenerlo.
 
 ### Servicios y estado de servidor
 

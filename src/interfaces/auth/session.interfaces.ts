@@ -42,5 +42,9 @@ export interface AuthState extends StoredAuthSession {
 
 export interface SessionManager {
     refreshSession: () => Promise<void>;
+    /** El usuario cierra sesión: vuelve al login sin recordar dónde estaba. */
     closeSession: () => Promise<void>;
+
+    /** La sesión caducó: vuelve al login recordando la pantalla en `from`. */
+    expireSession: () => Promise<void>;
 }

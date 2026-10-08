@@ -1,3 +1,5 @@
+import { LoaderCircle } from "lucide-react";
+
 import type { AlertProps } from "@/interfaces";
 import { ICON_SIZE, ICON_STROKE, ICON_STROKE_BY_SIZE, ICON_TOKENS } from "@/tokens";
 import { ASSERTIVE_TONES, DEFAULT_ICON, MEDIA_SIZE } from "@/utils";
@@ -11,6 +13,7 @@ import {
     alertDescriptionVariants,
     alertMediaGlyphVariants,
     alertMediaShapeVariants,
+    alertMediaSpinnerVariants,
     alertMediaVariants,
     alertProgressVariants,
     alertTitleVariants,
@@ -60,6 +63,7 @@ export default function Alert({
     size = "md",
     icon,
     showIcon = true,
+    loading = false,
     actions,
     countdownMs = null,
     dismissible = true,
@@ -79,7 +83,9 @@ export default function Alert({
         <div
             role={
                 announce
-                    ? ASSERTIVE_TONES.includes(tone)
+                    // Lo que está en curso no interrumpe: se anuncia su
+                    // resultado, que sí puede ser un error.
+                    ? !loading && ASSERTIVE_TONES.includes(tone)
                         ? "alert"
                         : "status"
                     : undefined
@@ -97,7 +103,17 @@ export default function Alert({
                 className
             )}
         >
-            {showIcon && (
+            {showIcon && loading && (
+                <span aria-hidden="true" className={alertMediaVariants()}>
+                    <LoaderCircle
+                        size={MEDIA_SIZE[size]}
+                        strokeWidth={ICON_STROKE.light}
+                        className={alertMediaSpinnerVariants({ tone })}
+                    />
+                </span>
+            )}
+
+            {showIcon && !loading && (
                 <span aria-hidden="true" className={alertMediaVariants()}>
                     {/* Silueta de color. Sin trazo: solo la forma. */}
                     <Icon

@@ -47,6 +47,15 @@ export const auth = {
         submit: "Iniciar sesión",
         submitting: "Iniciando sesión...",
 
+        /** Cuando el backend confirma el acceso sin redactar un mensaje. */
+        success: "Sesión iniciada.",
+
+        validation: {
+            tenantSlugRequired: "Escribe el nombre de tu empresa.",
+            usernameRequired: "Escribe tu usuario.",
+            passwordRequired: "Escribe tu contraseña.",
+        },
+
         /**
          * Cuando el backend rechaza las credenciales sin redactar el motivo.
          * No dice cuál de los tres campos falló a propósito: decirlo ayudaría

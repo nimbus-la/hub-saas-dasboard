@@ -81,6 +81,16 @@ export interface AlertProps {
     showIcon?: boolean;
 
     /**
+     * ¿Hay algo en curso?
+     *
+     * Cambia el icono del medallón por un círculo que gira. Es para el aviso
+     * que dura lo que dura una petición y luego se convierte en su resultado
+     * —"Iniciando sesión…" que pasa a "Sesión iniciada"—, no para decorar uno
+     * normal.
+     */
+    loading?: boolean;
+
+    /**
      * Acciones del aviso: "Reintentar", "Deshacer", "Ver detalle".
      *
      * Van por props y no dentro de la descripción porque tienen sitio propio

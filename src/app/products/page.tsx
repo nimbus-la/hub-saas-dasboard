@@ -12,7 +12,7 @@ import {
     createProductsService,
     productsInfiniteQueryOptions,
 } from "@/features/products/services";
-import { httpClient } from "@/lib/http";
+import { createServerHttpClient } from "@/lib/http/server-http-client";
 import { getQueryClient } from "@/lib/query/query-client";
 
 export const metadata: Metadata = messages.products.metadata.list;
@@ -26,13 +26,14 @@ export default async function ProductsPage() {
     await connection();
 
     const queryClient = getQueryClient();
+    const http = await createServerHttpClient();
 
     // Las dos peticiones no dependen una de otra, así que van a la vez. Si
     // alguna falla, el navegador la vuelve a pedir al montar.
     await Promise.all([
-        queryClient.prefetchInfiniteQuery(productsInfiniteQueryOptions(createProductsService(httpClient))),
+        queryClient.prefetchInfiniteQuery(productsInfiniteQueryOptions(createProductsService(http))),
         queryClient.prefetchInfiniteQuery(
-            categoriesInfiniteQueryOptions(createCategoriesService(httpClient), ACTIVE_CATEGORY_FILTERS)
+            categoriesInfiniteQueryOptions(createCategoriesService(http), ACTIVE_CATEGORY_FILTERS)
         ),
     ]);
 

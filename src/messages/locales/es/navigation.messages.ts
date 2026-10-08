@@ -44,6 +44,7 @@ export const navigation = {
         selectBranch: "Seleccionar sucursal",
         closeBranchSelector: "Cerrar selector de sucursal",
         notifications: "Ver notificaciones",
+        logout: "Cerrar sesión",
     },
 
 

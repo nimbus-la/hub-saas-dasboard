@@ -36,7 +36,7 @@ export class AuthHttpClient extends BaseHttpClient {
                 // Un 401 con un token recién emitido sí significa que la sesión
                 // no vale. Cualquier otro fallo es de la petición —un 422, un
                 // 503— y cerrar la sesión por él sacaría al usuario sin motivo.
-                if (isHttpError(retryError) && retryError.isUnauthorized) void this.session.closeSession();
+                if (isHttpError(retryError) && retryError.isUnauthorized) void this.session.expireSession();
 
                 throw retryError;
             }
