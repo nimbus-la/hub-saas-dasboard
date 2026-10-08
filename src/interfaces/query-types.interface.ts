@@ -16,7 +16,7 @@ export type MutationAlertPolicy = QueryAlertPolicy & {
  *
  * Por defecto toda mutación lo enciende, porque es lo que evita dibujar un
  * "cargando" en cada botón. Se apaga solo cuando la pantalla ya enseña su
- * propia espera, como el login con su aviso de carga.
+ * propia espera.
  */
 export type MutationLoadingPolicy = {
     globalLoading?: boolean;

@@ -446,7 +446,7 @@ Lo que se puede declarar en `meta`:
 | `alertOnSuccess: true` | Avisa al terminar bien. Solo en mutaciones |
 | `alertOptions` | `NotifyOptions` para ese aviso: `duration`, `id`, `description`… |
 | `loadingMessage` | Texto del loader global mientras la mutación está en curso. Solo en mutaciones |
-| `globalLoading: false` | La mutación no enciende el loader global (el login, que lleva su propio aviso) |
+| `globalLoading: false` | La mutación no enciende el loader global, para la que ya enseña su propia espera |
 
 ### Loader global
 
@@ -548,7 +548,9 @@ notify.success("Guardado", { id });   // o notify.error(…, { id })
 ```
 
 Un `id` nuevo por operación hace que los resultados de operaciones seguidas se
-apilen; un `id` fijo los haría pisarse. Es lo que hace el login con cada intento.
+apilen; un `id` fijo los haría pisarse.
+
+Para la espera de una mutación no hace falta: la enseña el loader global.
 
 Es una función y no un hook porque un aviso se lanza casi siempre desde donde
 no hay render: el `onSuccess` de una mutación, un `catch`, un manejador de

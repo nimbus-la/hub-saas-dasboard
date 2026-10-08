@@ -45,7 +45,7 @@ export const auth = {
         },
 
         submit: "Iniciar sesión",
-        submitting: "Iniciando sesión...",
+        submitting: "Iniciando sesión…",
 
         /** Cuando el backend confirma el acceso sin redactar un mensaje. */
         success: "Sesión iniciada.",
