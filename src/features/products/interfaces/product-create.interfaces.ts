@@ -40,8 +40,11 @@ export interface CreateProductParams {
     /** Costo de preparar una porción, en texto decimal. */
     cost: string;
 
-    /** Parte del precio que es ganancia, de 0 a menos de 100. */
-    targetMargin: number;
+    /**
+     * Parte del precio que es ganancia, de 0 a menos de 100, en texto decimal
+     * como el precio y el costo.
+     */
+    targetMargin: string;
 
     // recipe: CreateProductRecipeLineParams[];
 }

@@ -15,8 +15,8 @@ export interface ProfitabilityInput {
 
 /**
  * Cuerpo de `POST products/profitability`. Todo viaja como texto numérico,
- * también el margen: como número el backend lo rechaza con 400, aunque el
- * alta sí lo pida así.
+ * también el margen: como número el backend lo rechaza con 400. Igual que en
+ * el alta y la edición.
  */
 export interface ProfitabilityParams {
     cost: string;

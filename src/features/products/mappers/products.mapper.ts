@@ -109,7 +109,7 @@ export const toCreateProductParams = (values: ProductFormValues): CreateProductP
         ...(description && { description }),
         price: String(values.price ?? 0),
         cost: String(values.cost ?? 0),
-        targetMargin: values.margin ?? 0,
+        targetMargin: String(values.margin ?? 0),
         // recipe: toRecipeParams(values.recipe),
     };
 };
