@@ -16,7 +16,23 @@ export const productPricingStepVariants = cva([
 ]);
 
 
-/** El margen y el precio, uno al lado del otro a partir de `md`. */
+/**
+ * Costo, precio y margen, uno debajo de otro.
+ *
+ * En columna y no en rejilla porque el bloque vive en la columna angosta del
+ * formulario, y porque el orden de lectura es el de la cuenta: lo que cuesta,
+ * a cuánto se vende y lo que queda.
+ */
+export const productPricingFieldsVariants = cva([
+    "flex flex-col",
+    SPACING_CLASS.gap.lg,
+]);
+
+
+/**
+ * El margen y el precio, uno al lado del otro a partir de `md`. Era el arreglo
+ * del paso 3 del asistente; queda para las sucursales cuando vuelvan.
+ */
 export const productPricingGridVariants = cva([
     "grid grid-cols-1 md:grid-cols-2",
     SPACING_CLASS.gap.lg,

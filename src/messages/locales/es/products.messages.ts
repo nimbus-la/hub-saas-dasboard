@@ -411,33 +411,59 @@ export const products = {
             /** Nombre del grupo de campos. No se ve: en pantalla lo da el indicador. */
             legend: "Precio y disponibilidad del producto",
 
-            /** Lo que costó preparar una unidad, traído del paso de la receta. */
+            /**
+             * Lo que cuesta preparar una porción. Lo escribe la persona: antes
+             * salía de la receta, y volverá a salir de ahí cuando regresen.
+             */
             cost: {
-                label: "Costo de la receta",
-                hint: "Lo que cuesta preparar una unidad con los insumos del paso anterior.",
+                label: "Costo de preparación",
+                placeholder: "Ej. 4.000",
+                helper: "Lo que cuesta preparar una porción: ingredientes, empaque y lo que uses.",
+                hint: "Lo que cuesta preparar una porción.",
             },
 
             margin: {
                 label: "Margen de ganancia",
-                placeholder: "Ej. 45",
-                helper: "Lo que se gana sobre el costo. Al escribirlo se calcula el precio de venta.",
-                /** Sin receta no hay costo sobre el que calcular nada. */
-                missingCost: "Vuelve al paso anterior y completa la receta para poder calcularlo.",
+                placeholder: "Ej. 60",
+                helper: "Parte del precio que te queda de ganancia. Al escribirlo se calcula el precio.",
+                /** Sin costo no hay nada sobre lo que calcular el margen. */
+                missingCost: "Escribe primero el costo de preparación.",
             },
 
             price: {
                 label: "Precio de venta",
-                placeholder: "Ej. 12.000",
-                helper: "Lo que paga el cliente. Al escribirlo se recalcula el margen.",
+                placeholder: "Ej. 10.000",
+                helper: "Lo que paga el cliente. Al escribirlo se calcula el margen.",
+                missingCost: "Escribe primero el costo de preparación.",
             },
 
             profit: {
                 label: "Ganancia por unidad",
-                hint: "Lo que queda de cada unidad vendida después de pagar los insumos.",
+                hint: "Lo que queda de cada venta después de pagar el costo.",
                 /** Reemplaza al `hint` cuando ya hay margen: dice a cuánto equivale. */
-                margin: "Equivale a un margen de {margin} sobre el costo.",
+                margin: "Es el {margin} del precio de venta.",
                 pending: "Indica el margen o el precio para calcular la ganancia.",
             },
+
+            /**
+             * Los dos indicadores que acompañan al margen. Los calcula el
+             * backend junto con el precio.
+             */
+            foodCost: {
+                label: "Costo sobre el precio",
+                hint: "Parte del precio que se va en preparar el producto.",
+            },
+
+            markup: {
+                label: "Recargo sobre el costo",
+                hint: "Cuánto se le subió al costo para llegar al precio.",
+            },
+
+            /** Mientras el backend responde al último cambio. */
+            calculating: "Calculando…",
+
+            /** Título del aviso cuando el backend no pudo calcular; el detalle es su mensaje. */
+            calculationError: "No se pudo calcular el precio",
 
             /**
              * El desglose que cierra el paso.
@@ -453,17 +479,19 @@ export const products = {
             total: {
                 label: "Precio de venta",
                 hint: "Sale de sumar el costo y la ganancia.",
+                pendingBreakdown: "Escribe el costo y el margen o el precio para verlo.",
                 pending: "Escribe el margen o el precio para verlo.",
             },
 
             /**
-             * Vender por debajo del costo avisa pero no bloquea: un plato
-             * gancho o una promoción son decisiones legítimas.
+             * El backend no acepta un margen de cero o menos, así que vender
+             * por debajo del costo ya no es una decisión posible: el aviso
+             * explica por qué no se puede guardar.
              */
             belowCostNotice: {
-                title: "El precio está por debajo del costo",
+                title: "El precio no cubre el costo",
                 description:
-                    "Cada unidad vendida pierde {amount}. Si es a propósito puedes continuar.",
+                    "Cada unidad vendida perdería {amount}. Sube el precio o el margen para poder guardar.",
             },
 
             availability: {
@@ -530,8 +558,15 @@ export const products = {
                 priceMin: "El precio tiene que ser mayor que 0.",
                 priceMax: "El precio no puede pasar de {max}.",
 
-                marginMin: "El margen no puede bajar de {min} %.",
-                marginMax: "El margen no puede pasar de {max} %.",
+                costRequired: "Indica cuánto cuesta preparar una porción.",
+                costMin: "El costo tiene que ser mayor que 0.",
+                costMax: "El costo no puede pasar de {max}.",
+
+                priceAboveCost: "El precio tiene que ser mayor que el costo de preparación.",
+
+                marginRequired: "Indica el margen o el precio de venta.",
+                marginMin: "El margen tiene que ser mayor que {min} %.",
+                marginMax: "El margen tiene que ser menor que {max} %.",
 
                 branchPriceRequired: "Indica el precio de {name} o deja que herede el global.",
                 branchPriceMin: "El precio de {name} tiene que ser mayor que 0.",

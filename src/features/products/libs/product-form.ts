@@ -69,7 +69,7 @@ export const PRICING_STEP: ProductFormStep = {
     id: "pricing",
     title: message.steps.pricing.label,
     subtitle: message.steps.pricing.hint,
-    fields: ["margin", "price", "isAvailable", "branches"]
+    fields: ["cost", "price", "margin", "isAvailable", "branches"]
 }
 
 
@@ -83,9 +83,14 @@ export const RECIPE_STEP: ProductFormStep = {
 
 
 
+/**
+ * La receta sale del recorrido porque el backend ya no la recibe: su regla de
+ * "al menos un insumo" dejaría el formulario sin poder guardarse. Vuelve en
+ * medio de los otros dos cuando regresen las recetas.
+ */
 export const PRODUCT_FORM_STEPS: readonly ProductFormStep[] = [
     BASICS_STEP,
-    RECIPE_STEP,
+    // RECIPE_STEP,
     PRICING_STEP,
 ]
 

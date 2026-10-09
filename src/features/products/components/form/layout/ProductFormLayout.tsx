@@ -11,6 +11,7 @@ import { messages } from "@/messages";
 import { ICON_TOKENS } from "@/tokens";
 
 import { useProductForm } from "../../../hooks/use-product-form";
+import { useProductPrice } from "../../../hooks/use-product-price";
 import type { ProductFormLayoutProps } from "../../../interfaces";
 import { PRODUCTS_LIST_HREF, PRODUCT_FORM_STEPS } from "../../../libs";
 import { ProductBasicsStep } from "../basics";
@@ -54,6 +55,22 @@ export default function ProductFormLayout({
         goToPreviousStep,
     } = useProductForm(options);
 
+    // Va aquí y no dentro del bloque de precio porque, además de pintarse
+    // allí, decide si se puede guardar: mientras el backend no responda al
+    // último cambio, o si no pudo calcular, precio y margen no cuadran y el
+    // alta los rechazaría.
+    const pricing = useProductPrice(form);
+    const isPricingSettled = !pricing.isCalculating && !pricing.errorMessage;
+
+    const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
+        if (isLastStep && !isPricingSettled) {
+            event.preventDefault();
+            return;
+        }
+
+        void submitStep(event);
+    };
+
     const bodyRef = React.useRef<HTMLDivElement>(null);
     const previousStepIndex = React.useRef(stepIndex);
 
@@ -81,7 +98,7 @@ export default function ProductFormLayout({
                 aparecen de uno en uno y no se pueden estilar. */}
                 <form
                     noValidate
-                    onSubmit={submitStep}
+                    onSubmit={handleSubmit}
                     className={productFormPanelVariants()}
                 >
                     <ProductFormStepper
@@ -99,7 +116,7 @@ export default function ProductFormLayout({
                             <ProductBasicsStep currentCategory={currentCategory} />
                         )}
                         {step.id === "recipe" && (<ProductRecipeStep />)}
-                        {step.id === "pricing" && (<ProductPricingStep />)}
+                        {step.id === "pricing" && (<ProductPricingStep pricing={pricing} />)}
                     </div>
 
                     <footer className={productFormFooterVariants()}>
@@ -140,7 +157,7 @@ export default function ProductFormLayout({
                                         ? formMessages.submit
                                         : messages.common.actions.continue
                                 }
-                                disabled={!canSubmit}
+                                disabled={!canSubmit || (isLastStep && !isPricingSettled)}
                                 {...(!isLastStep && { endIcon: ICON_TOKENS.NEXT })}
                             />
                         </div>
