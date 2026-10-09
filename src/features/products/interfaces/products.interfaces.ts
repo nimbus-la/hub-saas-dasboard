@@ -39,12 +39,22 @@ export interface ProductFormValues {
     categoryId: string;
     description: string;
     imageUrl: File | null;
-    /** Precio de venta global, en pesos enteros. */
+    /** Lo que cuesta preparar una porción. Lo escribe la persona. */
+    cost: number | null;
+    /** Precio de venta global, en pesos. */
     price: number | null;
-    /** Margen sobre el costo de la receta, en porcentaje. */
+    /**
+     * Parte del precio que es ganancia, en porcentaje de 0 a menos de 100.
+     * Es sobre el precio, como lo mide el backend, y no sobre el costo.
+     */
     margin: number | null;
     /** Si el producto se publica en la carta. Cada sucursal puede cambiarlo. */
     isAvailable: boolean;
+    /**
+     * Estacionados: la receta y las sucursales no se piden ni se envían. Se
+     * quedan en el formulario con sus valores por defecto para que sus piezas
+     * sigan compilando y vuelvan sin rehacerlas.
+     */
     recipe: ProductRecipeFormValues[];
     branches: ProductBranchFormValues[];
 }
@@ -92,6 +102,13 @@ export interface ProductFormLayoutProps extends ProductFormOptions {
      * el selector necesita la etiqueta, que puede no estar entre las cargadas.
      */
     currentCategory?: InputSelectorOption | undefined;
+
+    /**
+     * Muestra el interruptor de disponibilidad. Solo lo usa la edición: un
+     * producto nuevo se crea a la venta, y apagarlo es algo que se decide
+     * después, sobre uno que ya existe.
+     */
+    showAvailability?: boolean | undefined;
 }
 
 

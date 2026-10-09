@@ -1,6 +1,6 @@
 import { cva } from "class-variance-authority";
 
-import { RADIUS_SEMANTIC, SPACING_CLASS, TYPOGRAPHY } from "@/tokens";
+import { DURATION_CLASS, EASING_CLASS, RADIUS_SEMANTIC, SPACING_CLASS, TYPOGRAPHY } from "@/tokens";
 
 
 /** Contenedor del aviso y el desglose. */
@@ -24,6 +24,13 @@ export const pricingBreakdownVariants = cva([
 ]);
 
 
+/** El rótulo y, a su derecha, el aviso de que se está calculando. */
+export const pricingBreakdownHeaderVariants = cva([
+    "flex items-baseline justify-between",
+    SPACING_CLASS.gap.sm,
+]);
+
+
 /** Rótulo del bloque. Va en overline para no competir con las cifras. */
 export const pricingBreakdownTitleVariants = cva([
     "text-neutral-600",
@@ -31,8 +38,34 @@ export const pricingBreakdownTitleVariants = cva([
 ]);
 
 
-/** Las filas, una debajo de otra. */
-export const pricingRowsVariants = cva(["flex flex-col", SPACING_CLASS.gap.md]);
+/** "Calculando…", discreto: es un estado de paso, no un resultado. */
+export const pricingCalculatingVariants = cva([
+    "text-neutral-600",
+    TYPOGRAPHY.caption,
+]);
+
+
+/**
+ * Las filas, una debajo de otra.
+ *
+ * Mientras llega el cálculo nuevo se atenúan: siguen siendo legibles, pero no
+ * se leen como el resultado de lo que se acaba de escribir. Solo cambia la
+ * opacidad, así que nada se mueve de sitio.
+ */
+export const pricingRowsVariants = cva(
+    [
+        "flex flex-col transition-opacity motion-reduce:transition-none",
+        DURATION_CLASS.fast,
+        EASING_CLASS.out,
+        SPACING_CLASS.gap.md,
+    ],
+    {
+        variants: {
+            stale: { true: "opacity-60", false: "opacity-100" },
+        },
+        defaultVariants: { stale: false },
+    }
+);
 
 
 /**
@@ -79,8 +112,11 @@ export const pricingRowHintVariants = cva([TYPOGRAPHY.caption], {
 /**
  * Las cifras. Van en ancho fijo porque cambian con cada tecla y si no, el
  * importe baila de lado mientras se escribe.
+ *
+ * `ms-auto` las deja contra el borde derecho también cuando la fila no cabe y
+ * la cifra baja a su propia línea, que en móvil pasa con casi todas.
  */
-export const pricingAmountVariants = cva(["shrink-0 tabular-nums"], {
+export const pricingAmountVariants = cva(["ms-auto shrink-0 tabular-nums"], {
     variants: {
         tone: {
             neutral: "text-neutral-800",
@@ -88,7 +124,7 @@ export const pricingAmountVariants = cva(["shrink-0 tabular-nums"], {
             success: "text-success-darker",
             error: "text-error-darker",
         },
-        size: { md: TYPOGRAPHY.h4, lg: TYPOGRAPHY.h3 },
+        size: { sm: TYPOGRAPHY.subtitleLg, md: TYPOGRAPHY.h4, lg: TYPOGRAPHY.h3 },
     },
     defaultVariants: { tone: "neutral", size: "md" },
 });
@@ -100,7 +136,13 @@ export const pricingAmountVariants = cva(["shrink-0 tabular-nums"], {
  * Se limita el ancho para que la frase no empuje al concepto contra el borde
  * izquierdo cuando la fila cabe en una sola línea.
  */
-export const pricingAmountPendingVariants = cva([
-    "max-w-xs text-right text-neutral-600",
-    TYPOGRAPHY.caption,
-]);
+export const pricingAmountPendingVariants = cva(
+    ["max-w-xs text-neutral-600", TYPOGRAPHY.caption],
+    {
+        variants: {
+            /** `start` cuando ocupa el lugar de todo el desglose y no de una cifra. */
+            align: { end: "text-right", start: "text-left" },
+        },
+        defaultVariants: { align: "end" },
+    }
+);

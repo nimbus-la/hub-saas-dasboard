@@ -2,13 +2,14 @@
 
 import { Controller, useFormContext } from "react-hook-form";
 
-import { InputSelector, TextAreaField, TextField } from "@/components";
+import { InputSelector, Switch, TextAreaField, TextField } from "@/components";
 import type { InputSelectorOption } from "@/interfaces";
 import { cn } from "@/lib/utils";
 import { messages } from "@/messages";
 
 import ProductImageField from "./ProductImageField";
 import {
+    productBasicsAvailabilityVariants,
     productBasicsFullRowVariants,
     productBasicsGridVariants,
     productBasicsStepVariants,
@@ -32,14 +33,18 @@ import { PRODUCT_FORM_RULES, PRODUCT_VALIDATION } from "../../../libs";
 interface ProductBasicsStepProps {
     /** La categoría que ya tiene el producto, para que el selector la nombre al editar. */
     currentCategory?: InputSelectorOption | undefined;
+    /** Muestra el interruptor de disponibilidad. Solo al editar. */
+    showAvailability?: boolean | undefined;
     className?: string;
 }
 
 export default function ProductBasicsStep({
     currentCategory,
+    showAvailability = false,
     className,
 }: ProductBasicsStepProps) {
     const stepMessaages = messages.products.create.basics;
+    const availabilityMessages = messages.products.create.pricing.availability;
 
     const { control } = useFormContext<ProductFormValues>();
 
@@ -48,7 +53,7 @@ export default function ProductBasicsStep({
     return (
         // El `fieldset` agrupa los campos del paso y la leyenda le pone nombre
         // al grupo para quien navega con lector de pantalla. No se ve porque en
-        // pantalla ese nombre ya lo da el indicador de la cabecera.
+        // pantalla ese nombre ya lo da el título de la tarjeta.
         <fieldset className={cn(productBasicsStepVariants(), className)}>
             <legend className="sr-only">{stepMessaages.legend}</legend>
 
@@ -131,6 +136,30 @@ export default function ProductBasicsStep({
                     />
                 )}
             />
+
+            {/* Solo al editar: al crear, el producto sale a la venta y el campo
+                se queda en su valor por defecto. No lleva reglas: las dos
+                opciones son válidas. */}
+            {showAvailability && (
+                <Controller
+                    control={control}
+                    name="isAvailable"
+                    render={({ field }) => (
+                        <Switch
+                            name={field.name}
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            label={availabilityMessages.label}
+                            description={
+                                field.value
+                                    ? availabilityMessages.on
+                                    : availabilityMessages.off
+                            }
+                            className={productBasicsAvailabilityVariants()}
+                        />
+                    )}
+                />
+            )}
         </fieldset>
     );
 };

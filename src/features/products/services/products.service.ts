@@ -3,8 +3,14 @@ import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 import type { ApiResponseWithPagination, HttpClient } from "@/interfaces";
 import { DEFAULT_PAGE_SIZE, FIRST_PAGE, emptyPage, getNextPageNumber } from "@/lib/pagination";
 import { ENDPOINTS, isUuid } from "@/utils";
-import type { ProductApiResponse, ProductFilters, ProductsService } from "../interfaces";
-import { toProductList } from "../mappers";
+import type {
+    ProductApiResponse,
+    ProductFilters,
+    ProductsService,
+    ProfitabilityApiResponse,
+    ProfitabilityInput,
+} from "../interfaces";
+import { toProductList, toProfitability, toProfitabilityParams } from "../mappers";
 
 /**
  * Peticiones al backend para el catálogo de productos. Igual que en
@@ -37,6 +43,8 @@ export const productKeys = {
     list: (filters: ProductFilters) => [...productKeys.lists(), filters] as const,
     details: () => [...productKeys.all, "products_detail"] as const,
     detail: (productId: string) => [...productKeys.details(), productId] as const,
+    profitability: (input: ProfitabilityInput) =>
+        [...productKeys.all, "products_profitability", input] as const,
 };
 
 
@@ -85,6 +93,19 @@ export function createProductsService(http: HttpClient): ProductsService {
 
         delete: (payload, config) =>
             http.delete(ENDPOINTS.PRODUCTS_DELETE, payload, config),
+
+        // Es un POST pero no guarda nada: solo calcula. Por eso se consume
+        // como consulta y no como mutación, y la caché sirve un cálculo que ya
+        // se pidió.
+        calculateProfitability: async (input, config) => {
+            const { content } = await http.post<ProfitabilityApiResponse>(
+                ENDPOINTS.PRODUCTS_PROFITABILITY,
+                toProfitabilityParams(input),
+                config
+            );
+
+            return toProfitability(content);
+        },
     };
 }
 
@@ -97,6 +118,22 @@ export function productDetailQueryOptions(service: ProductsService, productId: s
     return queryOptions({
         queryKey: productKeys.detail(productId),
         queryFn: ({ signal }) => service.getById(productId, { signal }),
+    });
+}
+
+
+/**
+ * El cálculo de rentabilidad de un costo con su precio o su margen.
+ *
+ * La cuenta es siempre la misma para los mismos datos, así que no caduca: si
+ * la persona vuelve a un valor que ya escribió, el resultado sale de la caché
+ * sin volver a preguntar.
+ */
+export function profitabilityQueryOptions(service: ProductsService, input: ProfitabilityInput) {
+    return queryOptions({
+        queryKey: productKeys.profitability(input),
+        queryFn: ({ signal }) => service.calculateProfitability(input, { signal }),
+        staleTime: Infinity,
     });
 }
 

@@ -36,9 +36,13 @@ export interface Product {
      * las iniciales del nombre en su lugar, nunca un hueco vacío.
      */
     image?: string;
-    price: number;              // precio de venta en COP (pesos enteros)
+    price: number;              // precio de venta en COP
     status: ProductStatus;
-    ingredientsCount: number;   // insumos que componen la receta
+    /**
+     * Insumos que componen la receta. Opcional mientras el backend no mande
+     * recetas; vuelve a ser obligatorio cuando regresen.
+     */
+    ingredientsCount?: number;
     /**
      * Aviso operativo que emite el servicio (ej. "Sin carne de res molida").
      *

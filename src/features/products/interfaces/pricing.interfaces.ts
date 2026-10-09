@@ -5,6 +5,8 @@ import type { Branch } from "@/lib/branches";
 import type { ProductFormValues } from "./products.interfaces";
 
 
+export type ProductCostRules = RegisterOptions<ProductFormValues, "cost">;
+
 export type ProductPriceRules = RegisterOptions<ProductFormValues, "price">;
 
 export type ProductMarginRules = RegisterOptions<ProductFormValues, "margin">;

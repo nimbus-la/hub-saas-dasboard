@@ -1,6 +1,6 @@
 import { cva } from "class-variance-authority";
 
-import { RADIUS_SEMANTIC, SPACING_CLASS, TYPOGRAPHY } from "@/tokens";
+import { SPACING_CLASS, TYPOGRAPHY } from "@/tokens";
 
 
 /**
@@ -16,25 +16,26 @@ export const productPricingStepVariants = cva([
 ]);
 
 
-/** El margen y el precio, uno al lado del otro a partir de `md`. */
-export const productPricingGridVariants = cva([
-    "grid grid-cols-1 md:grid-cols-2",
+/**
+ * Costo, precio y margen, uno debajo de otro.
+ *
+ * En columna y no en rejilla porque el bloque vive en la columna angosta del
+ * formulario, y porque el orden de lectura es el de la cuenta: lo que cuesta,
+ * a cuánto se vende y lo que queda.
+ */
+export const productPricingFieldsVariants = cva([
+    "flex flex-col",
     SPACING_CLASS.gap.lg,
 ]);
 
 
 /**
- * Caja de la disponibilidad global.
- *
- * Va sobre una superficie propia porque no es un campo más de la rejilla: es
- * la decisión de si el producto sale a la venta, y las sucursales de abajo la
- * heredan.
+ * El margen y el precio, uno al lado del otro a partir de `md`. Era el arreglo
+ * del paso 3 del asistente; queda para las sucursales cuando vuelvan.
  */
-export const productPricingAvailabilityVariants = cva([
-    "border border-neutral-200 bg-white",
-    RADIUS_SEMANTIC.surface,
-    SPACING_CLASS.paddingX.lg,
-    SPACING_CLASS.paddingY.md,
+export const productPricingGridVariants = cva([
+    "grid grid-cols-1 md:grid-cols-2",
+    SPACING_CLASS.gap.lg,
 ]);
 
 

@@ -6,6 +6,14 @@
 // El margen es sobre el costo: un 45 % sobre un costo de $8.400 da $12.180. Es
 // la cuenta que hace quien pone precios en una carta, y la que deja que el
 // precio suba solo cuando suben los insumos.
+//
+// Estacionado junto con la receta: hoy el margen es sobre el precio y la
+// cuenta la hace el backend (`products/profitability`), que es quien después
+// revisa que precio, costo y margen cuadren. Calcular aquí con otra fórmula
+// daría números que el alta rechaza. Estas funciones solo las usan el paso de
+// la receta y las sucursales, que no se montan; se dejan para cuando vuelvan,
+// y entonces hay que pasarlas a margen sobre el precio. Solo `hasCost` sigue
+// en uso.
 
 import { getBranch, type Branch } from "@/lib/branches";
 

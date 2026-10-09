@@ -140,6 +140,23 @@ const compactFormatter = new Intl.NumberFormat(LOCALE, {
 export const formatCurrency = (amount: number): string =>
     currencyFormatter.format(amount);
 
+const preciseCurrencyFormatter = new Intl.NumberFormat(LOCALE, {
+    style: "currency",
+    currency: CURRENCY,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+});
+
+/**
+ * Importe con centavos solo si los tiene: `$ 10.000` · `$ 1.492,54`.
+ *
+ * Para los montos que calcula el backend a partir de un margen. Redondearlos
+ * a pesos mostraría una cifra distinta a la que se guarda, y el backend
+ * rechaza el precio si no deja exactamente el margen pedido.
+ */
+export const formatCurrencyPrecise = (amount: number): string =>
+    preciseCurrencyFormatter.format(amount);
+
 /**
  * Importe abreviado para ejes de gráficas y métricas: `$ 850 K` · `$ 500 M`.
  *
