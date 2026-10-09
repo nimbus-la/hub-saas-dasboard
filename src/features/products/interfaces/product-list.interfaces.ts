@@ -3,6 +3,7 @@ import type { Product } from "@/lib/products";
 
 import type { CreateProductParams } from "./product-create.interfaces";
 import type { DeleteProductParams, UpdateProductParams } from "./product-update.interfaces";
+import type { Profitability, ProfitabilityInput } from "./profitability.interfaces";
 
 
 // El backend sacó las recetas del producto y con ellas se fueron los insumos de
@@ -137,4 +138,13 @@ export interface ProductsService {
         payload: DeleteProductParams,
         config?: HttpRequestConfig
     ): Promise<ApiEnvelope<null>>;
+
+    /**
+     * Calcula precio, margen y el resto de indicadores a partir del costo y
+     * del precio o el margen. No guarda nada.
+     */
+    calculateProfitability(
+        input: ProfitabilityInput,
+        config?: HttpRequestConfig
+    ): Promise<Profitability>;
 }

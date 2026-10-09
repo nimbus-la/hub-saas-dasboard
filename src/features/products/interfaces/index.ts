@@ -6,4 +6,5 @@ export * from './product-create.interfaces';
 export * from './product-list.interfaces';
 export * from './product-update.interfaces';
 export * from './products.interfaces';
+export * from './profitability.interfaces';
 export * from './recipe.interfaces';

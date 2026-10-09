@@ -38,8 +38,15 @@ export const ENDPOINTS = {
     /** Catálogo de productos. Pagina y filtra por texto, categoría y estado. */
     PRODUCTS: "products",
 
-    /** Alta de un producto con su receta. */
+    /** Alta de un producto. */
     PRODUCTS_CREATE: "products/create",
+
+    /**
+     * Cálculo de rentabilidad: con el costo y el precio o el margen devuelve
+     * el resto. No guarda nada; es la misma cuenta con la que el alta y la
+     * edición revisan que precio, costo y margen cuadren.
+     */
+    PRODUCTS_PROFITABILITY: "products/profitability",
 
     /**
      * Edición parcial de un producto. El id viaja en el cuerpo y no en la

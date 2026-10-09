@@ -9,6 +9,7 @@ export * from './use-product-detail';
 export * from './use-product-form';
 export * from './use-product-pricing';
 export * from './use-products';
+export * from './use-profitability';
 export * from './use-update-product';
 
 export * from './use-recipe-lines';
