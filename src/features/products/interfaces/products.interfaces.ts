@@ -102,6 +102,13 @@ export interface ProductFormLayoutProps extends ProductFormOptions {
      * el selector necesita la etiqueta, que puede no estar entre las cargadas.
      */
     currentCategory?: InputSelectorOption | undefined;
+
+    /**
+     * Muestra el interruptor de disponibilidad. Solo lo usa la edición: un
+     * producto nuevo se crea a la venta, y apagarlo es algo que se decide
+     * después, sobre uno que ya existe.
+     */
+    showAvailability?: boolean | undefined;
 }
 
 

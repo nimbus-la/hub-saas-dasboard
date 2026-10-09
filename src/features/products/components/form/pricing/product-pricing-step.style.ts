@@ -1,6 +1,6 @@
 import { cva } from "class-variance-authority";
 
-import { RADIUS_SEMANTIC, SPACING_CLASS, TYPOGRAPHY } from "@/tokens";
+import { SPACING_CLASS, TYPOGRAPHY } from "@/tokens";
 
 
 /**
@@ -36,21 +36,6 @@ export const productPricingFieldsVariants = cva([
 export const productPricingGridVariants = cva([
     "grid grid-cols-1 md:grid-cols-2",
     SPACING_CLASS.gap.lg,
-]);
-
-
-/**
- * Caja de la disponibilidad global.
- *
- * Va sobre una superficie propia porque no es un campo más de la rejilla: es
- * la decisión de si el producto sale a la venta, y las sucursales de abajo la
- * heredan.
- */
-export const productPricingAvailabilityVariants = cva([
-    "border border-neutral-200 bg-white",
-    RADIUS_SEMANTIC.surface,
-    SPACING_CLASS.paddingX.lg,
-    SPACING_CLASS.paddingY.md,
 ]);
 
 

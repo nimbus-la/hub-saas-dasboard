@@ -53,6 +53,7 @@ function EditProductForm({ product }: { product: ProductApiResponse }) {
             onSave={updateProduct.mutate}
             isSaving={updateProduct.isPending}
             requireChanges
+            showAvailability
             currentCategory={{
                 value: product.categoryId,
                 label: product.categoryName ?? "",

@@ -2,7 +2,7 @@
 
 import { Controller, useFormContext } from "react-hook-form";
 
-import { Alert, NumberField, Switch } from "@/components";
+import { Alert, NumberField } from "@/components";
 import { cn } from "@/lib/utils";
 import { messages } from "@/messages";
 
@@ -16,7 +16,6 @@ import { PRICING_RULES, PRICING_VALIDATION } from "../../../libs";
 // import BranchPricingList from "./BranchPricingList";
 import PricingSummary from "./PricingSummary";
 import {
-    productPricingAvailabilityVariants,
     productPricingFieldsVariants,
     productPricingStepVariants,
 } from "./product-pricing-step.style";
@@ -41,7 +40,8 @@ const pricingMessages = messages.products.create.pricing;
 export default function ProductPricingStep({ pricing, className }: ProductPricingStepProps) {
     const { control } = useFormContext<ProductFormValues>();
 
-    const { hasCost, errorMessage, onCostChange, onMarginChange, onPriceChange } = pricing;
+    const { hasCost, errorMessage, onCostChange, onMarginChange, onPriceChange, onCommit } =
+        pricing;
 
     return (
         <fieldset className={cn(productPricingStepVariants(), className)}>
@@ -61,7 +61,10 @@ export default function ProductPricingStep({ pricing, className }: ProductPricin
                             name={field.name}
                             value={field.value}
                             onChange={onCostChange}
-                            onBlur={field.onBlur}
+                            onBlur={() => {
+                                field.onBlur();
+                                onCommit();
+                            }}
                             disabled={field.disabled ?? false}
                             label={pricingMessages.cost.label}
                             required
@@ -85,7 +88,10 @@ export default function ProductPricingStep({ pricing, className }: ProductPricin
                             name={field.name}
                             value={field.value}
                             onChange={onPriceChange}
-                            onBlur={field.onBlur}
+                            onBlur={() => {
+                                field.onBlur();
+                                onCommit();
+                            }}
                             disabled={(field.disabled ?? false) || !hasCost}
                             label={pricingMessages.price.label}
                             required
@@ -113,7 +119,10 @@ export default function ProductPricingStep({ pricing, className }: ProductPricin
                             name={field.name}
                             value={field.value}
                             onChange={onMarginChange}
-                            onBlur={field.onBlur}
+                            onBlur={() => {
+                                field.onBlur();
+                                onCommit();
+                            }}
                             disabled={(field.disabled ?? false) || !hasCost}
                             label={pricingMessages.margin.label}
                             required
@@ -151,25 +160,8 @@ export default function ProductPricingStep({ pricing, className }: ProductPricin
 
             <PricingSummary pricing={pricing} />
 
-            {/* No lleva reglas: las dos opciones son válidas. */}
-            <Controller
-                control={control}
-                name="isAvailable"
-                render={({ field }) => (
-                    <Switch
-                        name={field.name}
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        label={pricingMessages.availability.label}
-                        description={
-                            field.value
-                                ? pricingMessages.availability.on
-                                : pricingMessages.availability.off
-                        }
-                        className={productPricingAvailabilityVariants()}
-                    />
-                )}
-            />
+            {/* La disponibilidad se mudó a la tarjeta de datos básicos, debajo
+                de la foto, y solo aparece al editar. */}
 
             {/* Los precios por sucursal no entran en el primer alcance. El
             backend ya tiene su servicio, pero el formulario todavía trabaja

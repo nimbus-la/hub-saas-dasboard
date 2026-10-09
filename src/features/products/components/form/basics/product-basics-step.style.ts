@@ -1,6 +1,6 @@
 import { cva } from "class-variance-authority";
 
-import { SPACING_CLASS } from "@/tokens";
+import { RADIUS_SEMANTIC, SPACING_CLASS } from "@/tokens";
 
 
 /**
@@ -36,3 +36,18 @@ export const productBasicsGridVariants = cva([
 
 /** Campo que ocupa la fila entera. */
 export const productBasicsFullRowVariants = cva(["md:col-span-2"]);
+
+
+/**
+ * Caja de la disponibilidad, debajo de la foto.
+ *
+ * Va sobre una superficie propia porque no es un campo más de la rejilla: es
+ * la decisión de si el producto se vende o no. Queda a la misma distancia de
+ * la foto que la foto de los campos, así la tarjeta cierra con su ritmo.
+ */
+export const productBasicsAvailabilityVariants = cva([
+    "border border-neutral-200 bg-white",
+    RADIUS_SEMANTIC.surface,
+    SPACING_CLASS.paddingX.lg,
+    SPACING_CLASS.paddingY.md,
+]);

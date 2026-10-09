@@ -42,7 +42,7 @@ const pricingMessages = messages.products.create.pricing;
  * backend y no de los campos: son las que se van a guardar.
  */
 export default function PricingSummary({ pricing, className }: PricingSummaryProps) {
-    const { cost, price, profitability, isCalculating, isBelowCost } = pricing;
+    const { cost, price, profitability, isCalculating, isOutdated, isBelowCost } = pricing;
 
     const grossProfit = profitability?.grossProfit ?? null;
     const margin = profitability?.margin ?? null;
@@ -79,11 +79,12 @@ export default function PricingSummary({ pricing, className }: PricingSummaryPro
                         {pricingMessages.total.pendingBreakdown}
                     </p>
                 ) : (
-                    // Mientras llega el cálculo nuevo, el anterior se queda pero
-                    // atenuado, para que no se lea como el definitivo.
+                    // Mientras falta salir del campo o llega el cálculo nuevo, el
+                    // anterior se queda pero atenuado, para que no se lea como el
+                    // definitivo.
                     <dl
-                        aria-busy={isCalculating}
-                        className={pricingRowsVariants({ stale: isCalculating })}
+                        aria-busy={isOutdated}
+                        className={pricingRowsVariants({ stale: isOutdated })}
                     >
                         <div className={pricingRowVariants()}>
                             <dt className={pricingRowTextVariants()}>

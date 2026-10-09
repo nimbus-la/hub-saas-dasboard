@@ -13,8 +13,10 @@
 import * as React from "react";
 import { useWatch, type UseFormReturn } from "react-hook-form";
 
+import { useDebouncedValue } from "@/hooks";
+
 import type { ProductFormValues, ProfitabilityInput } from "../interfaces";
-import { PRICING_VALIDATION, hasCost } from "../libs";
+import { PRICE_CALCULATION_DEBOUNCE_MS, PRICING_VALIDATION, hasCost } from "../libs";
 import { useProfitability } from "./use-profitability";
 
 
@@ -24,6 +26,18 @@ import { useProfitability } from "./use-profitability";
  * ninguno, que es como arranca la edición.
  */
 type PriceDriver = "price" | "margin";
+
+
+/**
+ * Los números con los que se calcula: los que había cuando la persona dejó de
+ * escribir o salió del campo. Lo que todavía se está escribiendo no entra.
+ */
+interface CommittedPricing {
+    cost: number | null;
+    price: number | null;
+    margin: number | null;
+    driver: PriceDriver | null;
+}
 
 
 const isValidMargin = (margin: number): boolean =>
@@ -37,12 +51,12 @@ const isValidMargin = (margin: number): boolean =>
  * Sin un campo que mande se pide con el precio: así la edición muestra el
  * resumen del producto guardado sin cambiar ningún campo.
  */
-function buildProfitabilityInput(
-    cost: number | null,
-    price: number | null,
-    margin: number | null,
-    driver: PriceDriver | null
-): ProfitabilityInput | null {
+function buildProfitabilityInput({
+    cost,
+    price,
+    margin,
+    driver,
+}: CommittedPricing): ProfitabilityInput | null {
     if (cost === null || !hasCost(cost)) return null;
 
     if (driver === "margin") {
@@ -65,26 +79,66 @@ export function useProductPrice({
 
     const [driver, setDriver] = React.useState<PriceDriver | null>(null);
 
-    const input = buildProfitabilityInput(cost, price, margin, driver);
+    // Lo escrito se manda a calcular cuando la persona deja de teclear un rato
+    // o cuando sale del campo, lo que pase primero. El retraso usa el hook
+    // general pero más largo que en un buscador (ver
+    // `PRICE_CALCULATION_DEBOUNCE_MS`). Salir del campo no espera: es la señal
+    // de que el número ya está completo.
+    //
+    // Lo que se retrasa es su forma en texto y no el objeto, que es nuevo en
+    // cada render y reiniciaría la espera sin fin.
+    const currentKey = JSON.stringify({ cost, price, margin, driver } satisfies CommittedPricing);
+    const debouncedKey = useDebouncedValue(currentKey, PRICE_CALCULATION_DEBOUNCE_MS);
+    const [blurredKey, setBlurredKey] = React.useState<string | null>(null);
+
+    // Si lo último que se hizo fue salir del campo, eso manda; si se siguió
+    // escribiendo después, vuelve a mandar la espera. Al abrir el formulario
+    // el retraso arranca con lo que trae, así la edición muestra su resumen
+    // sin que nadie toque nada.
+    const committedKey = blurredKey === currentKey ? currentKey : debouncedKey;
+
+    const committed = React.useMemo(
+        () => JSON.parse(committedKey) as CommittedPricing,
+        [committedKey]
+    );
+
+    const input = buildProfitabilityInput(committed);
 
     const { profitability, isCalculating, errorMessage } = useProfitability(input);
 
-    // Cuando llega la respuesta a lo último que se escribió, se rellena el
-    // campo que no manda. Solo con la respuesta ya al día: mientras tanto el
-    // cálculo en pantalla es el anterior, y escribirlo pisaría lo nuevo.
+    // Hay algo escrito que todavía no se mandó a calcular: otro costo, otro
+    // campo al mando o un cambio en el que manda. El campo que rellena el
+    // backend no cuenta, porque ese cambio lo hizo el propio cálculo.
+    const isUncommitted =
+        cost !== committed.cost ||
+        driver !== committed.driver ||
+        (driver === "price" && price !== committed.price) ||
+        (driver === "margin" && margin !== committed.margin);
+
+    /**
+     * Manda a calcular lo escrito sin esperar al retraso. Va en el `onBlur`
+     * de los tres campos: salir del campo es la señal de que el número ya
+     * está completo, y hacer esperar ahí solo demoraría el guardado.
+     */
+    const commit = React.useCallback(() => setBlurredKey(currentKey), [currentKey]);
+
+    // Cuando llega la respuesta, se rellena el campo que no manda. Solo si no
+    // hay nada nuevo a medio escribir: la respuesta es de lo que se mandó, y
+    // escribirla encima de lo que se está tecleando lo pisaría.
     //
     // No se retroalimenta: rellenar el precio no cambia lo que se pregunta
     // cuando manda el margen, y al revés tampoco.
     React.useEffect(() => {
-        if (isCalculating || !profitability || !driver) return;
+        if (isCalculating || errorMessage || isUncommitted) return;
+        if (!profitability || !committed.driver) return;
 
-        const field = driver === "margin" ? "price" : "margin";
-        const value = driver === "margin" ? profitability.price : profitability.margin;
+        const field = committed.driver === "margin" ? "price" : "margin";
+        const value = committed.driver === "margin" ? profitability.price : profitability.margin;
 
         if (value === null || value === getValues(field)) return;
 
         setValue(field, value, { shouldValidate: true, shouldDirty: true });
-    }, [driver, getValues, isCalculating, profitability, setValue]);
+    }, [committed.driver, errorMessage, getValues, isCalculating, isUncommitted, profitability, setValue]);
 
     // El campo avisa de sus cambios también cuando el valor le llega por
     // props, así que al rellenar el de al lado el aviso vuelve como si alguien
@@ -139,15 +193,19 @@ export function useProductPrice({
         price,
         margin,
 
-        /** El cálculo del backend para lo que hay escrito, o el último que respondió. */
+        /** El cálculo del backend para lo último que se mandó, o `null` si no hay. */
         profitability,
 
-        /**
-         * Si falta que el backend responda al último cambio. Mientras tanto el
-         * campo que no manda todavía tiene el valor viejo, y guardar mandaría
-         * tres números que no cuadran.
-         */
+        /** Si el backend está respondiendo. Es lo que enciende el "Calculando…". */
         isCalculating,
+
+        /**
+         * Si el resumen no corresponde a lo que hay escrito: falta que pase la
+         * espera (o salir del campo) o falta la respuesta. Mientras tanto
+         * precio y margen pueden no cuadrar, y guardar mandaría números que el
+         * backend rechaza.
+         */
+        isOutdated: isUncommitted || isCalculating,
 
         /** El mensaje del backend si el cálculo falló. */
         errorMessage,
@@ -161,6 +219,9 @@ export function useProductPrice({
         onCostChange: handleCostChange,
         onMarginChange: handleMarginChange,
         onPriceChange: handlePriceChange,
+
+        /** Para el `onBlur` de los tres campos: calcula sin esperar. */
+        onCommit: commit,
     };
 }
 

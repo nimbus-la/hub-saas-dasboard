@@ -32,6 +32,18 @@ export const PRICING_VALIDATION = {
 } as const;
 
 
+/**
+ * Cuánto se espera sin teclear antes de pedir el cálculo del precio.
+ *
+ * El doble del retraso general (`DEFAULT_DEBOUNCE_MS`). Ese está pensado para
+ * un buscador, donde pedir de más solo cuesta una lista; aquí un número a
+ * medias —un 8 camino de 8.000— cambia el precio de al lado, y quien escribe
+ * una cifra suele hacer pausas para mirar el teclado. Al salir del campo no se
+ * espera nada.
+ */
+export const PRICE_CALCULATION_DEBOUNCE_MS = 800;
+
+
 const message = messages.products.create.pricing.validation;
 
 

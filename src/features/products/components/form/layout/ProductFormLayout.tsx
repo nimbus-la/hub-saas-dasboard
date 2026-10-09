@@ -14,7 +14,7 @@ import { messages } from "@/messages";
 import { useProductForm } from "../../../hooks/use-product-form";
 import { useProductPrice } from "../../../hooks/use-product-price";
 import type { ProductFormLayoutProps } from "../../../interfaces";
-import { BASICS_STEP, PRICING_STEP, PRODUCTS_LIST_HREF } from "../../../libs";
+import { BASICS_STEP, PRODUCTS_LIST_HREF } from "../../../libs";
 import { ProductBasicsStep } from "../basics";
 import { ProductPricingStep } from "../pricing";
 // El paso de la receta y el indicador de pasos vuelven con las recetas.
@@ -53,16 +53,17 @@ import {
 export default function ProductFormLayout({
     formMessages,
     currentCategory,
+    showAvailability = false,
     ...options
 }: ProductFormLayoutProps) {
     const { form, canSubmit, submit } = useProductForm(options);
 
     // Va aquí y no dentro del bloque de precio porque, además de pintarse
-    // allí, decide si se puede guardar: mientras el backend no responda al
-    // último cambio, o si no pudo calcular, precio y margen no cuadran y el
-    // alta los rechazaría.
+    // allí, decide si se puede guardar: mientras haya un número sin calcular
+    // o el backend no haya respondido, o si no pudo calcular, precio y margen
+    // no cuadran y el alta los rechazaría.
     const pricing = useProductPrice(form);
-    const isPricingSettled = !pricing.isCalculating && !pricing.errorMessage;
+    const isPricingSettled = !pricing.isOutdated && !pricing.errorMessage;
 
     const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
         if (!isPricingSettled) {
@@ -72,6 +73,13 @@ export default function ProductFormLayout({
 
         void submit(event);
     };
+
+    // La disponibilidad vive en la tarjeta de datos básicos y solo al editar,
+    // así que su pista la menciona solo entonces. La del precio ya no la trae.
+    const basicsHint = showAvailability
+        ? messages.products.edit.basicsHint
+        : BASICS_STEP.subtitle;
+    const pricingSection = messages.products.create.priceSection;
 
     const basicsTitleId = React.useId();
     const pricingTitleId = React.useId();
@@ -104,12 +112,15 @@ export default function ProductFormLayout({
                                     {BASICS_STEP.title}
                                 </h2>
                                 <p className={productFormSectionHintVariants()}>
-                                    {BASICS_STEP.subtitle}
+                                    {basicsHint}
                                 </p>
                             </header>
 
                             <div className={productFormSectionBodyVariants()}>
-                                <ProductBasicsStep currentCategory={currentCategory} />
+                                <ProductBasicsStep
+                                    currentCategory={currentCategory}
+                                    showAvailability={showAvailability}
+                                />
                             </div>
                         </section>
 
@@ -119,10 +130,10 @@ export default function ProductFormLayout({
                         >
                             <header className={productFormSectionHeaderVariants()}>
                                 <h2 id={pricingTitleId} className={productFormSectionTitleVariants()}>
-                                    {PRICING_STEP.title}
+                                    {pricingSection.title}
                                 </h2>
                                 <p className={productFormSectionHintVariants()}>
-                                    {PRICING_STEP.subtitle}
+                                    {pricingSection.hint}
                                 </p>
                             </header>
 

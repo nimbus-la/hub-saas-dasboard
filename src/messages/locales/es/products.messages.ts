@@ -229,6 +229,12 @@ export const products = {
             },
         },
 
+        /** La tarjeta del precio. La disponibilidad va con los datos básicos. */
+        priceSection: {
+            title: "Precio",
+            hint: "Costo de preparación, precio de venta y margen",
+        },
+
         /* ── Paso 1: datos básicos ──────────────────────────────────────── */
 
         basics: {
@@ -496,8 +502,8 @@ export const products = {
 
             availability: {
                 label: "Disponible en la carta",
-                on: "Se publica en la carta al guardar el producto.",
-                off: "Se guarda, pero no se vende hasta que lo actives.",
+                on: "Está a la venta en la carta.",
+                off: "No aparece en la carta hasta que lo actives.",
             },
 
             /* ── Configuración por sucursal ─────────────────────────────── */
@@ -628,6 +634,9 @@ export const products = {
         backLabel: "Volver a la lista de productos",
 
         submit: "Guardar cambios",
+
+        /** Pista de los datos básicos al editar, que incluyen la disponibilidad. */
+        basicsHint: "Nombre, categoría, imagen y disponibilidad",
     },
 
 
