@@ -6,8 +6,11 @@ import type { ProductApiStatus } from "./product-list.interfaces";
  * Cuerpo de la edición de un producto.
  *
  * Es parcial: además del id solo viaja lo que cambió, y lo que no se envía se
- * queda como estaba. La receta es la excepción, porque si se manda reemplaza
- * entera a la anterior.
+ * queda como estaba.
+ *
+ * Precio, costo y margen son la excepción: si cambia uno, el backend completa
+ * los otros con lo guardado y exige que los tres cuadren. Por eso viajan
+ * juntos, salidos del mismo cálculo.
  *
  * `status` solo se envía para activar o desactivar de verdad. Mandarlo
  * con el mismo valor que ya tiene el producto hace que el backend rechace toda

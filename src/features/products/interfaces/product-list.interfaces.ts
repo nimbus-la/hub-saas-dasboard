@@ -5,52 +5,82 @@ import type { CreateProductParams } from "./product-create.interfaces";
 import type { DeleteProductParams, UpdateProductParams } from "./product-update.interfaces";
 
 
-/**
- * Un insumo de la receta tal como llega dentro del producto. Las cantidades y
- * los costos vienen como texto decimal.
- */
-export interface ProductIngredientApiResponse {
-    id: string;
-    inventoryItemId: string;
-    name: string;
-    quantity: string;
-    unitOfMeasure: string;
-    unitCostAmount: string;
-    lineCostAmount: string;
-    isOptional: boolean;
-
-    /** Indica si hay existencias para preparar el producto. */
-    hasStock: boolean;
-}
+// El backend sacó las recetas del producto y con ellas se fueron los insumos de
+// la respuesta. Se deja la forma anterior comentada porque las recetas van a
+// volver, y entonces el producto traerá otra vez sus insumos con existencias.
+//
+// /**
+//  * Un insumo de la receta tal como llega dentro del producto. Las cantidades y
+//  * los costos vienen como texto decimal.
+//  */
+// export interface ProductIngredientApiResponse {
+//     id: string;
+//     inventoryItemId: string;
+//     name: string;
+//     quantity: string;
+//     unitOfMeasure: string;
+//     unitCostAmount: string;
+//     lineCostAmount: string;
+//     isOptional: boolean;
+//
+//     /** Indica si hay existencias para preparar el producto. */
+//     hasStock: boolean;
+// }
+//
+// /** Producto con receta, como lo enviaba el backend antes de quitarlas. */
+// export interface ProductApiResponse {
+//     id: string;
+//     tenantId: string;
+//     productCategoryId: string;
+//     nameProductCategory: string;
+//     productName: string;
+//     productDescription: string | null;
+//     productSku: string;
+//     productBasePrice: string;
+//     costCurrency: string;
+//     profitMargin: string;
+//     status: ProductApiStatus;
+//     ingredients: ProductIngredientApiResponse[];
+//     createdAt: string;
+//     updatedAt: string;
+// }
 
 
 /**
  * Estado del producto como lo escribe el backend. Solo dice si está en la
- * carta; que se pueda preparar o no lo decide el stock de la receta.
+ * carta.
  */
 export type ProductApiStatus = "ACTIVE" | "INACTIVE";
 
 
-/** Producto tal como lo envía el backend. */
+/**
+ * Producto tal como lo envía el backend. Los montos llegan como texto decimal,
+ * por ejemplo `"4500.00"`.
+ */
 export interface ProductApiResponse {
     id: string;
-    tenantId: string;
-    productCategoryId: string;
-    nameProductCategory: string;
-    productName: string;
+    sku: string;
+    name: string;
+    categoryId: string;
+    /** Solo la trae el listado; un producto recién creado puede llegar sin ella. */
+    categoryName?: string;
     /** Es opcional al crear, así que puede llegar vacía. */
-    productDescription: string | null;
-    productSku: string;
+    description: string | null;
+    imageUrl?: string | null;
 
-    /** Precio de venta en texto decimal, por ejemplo `"9000.00"`. */
-    productBasePrice: string;
-    costCurrency: string;
-    profitMargin: string;
+    /** Precio de venta. */
+    price: string;
+    /** Lo que cuesta preparar una porción. Lo escribe la persona, no sale de una receta. */
+    cost: string;
+    currency: string;
+    /**
+     * Parte del precio que es ganancia, de 0 a menos de 100. Es sobre el
+     * precio, no sobre el costo: con costo 4.000 y precio 10.000 da `"60.00"`.
+     */
+    targetMargin: string;
 
     /** En `INACTIVE` el producto se retiró de la carta. */
     status: ProductApiStatus;
-
-    ingredients: ProductIngredientApiResponse[];
 
     /** Fechas en formato ISO 8601. */
     createdAt: string;
@@ -64,7 +94,7 @@ export interface ProductApiResponse {
  */
 export interface ProductFilters {
     text?: string;
-    productCategoryId?: string;
+    categoryId?: string;
 }
 
 
@@ -90,17 +120,17 @@ export interface ProductsService {
         config?: HttpRequestConfig
     ): Promise<ProductApiResponse | null>;
 
-    /** Crea un producto con su receta. El backend responde sin datos. */
+    /** Crea un producto y devuelve cómo quedó guardado. */
     create(
         payload: CreateProductParams,
         config?: HttpRequestConfig
-    ): Promise<ApiEnvelope<null>>;
+    ): Promise<ApiEnvelope<ProductApiResponse>>;
 
-    /** Cambia solo lo que venga en el cuerpo y devuelve el producto como quedó. */
+    /** Cambia solo lo que venga en el cuerpo. El backend responde sin datos. */
     update(
         payload: UpdateProductParams,
         config?: HttpRequestConfig
-    ): Promise<ApiEnvelope<ProductApiResponse>>;
+    ): Promise<ApiEnvelope<null>>;
 
     /** Elimina el producto. El backend responde sin datos. */
     delete(

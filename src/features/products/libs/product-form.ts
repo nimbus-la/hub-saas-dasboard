@@ -46,6 +46,7 @@ export const DEFAULT_PRODUCT_FORM_VALUES: ProductFormValues = {
     categoryId: "",
     description: "",
     imageUrl: null,
+    cost: null,
     margin: null,
     price: null,
     isAvailable: true,

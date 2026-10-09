@@ -1,12 +1,15 @@
-/**
- * Una línea de la receta tal como la espera el backend. La cantidad viaja
- * como texto decimal, igual que la devuelve en el listado.
- */
-export interface CreateProductRecipeLineParams {
-    inventoryItemId: string;
-    quantity: string;
-    isOptional: boolean;
-}
+// La receta dejó de viajar en el alta: el backend la quitó y rechaza con 400
+// cualquier campo que no declare. Se deja comentada para cuando vuelva.
+//
+// /**
+//  * Una línea de la receta tal como la espera el backend. La cantidad viaja
+//  * como texto decimal, igual que la devuelve en el listado.
+//  */
+// export interface CreateProductRecipeLineParams {
+//     inventoryItemId: string;
+//     quantity: string;
+//     isOptional: boolean;
+// }
 
 
 /**
@@ -16,22 +19,29 @@ export interface CreateProductRecipeLineParams {
  * existen en el formulario pero el backend todavía no las recibe, así que
  * mandarlas es un error de compilación y no un campo que se ignora en
  * silencio.
+ *
+ * Precio, costo y margen tienen que cuadrar: el backend rechaza el alta si el
+ * precio no deja ese margen sobre el costo. Por eso los tres salen del mismo
+ * cálculo de `products/profitability`.
  */
 export interface CreateProductParams {
-    productCategoryId: string;
-    productName: string;
+    categoryId: string;
+    name: string;
 
     /** No se envía si está vacía. */
-    productDescription?: string;
+    description?: string;
 
     /** No se envía mientras no exista la subida de archivos. */
-    productImgUrl?: string;
+    imageUrl?: string;
 
     /** Precio de venta en texto decimal, por ejemplo `"9000"`. */
-    productBasePrice: string;
+    price: string;
 
-    /** Margen sobre el costo de la receta, en porcentaje. */
-    profitMargin: number;
+    /** Costo de preparar una porción, en texto decimal. */
+    cost: string;
 
-    recipe: CreateProductRecipeLineParams[];
+    /** Parte del precio que es ganancia, de 0 a menos de 100. */
+    targetMargin: number;
+
+    // recipe: CreateProductRecipeLineParams[];
 }

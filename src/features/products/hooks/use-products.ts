@@ -43,7 +43,7 @@ export function useProducts() {
 
     const filters: ProductFilters = {
         ...(searchText ? { text: searchText } : {}),
-        ...(categoryId !== ALL_CATEGORIES ? { productCategoryId: categoryId } : {}),
+        ...(categoryId !== ALL_CATEGORIES ? { categoryId } : {}),
     };
 
     // Cambiar un filtro cambia la clave, así que la lista vuelve sola a la

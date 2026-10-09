@@ -46,7 +46,7 @@ function EditProductForm({ product }: { product: ProductApiResponse }) {
             formMessages={{
                 ...messages.products.edit,
                 subtitle: formatMessage(messages.products.edit.subtitle, {
-                    name: product.productName,
+                    name: product.name,
                 }),
             }}
             defaultValues={initialValues}
@@ -54,8 +54,8 @@ function EditProductForm({ product }: { product: ProductApiResponse }) {
             isSaving={updateProduct.isPending}
             requireChanges
             currentCategory={{
-                value: product.productCategoryId,
-                label: product.nameProductCategory,
+                value: product.categoryId,
+                label: product.categoryName ?? "",
             }}
         />
     );

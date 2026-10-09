@@ -42,7 +42,7 @@ export const products = {
         },
         edit: {
             title: "Editar producto · Vorea",
-            description: "Cambia los datos, la receta o el precio de un producto de la carta.",
+            description: "Cambia los datos o el precio de un producto de la carta.",
         },
         categories: {
             title: "Categorías · Vorea",

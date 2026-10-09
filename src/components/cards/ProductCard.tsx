@@ -1,4 +1,5 @@
-import { ListChecks, Pencil, Trash2, TriangleAlert } from "lucide-react";
+// `ListChecks` vuelve con el recuento de insumos.
+import { /* ListChecks, */ Pencil, Trash2, TriangleAlert } from "lucide-react";
 
 import StatusBadge from "@/components/badges/StatusBadge";
 import ProductThumbnail from "@/components/cards/ProductThumbnail";
@@ -7,12 +8,12 @@ import { formatCurrency } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { formatMessage, messages } from "@/messages";
 import {
-    formatIngredients,
+    // formatIngredients,
     isProductUnavailable,
     PRODUCT_STATUS_TONES,
 } from "@/lib/products";
 import type { ProductCardProps } from "@/interfaces";
-import { ICON_SIZE, ICON_STROKE, ICON_STROKE_BY_SIZE } from "@/tokens";
+import { ICON_SIZE, ICON_STROKE /* , ICON_STROKE_BY_SIZE */ } from "@/tokens";
 
 import {
     productCardActionsVariants,
@@ -22,7 +23,7 @@ import {
     productCardBadgeVariants,
     productCardBodyVariants,
     productCardCategoryVariants,
-    productCardIngredientsVariants,
+    // productCardIngredientsVariants,
     productCardMediaVariants,
     productCardMetaVariants,
     productCardNameVariants,
@@ -37,7 +38,7 @@ export default function ProductCard({
     onDelete,
     className,
 }: ProductCardProps) {
-    // Inactivo o sin insumos: la tarjeta se apaga para que la fila se lea de un
+    // Inactivo (o sin insumos, cuando vuelvan las recetas): la tarjeta se apaga para que la fila se lea de un
     // vistazo. El apagado es deliberadamente tenue —lo hace la escala de grises
     // de la miniatura, no un gris oscuro de fondo—: un producto inactivo sigue
     // siendo editable y no debe leerse como deshabilitado.
@@ -89,7 +90,9 @@ export default function ProductCard({
                 </h3>
 
                 <div className={productCardMetaVariants()}>
-                    <span className={productCardIngredientsVariants()}>
+                    {/* El backend dejó de mandar la receta, así que no hay
+                        insumos que contar. Vuelve con las recetas. */}
+                    {/* <span className={productCardIngredientsVariants()}>
                         <ListChecks
                             size={ICON_SIZE.sm}
                             strokeWidth={ICON_STROKE_BY_SIZE.sm}
@@ -99,7 +102,7 @@ export default function ProductCard({
                         <span className="truncate tabular-nums">
                             {formatIngredients(product.ingredientsCount)}
                         </span>
-                    </span>
+                    </span> */}
 
                     <span className={productCardPriceVariants()}>
                         <span className="sr-only">
