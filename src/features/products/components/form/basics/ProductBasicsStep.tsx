@@ -48,7 +48,7 @@ export default function ProductBasicsStep({
     return (
         // El `fieldset` agrupa los campos del paso y la leyenda le pone nombre
         // al grupo para quien navega con lector de pantalla. No se ve porque en
-        // pantalla ese nombre ya lo da el indicador de la cabecera.
+        // pantalla ese nombre ya lo da el título de la tarjeta.
         <fieldset className={cn(productBasicsStepVariants(), className)}>
             <legend className="sr-only">{stepMessaages.legend}</legend>
 

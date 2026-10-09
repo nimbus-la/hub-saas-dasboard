@@ -130,7 +130,7 @@ export const products = {
     list: {
         title: "Productos",
         description:
-            "Gestiona la carta de tus sucursales y avisa al equipo cuando falte un insumo.",
+            "Gestiona la carta de tus sucursales: precios, costos y disponibilidad de cada producto.",
         createProduct: "Crear producto",
 
         searchPlaceholder: "Buscar por nombre o SKU",
@@ -196,7 +196,7 @@ export const products = {
     create: {
         title: "Nuevo producto",
         subtitle:
-            "Completa los 3 pasos para publicar el producto. Nada se publicará hasta el último paso.",
+            "Completa los datos y el precio del producto. No se publicará hasta que lo guardes.",
         backLabel: "Volver a la lista de productos",
 
         submit: "Guardar producto",
@@ -221,7 +221,7 @@ export const products = {
             },
             pricing: {
                 label: "Precio y disponibilidad",
-                hint: "Precio de venta y estado en la carta",
+                hint: "Costo, precio de venta, margen y estado en la carta",
             },
             recipe: {
                 label: "Receta e insumos",
@@ -624,7 +624,7 @@ export const products = {
         title: "Editar producto",
         /** Nombra el producto para que quede claro cuál se está cambiando. */
         subtitle:
-            "Cambia los datos de «{name}». Nada se guardará hasta el último paso.",
+            "Cambia los datos o el precio de «{name}». Los cambios se aplican al guardar.",
         backLabel: "Volver a la lista de productos",
 
         submit: "Guardar cambios",

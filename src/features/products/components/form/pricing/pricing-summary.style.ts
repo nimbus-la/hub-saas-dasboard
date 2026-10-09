@@ -112,8 +112,11 @@ export const pricingRowHintVariants = cva([TYPOGRAPHY.caption], {
 /**
  * Las cifras. Van en ancho fijo porque cambian con cada tecla y si no, el
  * importe baila de lado mientras se escribe.
+ *
+ * `ms-auto` las deja contra el borde derecho también cuando la fila no cabe y
+ * la cifra baja a su propia línea, que en móvil pasa con casi todas.
  */
-export const pricingAmountVariants = cva(["shrink-0 tabular-nums"], {
+export const pricingAmountVariants = cva(["ms-auto shrink-0 tabular-nums"], {
     variants: {
         tone: {
             neutral: "text-neutral-800",
