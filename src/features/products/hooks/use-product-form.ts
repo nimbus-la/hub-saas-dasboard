@@ -11,7 +11,7 @@
 // formulario.
 
 import * as React from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm, useFormState, useWatch } from "react-hook-form";
 
 import type { ProductFormOptions, ProductFormValues } from "../interfaces";
 import { hasProductChanges } from "../mappers";
@@ -38,10 +38,13 @@ export function useProductForm({
         compute: (values) => !requireChanges || hasProductChanges(values, defaultValues),
     });
 
-    // El botón no se bloquea por errores: con todo en una página, pulsarlo es
-    // la forma de ver qué falta, y el envío lleva el foco al primer campo que
-    // falla. Solo se bloquea cuando pulsarlo no puede hacer nada.
-    const canSubmit = !isSaving && hasChanges;
+    // Con todos los campos en pantalla, `isValid` revisa el formulario entero:
+    // el botón se habilita recién cuando lo obligatorio está lleno y todo pasa
+    // las reglas. Los mensajes siguen saliendo al dejar cada campo.
+    const { isValid } = useFormState({ control: form.control });
+
+    // Además, sin otro guardado en camino y, si se exigen, con cambios.
+    const canSubmit = isValid && !isSaving && hasChanges;
 
     // Marca de "ya hay un envío en curso". Va en un ref y no en estado porque
     // tiene que cambiar en el acto: el botón se bloquea recién cuando React
@@ -98,7 +101,10 @@ export function useProductForm({
     return {
         /** Instancia de react-hook-form: `control`, `formState`, `watch`… */
         form,
-        /** Si el botón de guardar se puede pulsar: sin otro guardado en camino y, si se exigen, con cambios. */
+        /**
+         * Si el botón de guardar se puede pulsar: formulario completo y válido,
+         * sin otro guardado en camino y, si se exigen, con cambios.
+         */
         canSubmit,
         submit,
     };

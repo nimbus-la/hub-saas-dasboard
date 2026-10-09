@@ -146,10 +146,10 @@ export default function ProductFormLayout({
                             </Link>
 
                             {/* El único botón principal de la pantalla. Cuándo se
-                            puede pulsar lo deciden `useProductForm` —sin otro
-                            guardado en camino y, al editar, con algo que haya
-                            cambiado— y el cálculo del precio, que tiene que
-                            estar al día. */}
+                            puede pulsar lo deciden `useProductForm` —todo lo
+                            obligatorio lleno y válido, sin otro guardado en
+                            camino y, al editar, con algo que haya cambiado— y
+                            el cálculo del precio, que tiene que estar al día. */}
                             <GenericButton
                                 type="submit"
                                 variant="primary"

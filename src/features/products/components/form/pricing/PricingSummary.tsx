@@ -32,8 +32,10 @@ const pricingMessages = messages.products.create.pricing;
 
 /**
  * Cómo se compone el precio: lo que cuesta preparar el producto, lo que deja
- * cada unidad y, cerrando la cuenta, lo que paga el cliente. En medio, los dos
- * porcentajes que el backend calcula junto con el margen.
+ * cada unidad y, cerrando la cuenta, lo que paga el cliente.
+ *
+ * Por ahora solo se muestran costo, ganancia y precio; los dos porcentajes
+ * quedaron comentados.
  *
  * Es una lista de definición y no una tabla porque cada fila es un concepto
  * con su valor, no la celda de una rejilla. Las cifras salen del cálculo del
@@ -127,6 +129,9 @@ export default function PricingSummary({ pricing, className }: PricingSummaryPro
                             )}
                         </div>
 
+                        {/* Costo sobre el precio y recargo sobre el costo: el backend ya
+                        los calcula, pero por ahora no se muestran. Para volver a
+                        mostrarlos basta con quitar este comentario.
                         {profitability.foodCost !== null && (
                             <div className={pricingRowVariants()}>
                                 <dt className={pricingRowTextVariants()}>
@@ -160,6 +165,7 @@ export default function PricingSummary({ pricing, className }: PricingSummaryPro
                                 </dd>
                             </div>
                         )}
+                        */}
 
                         {/* El total. No se anuncia con cada cambio porque el
                             lector de pantalla leería un importe nuevo con cada
